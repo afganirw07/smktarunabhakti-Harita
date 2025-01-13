@@ -1,3 +1,7 @@
+import { ApexOptions } from 'apexcharts';
+
+type ApexGeneric = ApexOptions & any;
+
 export const barChartDataDailyTraffic = [
   {
     name: 'Daily Traffic',
@@ -5,7 +9,7 @@ export const barChartDataDailyTraffic = [
   },
 ];
 
-export const barChartOptionsDailyTraffic = {
+export const barChartOptionsDailyTraffic: ApexGeneric = {
   chart: {
     toolbar: {
       show: false,
@@ -15,7 +19,6 @@ export const barChartOptionsDailyTraffic = {
     style: {
       fontSize: '12px',
       fontFamily: undefined,
-      backgroundColor: '#000000',
     },
     onDatasetHover: {
       style: {
@@ -102,7 +105,7 @@ export const barChartOptionsDailyTraffic = {
   },
 };
 
-export const pieChartOptions = {
+export const pieChartOptions: ApexGeneric = {
   labels: ['Your files', 'System', 'Empty'],
   colors: ['#4318FF', '#6AD2FF', '#EFF4FB'],
   chart: {
@@ -138,11 +141,6 @@ export const pieChartOptions = {
   tooltip: {
     enabled: true,
     theme: 'dark',
-    style: {
-      fontSize: '12px',
-      fontFamily: undefined,
-      backgroundColor: '#000000',
-    },
   },
 };
 
