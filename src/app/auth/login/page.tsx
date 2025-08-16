@@ -6,7 +6,6 @@ import { Leaf } from "lucide-react";
 export default function Login() {
   return (
     <>
-      {/* ✅ h-screen agar fix setinggi layar */}
       <div className="h-screen bg-gray-100 flex justify-center">
         <div className="max-w-screen-xl m-0 sm:m-6 bg-white shadow sm:rounded-lg flex justify-center flex-1">
           
@@ -90,10 +89,15 @@ export default function Login() {
                   </div>
                 </div>
 
+                <div className="flex flex-col gap-1.5">
                 {/* Login Button */}
                 <button className="mt-6 tracking-wide font-semibold text-white w-full py-3 rounded-lg hover:opacity-90 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none" style={{backgroundColor: '#294B29'}}>
                   <span className="ml-2 text-sm">Masuk</span>
                 </button>
+                <div className="block lg:hidden text-sm ">Belum punya akun? <Link href={"/auth/register"}><span className="font-bold text-green-700 hover:text-green-500 transition-colors duration-150 ease-out">daftar</span>  
+                </Link>
+                </div>
+                </div>
 
                 {/* Divider */}
                 <div className="my-4 border-b text-center">
