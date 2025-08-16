@@ -55,21 +55,14 @@ export default function Register() {
                 </div>
 
                 {/* Sign Up Button */}
+                <div className="flex flex-col gap-1.5">
                 <button className="mt-5 tracking-wide font-semibold text-white w-full py-3 rounded-lg hover:opacity-90 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none" style={{backgroundColor: '#294B29'}}>
-                  <svg
-                    className="w-4 h-4 -ml-2"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                    <circle cx="8.5" cy="7" r="4" />
-                    <path d="M20 8v6M23 11h-6" />
-                  </svg>
                   <span className="ml-2 text-sm">Daftar</span>
                 </button>
+                <div className="block lg:hidden text-sm ">Belum punya akun? <Link href={"/auth/login"}><span className="font-bold text-green-700 hover:text-green-500 transition-colors duration-150 ease-out">daftar</span>  
+                </Link>
+                </div>
+                </div>
 
                 {/* Divider */}
                 <div className="my-4 border-b text-center">
