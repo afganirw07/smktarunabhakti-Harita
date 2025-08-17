@@ -27,7 +27,7 @@ const PieChartCard = () => {
       <div className="flex flex-row !justify-between rounded-2xl px-6 py-3 shadow-2xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
         <div className="flex flex-col items-center justify-center">
           <div className="flex items-center justify-center">
-            <div className="h-2 w-2 rounded-full bg-brand-500" />
+            <div className="h-2 w-2 rounded-full bg-[#294B29]" />
             <p className="ml-1 text-sm font-normal text-gray-600">Your Files</p>
           </div>
           <p className="mt-px text-xl font-bold text-navy-700  dark:text-white">
@@ -39,7 +39,7 @@ const PieChartCard = () => {
 
         <div className="flex flex-col items-center justify-center">
           <div className="flex items-center justify-center">
-            <div className="h-2 w-2 rounded-full bg-[#6AD2FF]" />
+            <div className="h-2 w-2 rounded-full bg-[#86A789]" />
             <p className="ml-1 text-sm font-normal text-gray-600">System</p>
           </div>
           <p className="mt-px text-xl font-bold text-navy-700 dark:text-white">
