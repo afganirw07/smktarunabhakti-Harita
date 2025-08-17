@@ -164,24 +164,7 @@ const Navbar = (props: {
             </a>
           </div>
         </Dropdown>
-        <div
-          className="cursor-pointer text-gray-600"
-          onClick={() => {
-            if (darkmode) {
-              document.body.classList.remove('dark');
-              setDarkmode(false);
-            } else {
-              document.body.classList.add('dark');
-              setDarkmode(true);
-            }
-          }}
-        >
-          {darkmode ? (
-            <RiSunFill className="h-4 w-4 text-gray-600 dark:text-white" />
-          ) : (
-            <RiMoonFill className="h-4 w-4 text-gray-600 dark:text-white" />
-          )}
-        </div>
+      
         {/* Profile & Dropdown */}
         <Dropdown
           button={
