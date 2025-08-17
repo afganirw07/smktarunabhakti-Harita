@@ -36,13 +36,13 @@ const NftCard = (props: {
           />
           <button
             onClick={() => setHeart(!heart)}
-            className="absolute right-3 top-3 flex items-center justify-center rounded-full bg-white p-2 text-brand-500 hover:cursor-pointer"
+            className="absolute right-3 top-3 flex items-center justify-center rounded-full bg-white p-2 text-white hover:cursor-pointer"
           >
             <div className="flex h-full w-full items-center justify-center rounded-full text-xl hover:bg-gray-50 dark:text-navy-900">
               {heart ? (
                 <IoHeartOutline />
               ) : (
-                <IoHeart className="text-brand-500" />
+                <IoHeart className="text-white" />
               )}
             </div>
           </button>
@@ -82,7 +82,7 @@ const NftCard = (props: {
 
         <div className="flex items-center justify-between md:flex-col md:items-start lg:flex-row lg:justify-between xl:flex-col 2xl:items-start 3xl:flex-row 3xl:items-center 3xl:justify-between">
           <div className="flex">
-            <p className="mb-2 text-sm font-bold text-brand-500 dark:text-white">
+            <p className="mb-2 text-sm font-bold text-white dark:text-white">
               Current Bid: {price} <span>ETH</span>
             </p>
           </div>

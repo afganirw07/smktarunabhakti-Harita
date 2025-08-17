@@ -10,7 +10,7 @@ const Widget = (props: {
     <Card extra="!flex-row flex-grow items-center rounded-[20px]">
       <div className="me-4 flex h-[90px] w-auto flex-row items-center">
         <div className="rounded-full bg-lightPrimary p-3 dark:bg-navy-700">
-          <span className="flex items-center text-brand-500 dark:text-white">
+          <span className="flex items-center text-white dark:text-white">
             {icon}
           </span>
         </div>

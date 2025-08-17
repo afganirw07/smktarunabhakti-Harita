@@ -34,7 +34,7 @@ export const barChartOptionsDailyTraffic: ApexGeneric = {
     labels: {
       show: true,
       style: {
-        colors: '#A3AED0',
+        colors: '#294B29',
         fontSize: '14px',
         fontWeight: '500',
       },
@@ -52,7 +52,7 @@ export const barChartOptionsDailyTraffic: ApexGeneric = {
     labels: {
       show: true,
       style: {
-        colors: '#CBD5E0',
+        colors: '#294B29',
         fontSize: '14px',
       },
     },
@@ -82,12 +82,12 @@ export const barChartOptionsDailyTraffic: ApexGeneric = {
         [
           {
             offset: 0,
-            color: '#4318FF',
+            color: '#294B29',
             opacity: 1,
           },
           {
             offset: 100,
-            color: 'rgba(67, 24, 255, 1)',
+            color: '#294B29',
             opacity: 0.28,
           },
         ],
@@ -107,7 +107,7 @@ export const barChartOptionsDailyTraffic: ApexGeneric = {
 
 export const pieChartOptions: ApexGeneric = {
   labels: ['Your files', 'System', 'Empty'],
-  colors: ['#4318FF', '#6AD2FF', '#EFF4FB'],
+  colors: ['#294B29', '#86A789', '#D2E3C8'],
   chart: {
     width: '50px',
   },
@@ -136,7 +136,7 @@ export const pieChartOptions: ApexGeneric = {
     },
   },
   fill: {
-    colors: ['#4318FF', '#6AD2FF', '#EFF4FB'],
+    colors: ['#294B29', '#86A789', '#D2E3C8'],
   },
   tooltip: {
     enabled: true,
@@ -150,12 +150,12 @@ export const barChartDataWeeklyRevenue = [
   {
     name: 'PRODUCT A',
     data: [400, 370, 330, 390, 320, 350, 360, 320, 380],
-    color: '#6AD2Fa',
+    color: '#294B29',
   },
   {
     name: 'PRODUCT B',
     data: [400, 370, 330, 390, 320, 350, 360, 320, 380],
-    color: '#4318FF',
+    color: '#86A789',
   },
   {
     name: 'PRODUCT C',
@@ -258,12 +258,12 @@ export const lineChartDataTotalSpent = [
   {
     name: 'Revenue',
     data: [50, 64, 48, 66, 49, 68],
-    color: '#4318FF',
+    color: '#294B29',
   },
   {
     name: 'Profit',
     data: [30, 40, 24, 46, 20, 46],
-    color: '#6AD2FF',
+    color: '#86A789',
   },
 ];
 
