@@ -22,6 +22,7 @@
     "apexcharts": "^3.35.2",
     "framer-motion": "^7.10.2",
     "lucide-react": "^0.539.0",
+    "motion": "^12.23.12",
     "next": "^15.1.4",
     "next-transpile-modules": "^9.0.0",
     "react": "^19.0.0-rc.1",

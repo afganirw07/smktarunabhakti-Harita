@@ -114,6 +114,8 @@ module.exports = {
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],
         dm: ['DM Sans', 'sans-serif'],
+        nunito: ['var(--font-nunito)', 'sans-serif'],
+        inter: ['var(--font-inter)', 'sans-serif'],
       },
       boxShadow: {
         '3xl': '14px 17px 40px 4px',
@@ -149,9 +151,12 @@ module.exports = {
     },
     colors: {
       white: '#ffffff',
+      black: '000000',
       lightPrimary: '#F4F7FE',
       blueSecondary: '#4318FF',
       brandLinear: '#868CFF',
+      bgPrimary: '#fdfaf4',
+
       gray: {
         50: '#F5F6FA',
         100: '#EEF0F6',
@@ -416,6 +421,11 @@ module.exports = {
         100: 'var(--shadow-100)',
         500: 'rgba(112, 144, 176, 0.08)',
       },
+
+      opacity:{
+        medium: "opacity-50"
+      }
+
     },
   },
   plugins: [require('tailwindcss-rtl')],
