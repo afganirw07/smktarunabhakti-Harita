@@ -41,7 +41,7 @@ const routes = [
   {
     name: 'Log Out',
     layout: '/admin',
-    path: 'profile',
+    path: 'log-out',
     icon: <MdLogout   className="h-6 w-6" />,
   }
 ];
