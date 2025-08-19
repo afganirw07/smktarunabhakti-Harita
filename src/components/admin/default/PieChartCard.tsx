@@ -3,12 +3,13 @@ import CardMenu from 'components/card/CardMenu';
 import PieChart from 'components/charts/PieChart';
 import Card from 'components/card';
 
-
-export const newPieChartData = [63, 25, 12]; 
+// Asumsi data ini berasal dari file 'variables/charts.js'
+// Anda harus mengubah data ini di file tersebut
+export const newPieChartData = [63, 25, 12]; // Contoh: 63% Organik, 25% Anorganik, 12% B3
 export const newPieChartOptions = {
   labels: ['Organik', 'Anorganik', 'B3'],
   colors: ['#294B29', '#86A789', '#D2E3C8'],
-
+  // Opsi lain
 };
 
 const PieChartCard = () => {
