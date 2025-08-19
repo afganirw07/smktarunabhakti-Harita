@@ -11,7 +11,7 @@ const WeeklyRevenue = () => {
     <Card extra="flex flex-col bg-white w-full rounded-3xl py-6 px-2 text-center">
       <div className="mb-auto flex items-center justify-between px-6">
         <h2 className="text-lg font-bold text-navy-700 dark:text-white">
-          Weekly Revenue
+          Laporan Mingguan
         </h2>
         <button className="!linear z-[1] flex items-center justify-center rounded-lg bg-[#294B29] p-2 text-white !transition !duration-200 hover:bg-[#86A789] active:bg-gray-200 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10">
           <MdBarChart className="h-6 w-6" />
