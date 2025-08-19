@@ -5,7 +5,8 @@ import TotalSpent from 'components/admin/default/TotalSpent';
 import PieChartCard from 'components/admin/default/PieChartCard';
 import { IoMdHome } from 'react-icons/io';
 import { IoDocuments } from 'react-icons/io5';
-import { MdBarChart, MdDashboard } from 'react-icons/md';
+import { MdBarChart , MdDashboard } from 'react-icons/md';
+import { FaUserFriends } from "react-icons/fa";
 
 import Widget from 'components/widget/Widget';
 import CheckTable from 'components/admin/default/CheckTable';
@@ -23,33 +24,33 @@ const Dashboard = () => {
       <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-6">
         <Widget
           icon={<MdBarChart className="h-7 w-7" />}
-          title={'Earnings'}
-          subtitle={'$340.5'}
+          title={'Pendapatan'}
+          subtitle={'Rp 82.000.000'}
         />
         <Widget
           icon={<IoDocuments className="h-6 w-6" />}
-          title={'Spend this month'}
-          subtitle={'$642.39'}
+          title={'Pengeluaran bulan ini'}
+          subtitle={'Rp 48.000.000'}
         />
         <Widget
-          icon={<MdBarChart className="h-7 w-7" />}
-          title={'Sales'}
-          subtitle={'$574.34'}
+          icon={<FaUserFriends className="h-7 w-7" />}
+          title={'Pengguna Terdaftar'}
+          subtitle={'1032'}
         />
         <Widget
           icon={<MdDashboard className="h-6 w-6" />}
-          title={'Your Balance'}
-          subtitle={'$1,000'}
+          title={'Saldo'}
+          subtitle={'Rp 34.000.000'}
         />
         <Widget
           icon={<MdBarChart className="h-7 w-7" />}
-          title={'New Tasks'}
-          subtitle={'145'}
+          title={'Layanan'}
+          subtitle={'942'}
         />
         <Widget
-          icon={<IoMdHome className="h-6 w-6" />}
-          title={'Total Projects'}
-          subtitle={'$2433'}
+          icon={<MdBarChart className="h-6 w-6" />}
+          title={'Mitra Aktif'}
+          subtitle={'900'}
         />
       </div>
 
