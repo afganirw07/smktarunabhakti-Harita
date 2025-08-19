@@ -50,7 +50,7 @@ const Dashboard = () => {
         <Widget
           icon={<MdBarChart className="h-6 w-6" />}
           title={'Mitra Aktif'}
-          subtitle={'900'}
+          subtitle={'100'}
         />
       </div>
 
