@@ -19,7 +19,7 @@ const routes = [
     icon: <MdHome className="h-6 w-6" />,
   },
   {
-    name: 'NFT Marketplace',
+    name: 'Laporan Layanan',
     layout: '/admin',
     path: 'nft-marketplace',
     icon: <MdOutlineShoppingCart className="h-6 w-6" />,

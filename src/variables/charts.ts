@@ -106,7 +106,7 @@ export const barChartOptionsDailyTraffic: ApexGeneric = {
 };
 
 export const pieChartOptions: ApexGeneric = {
-  labels: ['Your files', 'System', 'Empty'],
+  labels: ['Organik', 'Non Organik', 'B3'],
   colors: ['#294B29', '#86A789', '#D2E3C8'],
   chart: {
     width: '50px',
