@@ -13,6 +13,7 @@
 Get started and build your dream web app with Horizon UI Tailwind CSS NextJS, the trendiest & innovative Open Source Admin Template for Tailwind CSS, React & NextJS!
 
 ---
+Ngaji
 
 ### Introduction
 
