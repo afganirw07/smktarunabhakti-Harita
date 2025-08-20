@@ -25,30 +25,15 @@ const Banner = () => {
       {/* Name and position */}
       <div className="mt-16 flex flex-col items-center">
         <h4 className="text-xl font-bold text-navy-700 dark:text-white">
-          Adela Parkson
+          John Doe
         </h4>
-        <h5 className="text-base font-normal text-gray-600">Product Manager</h5>
+        <h5 className="text-base font-normal text-gray-600">Operasional Manager </h5>
       </div>
 
       {/* Post followers */}
       <div className="mb-3 mt-6 flex gap-4 md:!gap-14">
         <div className="flex flex-col items-center justify-center">
-          <h4 className="text-2xl font-bold text-navy-700 dark:text-white">
-            17
-          </h4>
-          <p className="text-sm font-normal text-gray-600">Posts</p>
-        </div>
-        <div className="flex flex-col items-center justify-center">
-          <h4 className="text-2xl font-bold text-navy-700 dark:text-white">
-            9.7K
-          </h4>
-          <p className="text-sm font-normal text-gray-600">Followers</p>
-        </div>
-        <div className="flex flex-col items-center justify-center">
-          <h4 className="text-2xl font-bold text-navy-700 dark:text-white">
-            434
-          </h4>
-          <p className="text-sm font-normal text-gray-600">Following</p>
+          <p className="text-sm font-normal text-gray-600 text-center">Memimpin dan mengelola proses operasional harian agar berjalan efisien. Bertanggung jawab memastikan seluruh sumber daya dan alur kerja di lapangan berfungsi optimal.</p>
         </div>
       </div>
     </Card>
