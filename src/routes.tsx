@@ -5,7 +5,7 @@ import React from 'react';
 // Icon Imports
 import {
   MdHome,
-  MdOutlineShoppingCart,
+  MdOutlineArticle,
   MdBarChart,
   MdPerson,
   MdLogout 
@@ -19,10 +19,10 @@ const routes = [
     icon: <MdHome className="h-6 w-6" />,
   },
   {
-    name: 'NFT Marketplace',
+    name: 'Manajemen Aset',
     layout: '/admin',
     path: 'nft-marketplace',
-    icon: <MdOutlineShoppingCart className="h-6 w-6" />,
+    icon: <MdOutlineArticle className="h-6 w-6" />,
 
     secondary: true,
   },

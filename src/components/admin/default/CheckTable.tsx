@@ -27,7 +27,7 @@ function CheckTable(props: { tableData: any }) {
     columnHelper.accessor('name', {
       id: 'name',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">NAME</p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">ID layanan</p>
       ),
       cell: (info: any) => (
         <div className="flex items-center">
@@ -46,7 +46,7 @@ function CheckTable(props: { tableData: any }) {
       id: 'progress',
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">
-          PROGRESS
+          Nama pengguna
         </p>
       ),
       cell: (info) => (
@@ -59,7 +59,7 @@ function CheckTable(props: { tableData: any }) {
       id: 'quantity',
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">
-          QUANTITY
+          Tipe layanan
         </p>
       ),
       cell: (info) => (
@@ -71,7 +71,7 @@ function CheckTable(props: { tableData: any }) {
     columnHelper.accessor('date', {
       id: 'date',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">DATE</p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Tanggal</p>
       ),
       cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
@@ -96,7 +96,7 @@ function CheckTable(props: { tableData: any }) {
     <Card extra={'w-full h-full sm:overflow-auto px-6'}>
       <header className="relative flex items-center justify-between pt-4">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-          Check Table
+         Tabel Permintaan Layanan
         </div>
 
         <CardMenu />

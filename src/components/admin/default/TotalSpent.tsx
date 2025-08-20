@@ -25,14 +25,14 @@ const TotalSpent = () => {
 
       <div className="flex h-full w-full flex-row justify-between sm:flex-wrap lg:flex-nowrap 2xl:overflow-hidden">
         <div className="flex flex-col">
-          <p className="mt-[20px] text-3xl font-bold text-navy-700 dark:text-white">
-            $37.5K
+          <p className="mt-[20px] text-2xl font-bold text-navy-700 dark:text-white">
+            82 JT
           </p>
           <div className="flex flex-col items-start">
-            <p className="mt-2 text-sm text-gray-600">Total Spent</p>
+            <p className="mt-4 ml-2 text-sm text-gray-600">Layanan</p>
             <div className="flex flex-row items-center justify-center">
               <MdArrowDropUp className="font-medium text-green-500" />
-              <p className="text-sm font-bold text-green-500"> +2.45% </p>
+              <p className="text-sm font-bold text-green-500"> +5.45% </p>
             </div>
           </div>
         </div>
