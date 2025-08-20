@@ -1,10 +1,11 @@
 'use client';
 // import Banner from 'components/admin/nft-marketplace/Banner';
-import NFt2 from '/public/img/nfts/Nft2.png';
-import NFt4 from '/public/img/nfts/Nft4.png';
-import NFt3 from '/public/img/nfts/Nft3.png';
-import NFt5 from '/public/img/nfts/Nft5.png';
-import NFt6 from '/public/img/nfts/Nft6.png';
+import pupuk from '/public/img/barang/pupuk.png';
+import bricket from '/public/img/barang/briket.png';
+import kerajinan from '/public/img/barang/kerajinan.png';
+import truk from '/public/img/aset/truk.png';
+import alat from '/public/img/aset/alat.png';
+import gudang from '/public/img/aset/gudang.png';
 import avatar1 from '/public/img/avatars/avatar1.png';
 import avatar2 from '/public/img/avatars/avatar2.png';
 import avatar3 from '/public/img/avatars/avatar3.png';
@@ -26,98 +27,64 @@ const Marketplace = () => {
           <h4 className="ml-1 text-2xl font-bold text-navy-700 dark:text-white">
             Inventaris Barang
           </h4>
-          <ul className="mt-4 flex items-center justify-between md:mt-0 md:justify-center md:!gap-5 2xl:!gap-12">
-            <li>
-              <a
-                className="text-base font-medium text-white hover:text-white dark:text-white"
-                href=" "
-              >
-                Art
-              </a>
-            </li>
-            <li>
-              <a
-                className="text-base font-medium text-white hover:text-white dark:text-white"
-                href=" "
-              >
-                Music
-              </a>
-            </li>
-            <li>
-              <a
-                className="text-base font-medium text-white hover:text-white dark:text-white"
-                href=" "
-              >
-                Collection
-              </a>
-            </li>
-            <li>
-              <a
-                className="text-base font-medium text-white hover:text-white dark:text-white"
-                href=" "
-              >
-                Sports
-              </a>
-            </li>
-          </ul>
         </div>
 
         {/* NFTs trending card */}
         <div className="z-20 grid grid-cols-1 gap-5 md:grid-cols-3">
           <NftCard
             bidders={[avatar1, avatar2, avatar3]}
-            title="Abstract Colors"
-            author="Esthera Jackson"
+            title="Pupuk Kompos"
+            desc="Pupuk organik ramah lingkungan dari limbah dapur"
             price="0.91"
-            image={NFt3}
+            image={pupuk}
           />
           <NftCard
             bidders={[avatar1, avatar2, avatar3]}
-            title="ETH AI Brain"
-            author="Nick Wilson"
+            title="Bricket"
+            desc="Bahan bakar alternatif dari limbah biomassa yang efisien"
             price="0.7"
-            image={NFt2}
+            image={bricket}
           />
           <NftCard
             bidders={[avatar1, avatar2, avatar3]}
-            title="Mesh Gradients"
-            author="Will Smith"
+            title="Kerajinan Tangan"
+            desc="Produk kreatif berbahan daur ulang dengan sentuhan lokal"
             price="2.91"
-            image={NFt4}
+            image={kerajinan}
           />
         </div>
 
         {/* Recenlty Added setion */}
         <div className="mb-5 mt-5 flex items-center justify-between px-[26px]">
           <h4 className="text-2xl font-bold text-navy-700 dark:text-white">
-            Aset Siap Operasi
+            Status Aset
           </h4>
         </div>
 
-        {/* Recently Add NFTs */}
+     
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          <NftCard
-            bidders={[avatar1, avatar2, avatar3]}
-            title="Abstract Colors"
-            author="Esthera Jackson"
-            price="0.91"
-            image={NFt4}
-          />
-          <NftCard
-            bidders={[avatar1, avatar2, avatar3]}
-            title="ETH AI Brain"
-            author="Nick Wilson"
-            price="0.7"
-            image={NFt5}
-          />
-          <NftCard
-            bidders={[avatar1, avatar2, avatar3]}
-            title="Mesh Gradients"
-            author="Will Smith"
-            price="2.91"
-            image={NFt6}
-          />
-        </div>
+  <NftCard
+    bidders={[avatar1, avatar2, avatar3]}
+    title="Status Armada"
+    desc="Total Kendaraan: 30, Sedang Beroperasi: 15, Perlu Perawatan: 5."
+    price="0.91"
+    image={truk}
+  />
+  <NftCard
+    bidders={[avatar1, avatar2, avatar3]}
+    title="Status Peralatan"
+    desc="Total Alat: 25, Sedang Beroperasi: 20, Perlu Perawatan: 4"
+    price="0.7"
+    image={alat}
+  />
+  <NftCard
+    bidders={[avatar1, avatar2, avatar3]}
+    title="Status Gudang"
+   desc="Gudang menyimpan 120 barang, 90 tersedia, 15 perlu segera dilengkapi."
+    price="1.1"
+    image={gudang}
+  />
+</div>
       </div>
 
       {/* right side section */}
