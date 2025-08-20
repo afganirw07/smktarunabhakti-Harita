@@ -1,6 +1,8 @@
 import React from 'react';
 import CardMenu from 'components/card/CardMenu';
 import Card from 'components/card';
+import { BsCheckCircleFill, BsXCircleFill } from 'react-icons/bs';
+import { AiOutlineClockCircle } from 'react-icons/ai';
 
 import {
   createColumnHelper,
@@ -11,35 +13,40 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
+// Mengubah tipe data untuk mencerminkan kolom-kolom baru
 type RowObj = {
-  name: [string, boolean];
-  progress: string;
-  quantity: number;
-  date: string;
+  id: number;
+  nama: string;
+  role: string;
+  divisi: string;
+  tugas: number;
+  status: 'active' | 'nonactive' | 'in-progress';
 };
 
 function ColumnsTable(props: { tableData: any }) {
   const { tableData } = props;
   const [sorting, setSorting] = React.useState<SortingState>([]);
   let defaultData = tableData;
+  const columnHelper = createColumnHelper<RowObj>();
+
   const columns = [
-    columnHelper.accessor('name', {
-      id: 'name',
+    // Kolom 1: ID
+    columnHelper.accessor('id', {
+      id: 'id',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">NAME</p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Id</p>
       ),
-      cell: (info: any) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
+      cell: (info) => (
+        <p className="text-sm font-medium text-navy-700 dark:text-white">
           {info.getValue()}
         </p>
       ),
     }),
-    columnHelper.accessor('progress', {
-      id: 'progress',
+    // Kolom 2: Nama
+    columnHelper.accessor('nama', {
+      id: 'nama',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">
-          PROGRESS
-        </p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Nama</p>
       ),
       cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
@@ -47,31 +54,65 @@ function ColumnsTable(props: { tableData: any }) {
         </p>
       ),
     }),
-    columnHelper.accessor('quantity', {
-      id: 'quantity',
+    // Kolom 3: Role
+    columnHelper.accessor('role', {
+      id: 'role',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">
-          QUANTITY
-        </p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Role</p>
       ),
       cell: (info) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
+        <p className="text-sm font-medium text-navy-700 dark:text-white">
           {info.getValue()}
         </p>
       ),
     }),
-    columnHelper.accessor('date', {
-      id: 'date',
+    // Kolom 4: Divisi
+    columnHelper.accessor('divisi', {
+      id: 'divisi',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">DATE</p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Divisi</p>
       ),
       cell: (info) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
+        <p className="text-sm font-medium text-navy-700 dark:text-white">
           {info.getValue()}
         </p>
       ),
     }),
-  ]; // eslint-disable-next-line
+    // Kolom 5: Tugas
+    columnHelper.accessor('tugas', {
+      id: 'tugas',
+      header: () => (
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Tugas</p>
+      ),
+      cell: (info) => (
+        <p className="text-sm font-medium text-navy-700 dark:text-white">
+          {info.getValue()}
+        </p>
+      ),
+    }),
+    // Kolom 6: Status
+    columnHelper.accessor('status', {
+      id: 'status',
+      header: () => (
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Status</p>
+      ),
+      cell: (info) => (
+        <div className="flex items-center gap-2">
+          {info.getValue() === 'active' ? (
+            <BsCheckCircleFill className="text-green-500" />
+          ) : info.getValue() === 'in-progress' ? (
+            <AiOutlineClockCircle className="text-yellow-500" />
+          ) : (
+            <BsXCircleFill className="text-red-500" />
+          )}
+          <p className="text-sm font-medium text-navy-700 dark:text-white">
+            {info.getValue()}
+          </p>
+        </div>
+      ),
+    }),
+  ];
+
   const [data, setData] = React.useState(() => [...defaultData]);
   const table = useReactTable({
     data,
@@ -84,6 +125,7 @@ function ColumnsTable(props: { tableData: any }) {
     getSortedRowModel: getSortedRowModel(),
     debugTable: true,
   });
+
   return (
     <Card extra={'w-full pb-10 p-4 h-full'}>
       <header className="relative flex items-center justify-between">
@@ -93,7 +135,7 @@ function ColumnsTable(props: { tableData: any }) {
         <CardMenu />
       </header>
 
-      <div className="mt-8 overflow-x-scroll xl:overflow-x-hidden">
+      <div className="mt-8 overflow-x-scroll scrollbar-thin">
         <table className="w-full">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -104,7 +146,7 @@ function ColumnsTable(props: { tableData: any }) {
                       key={header.id}
                       colSpan={header.colSpan}
                       onClick={header.column.getToggleSortingHandler()}
-                      className="cursor-pointer border-b border-gray-200 pb-2 pr-4 pt-4 text-start dark:border-white/30"
+                      className="cursor-pointer border-b border-gray-200 pb-2 px-4 pt-4 text-start dark:border-white/30"
                     >
                       <div className="items-center justify-between text-xs text-gray-200">
                         {flexRender(
@@ -133,7 +175,7 @@ function ColumnsTable(props: { tableData: any }) {
                       return (
                         <td
                           key={cell.id}
-                          className="min-w-[150px] border-white/0 py-3  pr-4"
+                          className="min-w-[150px] border-white/0 py-3 px-7 "
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
@@ -153,4 +195,3 @@ function ColumnsTable(props: { tableData: any }) {
 }
 
 export default ColumnsTable;
-const columnHelper = createColumnHelper<RowObj>();
