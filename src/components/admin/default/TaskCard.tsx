@@ -13,7 +13,7 @@ const TaskCard = () => {
             <MdCheckCircle className="h-6 w-6 text-white dark:text-white" />
           </div>
           <h4 className="ml-4 text-xl font-bold text-navy-700 dark:text-white">
-            Tasks
+            Tugas Hari Ini
           </h4>
         </div>
         <CardMenu />
@@ -26,7 +26,7 @@ const TaskCard = () => {
           <div className="flex items-center justify-center gap-2">
             <Checkbox />
             <p className="text-base font-bold text-navy-700 dark:text-white">
-              Landing Page Design
+              Laporan #1234
             </p>
           </div>
           <div>
@@ -38,7 +38,7 @@ const TaskCard = () => {
           <div className="flex items-center justify-center gap-2">
             <Checkbox />
             <p className="text-base font-bold text-navy-700 dark:text-white">
-              Mobile App Design
+              Jemputan #5678
             </p>
           </div>
           <div>
@@ -50,7 +50,7 @@ const TaskCard = () => {
           <div className="flex items-center justify-center gap-2">
             <Checkbox />
             <p className="text-base font-bold text-navy-700 dark:text-white">
-              Dashboard Builder
+              Penukaran #9101
             </p>
           </div>
           <div>
@@ -62,7 +62,7 @@ const TaskCard = () => {
           <div className="flex items-center justify-center gap-2">
             <Checkbox />
             <p className="text-base font-bold text-navy-700 dark:text-white">
-              Landing Page Design
+              Laporan #1213
             </p>
           </div>
           <div>
@@ -74,7 +74,7 @@ const TaskCard = () => {
           <div className="flex items-center justify-center gap-2">
             <Checkbox />
             <p className="text-base font-bold text-navy-700 dark:text-white">
-              Dashboard Builder
+              Jemputan #1415
             </p>
           </div>
           <div>

@@ -4,7 +4,7 @@ type ApexGeneric = ApexOptions & any;
 
 export const barChartDataDailyTraffic = [
   {
-    name: 'Daily Traffic',
+    name: 'Lalu Lintas Harian',
     data: [20, 30, 40, 20, 45, 50, 30],
   },
 ];
@@ -106,7 +106,7 @@ export const barChartOptionsDailyTraffic: ApexGeneric = {
 };
 
 export const pieChartOptions: ApexGeneric = {
-  labels: ['Your files', 'System', 'Empty'],
+  labels: ['Organik', 'Non Organik', 'B3'],
   colors: ['#294B29', '#86A789', '#D2E3C8'],
   chart: {
     width: '50px',
@@ -148,17 +148,17 @@ export const pieChartData = [63, 25, 12];
 
 export const barChartDataWeeklyRevenue = [
   {
-    name: 'PRODUCT A',
+    name: 'Pelaporan',
     data: [400, 370, 330, 390, 320, 350, 360, 320, 380],
     color: '#294B29',
   },
   {
-    name: 'PRODUCT B',
+    name: 'Penjemputan',
     data: [400, 370, 330, 390, 320, 350, 360, 320, 380],
     color: '#86A789',
   },
   {
-    name: 'PRODUCT C',
+    name: 'Penukaran',
     data: [400, 370, 330, 390, 320, 350, 360, 320, 380],
     color: '#EFF4FB',
   },
@@ -216,7 +216,6 @@ export const barChartOptionsWeeklyRevenue = {
       },
     },
   },
-
   grid: {
     borderColor: 'rgba(163, 174, 208, 0.3)',
     show: true,
@@ -253,15 +252,14 @@ export const barChartOptionsWeeklyRevenue = {
     },
   },
 };
-
 export const lineChartDataTotalSpent = [
   {
-    name: 'Revenue',
+    name: 'Pendapatan',
     data: [50, 64, 48, 66, 49, 68],
     color: '#294B29',
   },
   {
-    name: 'Profit',
+    name: 'Laba',
     data: [30, 40, 24, 46, 20, 46],
     color: '#86A789',
   },
@@ -275,9 +273,9 @@ export const lineChartOptionsTotalSpent = {
   theme: {
     mode: 'light',
   },
+
   chart: {
     type: 'line',
-
     toolbar: {
       show: false,
     },
@@ -286,25 +284,31 @@ export const lineChartOptionsTotalSpent = {
   dataLabels: {
     enabled: false,
   },
+
   stroke: {
     curve: 'smooth',
   },
 
   tooltip: {
+    theme: 'dark',
     style: {
       fontSize: '12px',
       fontFamily: undefined,
       backgroundColor: '#000000',
     },
-    theme: 'dark',
-    x: {
-      format: 'dd/MM/yy HH:mm',
+    y: {
+      formatter: (val: number) => `Rp${val} juta`,
     },
+
   },
+
   grid: {
     show: false,
   },
+
   xaxis: {
+    type: 'category',
+    categories: ['SEP', 'OCT', 'NOV', 'DEC', 'JAN', 'FEB'],
     axisBorder: {
       show: false,
     },
@@ -318,12 +322,17 @@ export const lineChartOptionsTotalSpent = {
         fontWeight: '500',
       },
     },
-    type: 'text',
-    range: undefined,
-    categories: ['SEP', 'OCT', 'NOV', 'DEC', 'JAN', 'FEB'],
   },
 
   yaxis: {
     show: false,
+    labels: {
+      formatter: (val: number) => `Rp${val} jt`,
+      style: {
+        colors: '#A3AED0',
+        fontSize: '12px',
+        fontWeight: '500',
+      },
+    },
   },
 };
