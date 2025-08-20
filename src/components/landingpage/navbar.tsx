@@ -12,7 +12,7 @@ const Navbar = () => {
 
     return(
         <>
-        <nav className="lg:w-auto w-[95%] md:w-[95%]  bg-white/85 backdrop-blur-sm text-black md:px-12 px-8 py-2 flex items-center lg:justify-center justify-between  lg:gap-16 gap-4 drop-shadow-md rounded-full sticky top-6 z-40">
+        <nav className="lg:w-auto w-[95%] md:w-[95%]  bg-white/85 backdrop-blur-sm text-black md:px-12 px-8 py-2 flex items-center lg:justify-center justify-between  lg:gap-16 gap-4 drop-shadow-md rounded-full fixed top-6 z-40">
             <div className="font-black text-2xl text-green-800 font-family-inter flex ">
                 HARITA
             </div>
