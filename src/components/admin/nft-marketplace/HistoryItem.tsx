@@ -1,53 +1,49 @@
-import Nft2 from '/public/img/nfts/Nft2.png';
-import Nft1 from '/public/img/nfts/Nft1.png';
-import Nft3 from '/public/img/nfts/Nft3.png';
-import Nft4 from '/public/img/nfts/Nft4.png';
-import Nft5 from '/public/img/nfts/Nft5.png';
-import Nft6 from '/public/img/nfts/Nft6.png';
+import pupuk from '/public/img/barang/pupuk.png';
+import bricket from '/public/img/barang/briket.png';
+import kerajinan from '/public/img/barang/kerajinan.png';
 import Image from 'next/image';
-
 import { FaEthereum } from 'react-icons/fa';
 import Card from 'components/card';
 
 const HistoryCard = () => {
   const HistoryData = [
     {
-      image: Nft1,
+      image: pupuk,
       title: 'Colorful Heaven',
       owner: 'Mark Benjamin',
       price: 0.4,
       time: '30s',
     },
     {
-      image: Nft2,
+      image: pupuk,
       title: 'Abstract Colors',
       owner: 'Esthera Jackson',
       price: 2.4,
       time: '50m',
     },
     {
-      image: Nft3,
+      image: pupuk,
       title: 'ETH AI Brain',
       owner: 'Nick Wilson',
       price: 0.3,
       time: '20s',
     },
     {
-      image: Nft4,
+      image: pupuk,
       title: 'Swipe Circles',
       owner: ' Peter Will',
       price: 0.4,
       time: '4h',
     },
     {
-      image: Nft5,
+      image: pupuk,
       title: 'Mesh Gradients',
       owner: 'Will Smith',
       price: 0.4,
       time: '30s',
     },
     {
-      image: Nft6,
+      image: pupuk,
       title: '3D Cubes Art',
       owner: ' Manny Gates',
       price: 0.4,
