@@ -1,13 +1,15 @@
-import { url } from 'inspector';
 import Navbar from '../../components/landingpage/navbar';
 import Image from 'next/image';
 import CountUp from 'components/landingpage/counter';
 import { Home, Truck, ClockPlus, Sprout, Star } from 'lucide-react';
+import Collab from 'components/landingpage/marque section/collab';
+import About from 'components/landingpage/about/about';
+import Card from 'components/landingpage/cardFeature/card';
 
 export default function landingPage() {
   return (
     <>
-      <section className="relative z-20 flex h-auto w-full flex-col items-center justify-center bg-bgPrimary px-6 lg:py-6 py-6 md:py-10  sm:px-16 md:px-8 lg:px-20">
+      <section className="relative z-20 flex h-auto w-full flex-col items-center justify-center bg-bgPrimary px-6 py-20  sm:px-16 md:px-8 lg:px-20">
         <Navbar />
         <div className="heading mt-10 flex flex-col items-center justify-center gap-2">
           <h1 className="text-Black max-w-[600px]  text-wrap  text-center font-inter text-[2rem]/tight font-black md:text-[2.5rem]/tight ">
@@ -63,6 +65,8 @@ export default function landingPage() {
               alt="recycle"
               src={'/img/Landingpage/recycle.jpg'}
             />
+            <div>
+            </div>
             <div className="absolute inset-0 z-10 rounded-2xl  bg-gradient-to-t from-black"></div>
           </div>
 
@@ -153,7 +157,7 @@ export default function landingPage() {
                     duration={8}
                     className="count-up-text"
                   />
-                  <span>+</span>
+                  <span>+ </span>
                 </div>
 
                 <p className="text-wrap text-center font-nunito text-lg font-semibold text-white lg:text-base">
@@ -191,6 +195,59 @@ export default function landingPage() {
           </div>
         </div>
       </section>
+
+      {/* Marquee */}
+      <section className='w-full bg-bgPrimary h-auto py-20 flex flex-col gap-12 justify-center items-center'>
+        <h1 className='font-inter text-3xl font-bold'>Kolaborasi dengan</h1>
+      <Collab/>
+      </section>
+
+
+    {/* about section */}
+
+     <section className="relative w-full h-auto flex lg:justify-start justify-center items-center bg-white overflow-hidden lg:px-24 px-6 py-10">
+  {/* Lingkaran 1 */}
+  <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] rounded-full bg-[#F6F193] blur-[400px] opacity-100"></div>
+
+  {/* Lingkaran 2 */}
+  <div className="absolute bottom-[-200px] right-[-200px] w-[600px] h-[600px] rounded-full bg-[#D2E3C8] blur-[200px] opacity-100"></div>
+
+  <div className='absolute lg:right-0 lg:left-auto left-1/2 lg:-translate-x-0  lg:flex hidden'>
+    <Image
+    alt='circle'
+    src={"/img/Landingpage/circle.png"}
+    width={270}
+    height={270}
+    ></Image>
+  </div>
+
+  {/* Konten utama */}
+    <About/>
+</section>
+
+
+{/* feature section */}
+    <section className='w-full h-screen lg:px-20 sm:px-16 px-6 bg-bgPrimary/70 py-16'>
+    {/* heading */}
+      <div className='flex lg:flex-row lg:gap-0 gap-6 flex-col items-center w-full justify-between'>
+        <h1 className='text-black font-semibold font-inter text-[2rem] text-wrap lg:w-[300px] lg:text-left text-center'>Fitur yang akan Anda Dapatkan</h1>
+
+        <div className='flex lg:flex-row flex-col justify-center items-center gap-8'>
+        <p className='text-black/40 font-nunito text-lg text-wrap lg:w-[550px] font-semibold lg:text-left text-center'>
+          We offer a variety of interesting features that you can help increase yor productivity at work and manage your projrct esaly
+        </p>
+        <button className='bg-green-800  px-4 py-3  rounded-full text-lg font-bold font-nunito text-white'>Mulai Sekarang</button>
+        </div>
+      </div>
+      
+      {/* card */}
+        <div className='mt-12 flex w-full justify-evenly'>
+        <Card/>
+        <Card/>
+        <Card/>
+        </div>
+    </section>
+
     </>
   );
 }
