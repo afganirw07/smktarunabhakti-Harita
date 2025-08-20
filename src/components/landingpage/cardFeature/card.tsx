@@ -1,29 +1,35 @@
 import Image from 'next/image';
 
-export default function Card(image, background, heading, desc) {
-    background = 'bg-green-700'
-    heading = "Test"
-    desc = "lorem ipsum sir aler domet cukup"
-
+export default function Card({
+  image,
+  background,
+  meshes = [],
+  heading,
+  desc,
+}) {
   return (
-    <>
-      <div className="flex flex-col gap-4">
-        <div
-          className="relative h-[340px] w-[300px] rounded-3xl bg-gradient-to-b from-green-400 via-green-600 
-     to-green-800 shadow-[0_20px_60px_rgba(34,197,94,0.35)]"
-        >
+    <div className="flex w-[300px] flex-col gap-3">
+      <div
+        className={`relative h-[340px] w-[300px] overflow-hidden rounded-3xl ${background} shadow-[0_20px_60px_rgba(34,197,94,0.25)]`}
+      >
+        {meshes.map((mesh, i) => (
           <div
-            className={`absolute bottom-0 z-10 h-[80%] w-full rounded-full ${background}/10`}
-          ></div>
-          <div>
-            <Image src={image} alt={`${heading}`} />
-          </div>
-        </div>
-        <div className='flex flex-col gap-2'>
-          <h1>{heading}</h1>
-          <p>{desc}</p>
+            key={i}
+            className={`absolute rounded-full opacity-60 blur-[100px] ${mesh}`}
+          />
+        ))}
+
+        <div className="absolute  bottom-0 left-1/2 z-10 h-[200px] w-[300px] -translate-x-1/2">
+          {image && (
+            <Image src={image} alt={heading} fill className="object-contain" />
+          )}
         </div>
       </div>
-    </>
+
+      <div className="flex flex-col gap-2 px-1">
+        <h1 className="font-inter text-[1.4rem] font-bold">{heading}</h1>
+        <p>{desc}</p>
+      </div>
+    </div>
   );
 }

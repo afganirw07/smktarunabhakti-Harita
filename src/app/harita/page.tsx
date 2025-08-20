@@ -1,3 +1,4 @@
+import { cn } from '@/public/lib/utils';
 import Navbar from '../../components/landingpage/navbar';
 import Image from 'next/image';
 import CountUp from 'components/landingpage/counter';
@@ -5,11 +6,22 @@ import { Home, Truck, ClockPlus, Sprout, Star } from 'lucide-react';
 import Collab from 'components/landingpage/marque section/collab';
 import About from 'components/landingpage/about/about';
 import Card from 'components/landingpage/cardFeature/card';
+import { DotPattern } from 'components/magicui/dot-pattern';
 
 export default function landingPage() {
   return (
     <>
-      <section className="relative z-20 flex h-auto w-full flex-col items-center justify-center bg-bgPrimary px-6 py-20  sm:px-16 md:px-8 lg:px-20">
+      <section className="relative z-20 flex h-auto w-full flex-col items-center justify-center bg-bgPrimary/60 px-6 py-20  sm:px-16 md:px-8 lg:px-20">
+        <DotPattern
+        width={30}
+        height={35}
+        cx={1}
+        cy={1}
+        cr={1}
+        className={cn(
+          "[mask-image:linear-gradient(to_bottom,white,transparent)] opacity-70 -z-10 ",
+        )}
+      />
         <Navbar />
         <div className="heading mt-10 flex flex-col items-center justify-center gap-2">
           <h1 className="text-Black max-w-[600px]  text-wrap  text-center font-inter text-[2rem]/tight font-black md:text-[2.5rem]/tight ">
@@ -33,30 +45,17 @@ export default function landingPage() {
         </div>
 
         <div className=" relative mt-24 flex h-auto w-full  flex-row flex-wrap items-center justify-center gap-6 lg:mt-10  lg:h-[350px] lg:flex-row lg:flex-nowrap lg:items-end lg:justify-center lg:gap-4">
-          <div className="absolute -top-16 left-1/2 -translate-x-1/2 flex flex-col gap-1  lg:-top-0 ">
-            <div className='flex gap-1'>
-              <Star
-              strokeWidth={0}
-              className='fill-amber-400'
-              />
-              <Star
-              strokeWidth={0}
-              className='fill-amber-400'
-              />
-              <Star
-              strokeWidth={0}
-              className='fill-amber-400'
-              />
-              <Star
-              strokeWidth={0}
-              className='fill-amber-400'
-              />
-              <Star
-              strokeWidth={0}
-              className='fill-amber-400'
-              />
+          <div className="absolute -top-16 left-1/2 flex -translate-x-1/2 flex-col gap-1  lg:-top-0 ">
+            <div className="flex gap-1">
+              <Star strokeWidth={0} className="fill-amber-400" />
+              <Star strokeWidth={0} className="fill-amber-400" />
+              <Star strokeWidth={0} className="fill-amber-400" />
+              <Star strokeWidth={0} className="fill-amber-400" />
+              <Star strokeWidth={0} className="fill-amber-400" />
             </div>
-            <p className='text-sm font-bold font-nunito text-center'>99+ Orang menilai</p>
+            <p className="text-center font-nunito text-sm font-bold">
+              99+ Orang menilai
+            </p>
           </div>
           <div className="relative hidden h-[200px] w-full overflow-hidden rounded-2xl bg-cyan-300 shadow-md shadow-yellow-200 md:w-[300px] lg:mt-0 lg:flex lg:h-full lg:w-[220px]">
             <Image
@@ -65,8 +64,7 @@ export default function landingPage() {
               alt="recycle"
               src={'/img/Landingpage/recycle.jpg'}
             />
-            <div>
-            </div>
+            <div></div>
             <div className="absolute inset-0 z-10 rounded-2xl  bg-gradient-to-t from-black"></div>
           </div>
 
@@ -168,28 +166,31 @@ export default function landingPage() {
           </div>
           <div
             className="flex h-[200px] w-full items-center justify-center rounded-2xl  bg-[#2F362B]
-          md:w-[300px] lg:h-full lg:w-[220px] px-8 md:px-4"
+          px-8 md:w-[300px] md:px-4 lg:h-full lg:w-[220px]"
           >
-            <div className='flex flex-col md:gap-5 gap-2 justify-center items-center'>
+            <div className="flex flex-col items-center justify-center gap-2 md:gap-5">
               <Sprout
                 stroke="#6DD130"
                 strokeWidth={2}
                 className="size-[48px]"
               />
-              <div className='w-full h-full flex flex-col md:gap-2 justify-center items-center'>
-                <div className='font-extrabold text-white font-nunito text-3xl flex'>
+              <div className="flex h-full w-full flex-col items-center justify-center md:gap-2">
+                <div className="flex font-nunito text-3xl font-extrabold text-white">
                   <CountUp
                     from={0}
                     to={99}
                     separator=","
                     direction="up"
                     duration={8}
-                    className="count-up-text flex justify-center items-center"
+                    className="count-up-text flex items-center justify-center"
                   />
                   <span>+ Kg</span>
-                  
                 </div>
-                <p className=' text-white font-medium text-lg text-center '><span className='text-[#6DD130]'>Pupuk Organik</span> yang di hasilkan dari <span className='text-[#6DD130]'>daur ulang sampah</span> </p>
+                <p className=" text-center text-lg font-medium text-white ">
+                  <span className="text-[#6DD130]">Pupuk Organik</span> yang di
+                  hasilkan dari{' '}
+                  <span className="text-[#6DD130]">daur ulang sampah</span>{' '}
+                </p>
               </div>
             </div>
           </div>
@@ -197,57 +198,90 @@ export default function landingPage() {
       </section>
 
       {/* Marquee */}
-      <section className='w-full bg-bgPrimary h-auto py-20 flex flex-col gap-12 justify-center items-center'>
-        <h1 className='font-inter text-3xl font-bold'>Kolaborasi dengan</h1>
-      <Collab/>
+      <section className="flex h-auto w-full flex-col items-center justify-center gap-12 bg-bgPrimary py-20">
+        <h1 className="font-inter text-3xl font-bold">Kolaborasi dengan</h1>
+        <Collab />
       </section>
 
+      {/* about section */}
 
-    {/* about section */}
+      <section className="relative flex h-auto w-full items-center justify-center overflow-hidden bg-white px-6 py-10 lg:justify-start lg:px-24">
+        {/* Lingkaran 1 */}
+        <div className="absolute left-[-200px] top-[-200px] h-[600px] w-[600px] rounded-full bg-[#F6F193] opacity-100 blur-[400px]"></div>
 
-     <section className="relative w-full h-auto flex lg:justify-start justify-center items-center bg-white overflow-hidden lg:px-24 px-6 py-10">
-  {/* Lingkaran 1 */}
-  <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] rounded-full bg-[#F6F193] blur-[400px] opacity-100"></div>
+        {/* Lingkaran 2 */}
+        <div className="absolute bottom-[-200px] right-[-200px] h-[600px] w-[600px] rounded-full bg-[#D2E3C8] opacity-100 blur-[200px]"></div>
 
-  {/* Lingkaran 2 */}
-  <div className="absolute bottom-[-200px] right-[-200px] w-[600px] h-[600px] rounded-full bg-[#D2E3C8] blur-[200px] opacity-100"></div>
-
-  <div className='absolute lg:right-0 lg:left-auto left-1/2 lg:-translate-x-0  lg:flex hidden'>
-    <Image
-    alt='circle'
-    src={"/img/Landingpage/circle.png"}
-    width={270}
-    height={270}
-    ></Image>
-  </div>
-
-  {/* Konten utama */}
-    <About/>
-</section>
-
-
-{/* feature section */}
-    <section className='w-full h-screen lg:px-20 sm:px-16 px-6 bg-bgPrimary/70 py-16'>
-    {/* heading */}
-      <div className='flex lg:flex-row lg:gap-0 gap-6 flex-col items-center w-full justify-between'>
-        <h1 className='text-black font-semibold font-inter text-[2rem] text-wrap lg:w-[300px] lg:text-left text-center'>Fitur yang akan Anda Dapatkan</h1>
-
-        <div className='flex lg:flex-row flex-col justify-center items-center gap-8'>
-        <p className='text-black/40 font-nunito text-lg text-wrap lg:w-[550px] font-semibold lg:text-left text-center'>
-          We offer a variety of interesting features that you can help increase yor productivity at work and manage your projrct esaly
-        </p>
-        <button className='bg-green-800  px-4 py-3  rounded-full text-lg font-bold font-nunito text-white'>Mulai Sekarang</button>
+        <div className="absolute left-1/2 hidden lg:left-auto lg:right-0  lg:flex lg:-translate-x-0">
+          <Image
+            alt="circle"
+            src={'/img/Landingpage/circle.png'}
+            width={270}
+            height={270}
+          ></Image>
         </div>
-      </div>
-      
-      {/* card */}
-        <div className='mt-12 flex w-full justify-evenly'>
-        <Card/>
-        <Card/>
-        <Card/>
-        </div>
-    </section>
 
+        {/* Konten utama */}
+        <About />
+      </section>
+
+      {/* feature section */}
+      <section className="h-auto w-full bg-white px-6 py-16 sm:px-16 lg:px-20">
+        {/* heading */}
+        <div className="flex w-full flex-col items-center justify-between gap-6 lg:flex-row lg:gap-0">
+          <h1 className="text-wrap text-center font-inter text-[2rem] font-semibold text-black lg:w-[300px] lg:text-left">
+            Fitur yang akan Anda Dapatkan
+          </h1>
+
+          <div className="flex flex-col items-center justify-center gap-8 lg:flex-row">
+            <p className="text-wrap text-center font-nunito text-lg font-semibold text-black/40 lg:w-[550px] lg:text-left">
+              Kami Menyediakan fitur yang dapat di jadikan solusi permasalahan sampah pada masyarakat Indonesia
+            </p>
+            <button className="rounded-full  bg-green-800 px-4  py-3 font-nunito text-lg font-bold text-white">
+              Mulai Sekarang
+            </button>
+          </div>
+        </div>
+
+        {/* card */}
+        <div className="mt-12 flex w-full flex-col items-center justify-center gap-10 lg:flex-row lg:justify-evenly lg:gap-0">
+          {/* Card 1: Hijau Segar */}
+          <Card
+            heading="Lapor Sampah"
+            desc="Fitur melaporkan lokasi yang tercemar sampah untuk dibersihkan"
+            background="bg-gradient-to-b from-[#8CFF8B] to-[#4FB990]"
+            meshes={[
+              'bg-green-300 top-10 left-10 w-[200px] h-[200px]',
+              'bg-lime-400 bottom-10 right-10 w-[250px] h-[250px]',
+            ]}
+            image={'/img/Landingpage/Vector1.png'}
+          />
+
+          {/* Card 2: Hijau Gelap Elegan */}
+          <Card
+            heading="Trash House"
+            desc="Fitur layanan pengangkutan sampah rumah anda secara rutin"
+            background="bg-gradient-to-b from-[#8CFF8B] to-[#4FB990]"
+            meshes={[
+              'bg-green-800 top-20 left-20 w-[200px] h-[200px]',
+              'bg-lime-500 bottom-5 right-16 w-[220px] h-[220px]',
+            ]}
+            image={'/img/Landingpage/Vector2.png'}
+          />
+
+          {/* Card 3: Hijau Lembut Variasi Lime */}
+          <Card
+            heading="Tukar Sampah"
+            desc="Tukar sampah anda menjadi produk daur ulang pilihan dan bonus HaCoins"
+            background="bg-gradient-to-b from-[#8CFF8B] to-[#4FB990]"
+            meshes={[
+              'bg-green-400 top-10 right-14 w-[180px] h-[180px]',
+              'bg-lime-300 bottom-12 left-14 w-[240px] h-[240px]',
+            ]}
+            image={'/img/Landingpage/Vector3.png'}
+          />
+        </div>
+      </section>
     </>
   );
 }
