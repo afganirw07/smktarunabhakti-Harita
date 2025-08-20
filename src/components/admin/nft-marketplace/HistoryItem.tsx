@@ -60,10 +60,10 @@ const HistoryCard = () => {
       {/* HistoryCard Header */}
       <div className="flex items-center justify-between rounded-t-3xl p-3">
         <div className="text-lg font-bold text-navy-700 dark:text-white">
-          History
+          Riwayat Aktivitas Aset 
         </div>
-        <button className="linear rounded-[20px] bg-lightPrimary px-4 py-2 text-base font-medium text-white transition duration-200 hover:bg-gray-100 active:bg-gray-200 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:active:bg-white/20">
-          See all
+        <button className="linear rounded-[20px] bg-[#294B29] px-4 py-2 text-base font-medium text-white transition duration-200 hover:bg-[#86A789] dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:active:bg-white/20">
+          Lihat Semua
         </button>
       </div>
 
