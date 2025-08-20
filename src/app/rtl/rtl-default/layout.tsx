@@ -9,7 +9,6 @@ import {
   isWindowAvailable,
 } from 'utils/navigation';
 import React from 'react';
-import { Portal } from '@chakra-ui/portal';
 import Navbar from 'components/navbar/RTL';
 import Sidebar from 'components/sidebar/RTL';
 import Footer from 'components/footer/Footer';
