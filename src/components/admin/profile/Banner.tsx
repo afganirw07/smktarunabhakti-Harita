@@ -27,7 +27,7 @@ const Banner = () => {
         <h4 className="text-xl font-bold text-navy-700 dark:text-white">
           John Doe
         </h4>
-        <h5 className="text-base font-normal text-gray-600">Operasional Manager </h5>
+        <h5 className="text-base font-normal text-gray-600">Operasional Admin </h5>
       </div>
 
       {/* Post followers */}
