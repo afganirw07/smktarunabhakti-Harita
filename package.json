@@ -20,6 +20,8 @@
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "apexcharts": "^3.35.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "framer-motion": "^7.10.2",
     "lucide-react": "^0.539.0",
     "motion": "^12.23.12",
@@ -33,6 +35,8 @@
     "react-icons": "^4.4.0",
     "react-no-ssr": "^1.1.0",
     "react-router-dom": "^6.4.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
     "tailwindcss-rtl": "^0.9.0",
     "typescript": "^4.9.4",
     "web-vitals": "^2.1.4"
