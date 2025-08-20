@@ -13,25 +13,27 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
+// Mengubah tipe data untuk mencerminkan skema inventaris barang
 type RowObj = {
-  name: string;
-  status: string;
-  date: string;
-  progress: number;
+  id: number;
+  namaBarang: string;
+  status: 'tersedia' | 'habis' | 'dipesan';
+  jumlah: number;
+  tanggalUpdate: string;
 };
 
 const columnHelper = createColumnHelper<RowObj>();
 
-// const columns = columnsDataCheck;
 export default function ComplexTable(props: { tableData: any }) {
   const { tableData } = props;
   const [sorting, setSorting] = React.useState<SortingState>([]);
   let defaultData = tableData;
   const columns = [
-    columnHelper.accessor('name', {
-      id: 'name',
+    // Kolom 0: ID
+    columnHelper.accessor('id', {
+      id: 'id',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">NAME</p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Id</p>
       ),
       cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
@@ -39,32 +41,46 @@ export default function ComplexTable(props: { tableData: any }) {
         </p>
       ),
     }),
+    // Kolom 1: Nama Barang
+    columnHelper.accessor('namaBarang', {
+      id: 'namaBarang',
+      header: () => (
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Nama Barang</p>
+      ),
+      cell: (info) => (
+        <p className="text-sm font-bold text-navy-700 dark:text-white">
+          {info.getValue()}
+        </p>
+      ),
+    }),
+    // Kolom 2: Status
     columnHelper.accessor('status', {
       id: 'status',
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">
-          STATUS
+          Status
         </p>
       ),
       cell: (info) => (
         <div className="flex items-center">
-          {info.getValue() === 'Approved' ? (
+          {info.getValue() === 'tersedia' ? (
             <MdCheckCircle className="me-1 text-green-500 dark:text-green-300" />
-          ) : info.getValue() === 'Disable' ? (
-            <MdCancel className="me-1 text-red-500 dark:text-red-300" />
-          ) : info.getValue() === 'Error' ? (
+          ) : info.getValue() === 'dipesan' ? (
             <MdOutlineError className="me-1 text-amber-500 dark:text-amber-300" />
+          ) : info.getValue() === 'habis' ? (
+            <MdCancel className="me-1 text-red-500 dark:text-red-300" />
           ) : null}
           <p className="text-sm font-bold text-navy-700 dark:text-white">
-            {info.getValue()}
+            {info.getValue().charAt(0).toUpperCase() + info.getValue().slice(1)}
           </p>
         </div>
       ),
     }),
-    columnHelper.accessor('date', {
-      id: 'date',
+    // Kolom 3: Jumlah
+    columnHelper.accessor('jumlah', {
+      id: 'jumlah',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">DATE</p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Jumlah</p>
       ),
       cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
@@ -72,20 +88,20 @@ export default function ComplexTable(props: { tableData: any }) {
         </p>
       ),
     }),
-    columnHelper.accessor('progress', {
-      id: 'progress',
+    // Kolom 4: Tanggal Update
+    columnHelper.accessor('tanggalUpdate', {
+      id: 'tanggalUpdate',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">
-          PROGRESS
-        </p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Tanggal Update</p>
       ),
       cell: (info) => (
-        <div className="flex items-center">
-          <Progress width="w-[108px]" value={info.getValue()} />
-        </div>
+        <p className="text-sm font-bold text-navy-700 dark:text-white">
+          {info.getValue()}
+        </p>
       ),
     }),
-  ]; // eslint-disable-next-line
+  ]; 
+
   const [data, setData] = React.useState(() => [...defaultData]);
   const table = useReactTable({
     data,
@@ -98,6 +114,7 @@ export default function ComplexTable(props: { tableData: any }) {
     getSortedRowModel: getSortedRowModel(),
     debugTable: true,
   });
+
   return (
     <Card extra={'w-full h-full px-6 pb-6 sm:overflow-x-auto'}>
       <div className="relative flex items-center justify-between pt-4">
@@ -107,7 +124,7 @@ export default function ComplexTable(props: { tableData: any }) {
         <CardMenu />
       </div>
 
-      <div className="mt-8 overflow-x-scroll xl:overflow-x-hidden">
+      <div className="mt-8 overflow-x-scroll scrollbar-thin">
         <table className="w-full">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -118,7 +135,7 @@ export default function ComplexTable(props: { tableData: any }) {
                       key={header.id}
                       colSpan={header.colSpan}
                       onClick={header.column.getToggleSortingHandler()}
-                      className="cursor-pointer border-b border-gray-200 pb-2 pr-4 pt-4 text-start dark:border-white/30"
+                      className="cursor-pointer border-b border-gray-200 pb-2 px-4 pt-4 text-start dark:border-white/30"
                     >
                       <div className="items-center justify-between text-xs text-gray-200">
                         {flexRender(
@@ -147,7 +164,7 @@ export default function ComplexTable(props: { tableData: any }) {
                       return (
                         <td
                           key={cell.id}
-                          className="min-w-[150px] border-white/0 py-3  pr-4"
+                          className="min-w-[150px] border-white/0 py-3 "
                         >
                           {flexRender(
                             cell.column.columnDef.cell,

@@ -58,7 +58,7 @@ function CheckTable(props: { tableData: RowObj[] }) {
         </button>
       </header>
 
-      <div className="w-full overflow-x-auto scrollbar-hide">
+      <div className="w-full overflow-x-auto scrollbar-thin">
         <table className="min-w-[7px] w-full table-auto">
 
 
