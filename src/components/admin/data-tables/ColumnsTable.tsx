@@ -34,7 +34,7 @@ function ColumnsTable(props: { tableData: any }) {
     columnHelper.accessor('id', {
       id: 'id',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">Id</p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">ID</p>
       ),
       cell: (info) => (
         <p className="text-sm font-medium text-navy-700 dark:text-white">
