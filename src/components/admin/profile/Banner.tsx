@@ -16,7 +16,7 @@ const Banner = () => {
             width="2"
             height="20"
             className="h-full w-full rounded-full"
-            src={avatar}
+            src= 'https://i.pinimg.com/564x/f1/b9/13/f1b9133c65ec275f4657dc916abad249.jpg'
             alt=""
           />
         </div>
