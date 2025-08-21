@@ -2,13 +2,13 @@ import {
   MdArrowDropUp,
   MdOutlineCalendarToday,
   MdBarChart,
-} from "react-icons/md";
-import Card from "components/card";
+} from 'react-icons/md';
+import Card from 'components/card';
 import {
   lineChartDataTotalSpent,
   lineChartOptionsTotalSpent,
-} from "variables/charts";
-import LineChart from "components/charts/LineChart";
+} from 'variables/charts';
+import LineChart from 'components/charts/LineChart';
 
 const TotalSpent = () => {
   return (
@@ -23,13 +23,13 @@ const TotalSpent = () => {
         </button>
       </div>
 
+      <p className="mt-[20px] text-left text-2xl font-bold text-navy-700 dark:text-white">
+        Rp 82.000.000
+      </p>
       <div className="flex h-full w-full flex-row justify-between sm:flex-wrap lg:flex-nowrap 2xl:overflow-hidden">
         <div className="flex flex-col">
-          <p className="mt-[20px] text-2xl font-bold text-navy-700 dark:text-white">
-            82 JT
-          </p>
           <div className="flex flex-col items-start">
-            <p className="mt-4 ml-2 text-sm text-gray-600">Layanan</p>
+            <p className="ml-2 mt-4 text-sm text-gray-600">Layanan</p>
             <div className="flex flex-row items-center justify-center">
               <MdArrowDropUp className="font-medium text-green-500" />
               <p className="text-sm font-bold text-green-500"> +5.45% </p>
