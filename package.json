@@ -11,6 +11,7 @@
     "@chakra-ui/tooltip": "^2.2.6",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@tabler/icons-react": "^3.34.1",
     "@tanstack/react-table": "^8.7.9",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",
@@ -20,13 +21,9 @@
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "apexcharts": "^3.35.2",
-<<<<<<< HEAD
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^7.10.2",
-=======
-    "framer-motion": "^7.10.3",
->>>>>>> 8d8f5cd7395110e620c2dbe5f74344fedc97b802
     "lucide-react": "^0.539.0",
     "motion": "^12.23.12",
     "next": "^15.1.4",

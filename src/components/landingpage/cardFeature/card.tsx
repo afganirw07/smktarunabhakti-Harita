@@ -8,9 +8,9 @@ export default function Card({
   desc,
 }) {
   return (
-    <div className="flex w-[300px] flex-col gap-3">
+    <div className="flex lg:w-[340px] w-[340px] md:w-[300px] flex-col gap-3">
       <div
-        className={`relative h-[340px] w-[300px] overflow-hidden rounded-3xl ${background} shadow-[0_20px_60px_rgba(34,197,94,0.25)]`}
+        className={`relative h-[340px] w-full overflow-hidden rounded-3xl ${background} shadow-[0_20px_60px_rgba(34,197,94,0.25)]`}
       >
         {meshes.map((mesh, i) => (
           <div
@@ -27,8 +27,8 @@ export default function Card({
       </div>
 
       <div className="flex flex-col gap-2 px-1">
-        <h1 className="font-inter text-[1.4rem] font-bold">{heading}</h1>
-        <p>{desc}</p>
+        <h1 className="font-inter text-[1.4rem] font-bold lg:text-left text-center">{heading}</h1>
+        <p className='lg:text-left text-center'>{desc}</p>
       </div>
     </div>
   );
