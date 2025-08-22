@@ -12,6 +12,9 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@tabler/icons-react": "^3.34.1",
+    "@supabase/auth-ui-react": "^0.4.7",
+    "@supabase/auth-ui-shared": "^0.1.8",
+    "@supabase/supabase-js": "^2.56.0",
     "@tanstack/react-table": "^8.7.9",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",
@@ -21,9 +24,8 @@
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "apexcharts": "^3.35.2",
-    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "framer-motion": "^7.10.2",
+    "framer-motion": "^7.10.3",
     "lucide-react": "^0.539.0",
     "motion": "^12.23.12",
     "next": "^15.1.4",
@@ -37,7 +39,6 @@
     "react-no-ssr": "^1.1.0",
     "react-router-dom": "^6.4.0",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7",
     "tailwindcss-rtl": "^0.9.0",
     "typescript": "^4.9.4",
     "web-vitals": "^2.1.4"
@@ -88,7 +89,8 @@
     "postcss": "^8.5.6",
     "prettier": "^2.8.3",
     "prettier-plugin-tailwindcss": "^0.2.1",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "tailwindcss-animate": "^1.0.7"
   },
   "resolutions": {
     "@types/react": "18.0.31",

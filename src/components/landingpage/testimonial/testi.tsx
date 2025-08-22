@@ -1,4 +1,4 @@
-import Testi from "components/magicui/testimonia;";
+import Testi from "components/magicui/testimonial";
 
 export function AnimatedTesti() {
   const testimonials = [

@@ -1,181 +1,200 @@
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { Users} from "lucide-react";
+
+"use client"
+import { createClient } from '@supabase/supabase-js';
+import React, { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Users } from 'lucide-react';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 export default function Register() {
-  return (
-    <>
-      {/* ✅ h-screen agar fix setinggi layar */}
-      <div className="h-screen bg-gray-100 text-gray-900 flex justify-center">
-        <div className="max-w-screen-xl m-0 sm:m-6 bg-white shadow sm:rounded-lg flex justify-center flex-1">
-          
-          {/* ✅ Form area diperbesar */}
-          <div className="lg:w-3/5 xl:w-7/12 p-4 sm:p-8 flex flex-col justify-center">
-            <div className="flex flex-col items-center">
-              <h1 className="text-xl xl:text-2xl font-extrabold mb-4">Daftar</h1>
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [city, setCity] = useState('');
+  const [address, setAddress] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-              <div className="w-full max-w-sm">
-                {/* --- Form Fields --- */}
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          phone: phone,
+          city: city,
+          address: address,
+        },
+      },
+    });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    if (data.user) {
+      alert('Pendaftaran berhasil! Silakan periksa email Anda untuk verifikasi.');
+      // Redirect atau navigasi ke halaman lain
+    }
+    
+    setLoading(false);
+  };
+
+  return (
+    <div className="h-screen bg-gray-100 text-gray-900 flex justify-center">
+      <div className="max-w-screen-xl m-0 sm:m-6 bg-white shadow sm:rounded-lg flex justify-center flex-1">
+        
+        <div className="lg:w-3/5 xl:w-7/12 p-4 sm:p-8 flex flex-col justify-center">
+          <div className="flex flex-col items-center">
+            <h1 className="text-xl xl:text-2xl font-extrabold mb-4">Daftar</h1>
+
+            <div className="w-full max-w-sm">
+              {error && <div className="text-red-500 text-sm mb-4 text-center">{error}</div>}
+              <form onSubmit={handleSignUp}> {/* 3. Tambahkan tag form */}
                 <div className="space-y-3">
-                  {/* Nama Depan & Belakang */}
+                  {/* ... Input Fields ... */}
                   <div className="grid grid-cols-2 gap-2">
                     <input
                       className="w-full px-5 py-3 rounded-lg font-medium bg-white border border-green-200 placeholder-gray-500 text-sm focus:outline-none focus:border-green-400 focus:bg-white"
                       type="text"
                       placeholder="Nama Depan"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)} // Tambahkan onChange handler
                     />
                     <input
                       className="w-full px-5 py-3 rounded-lg font-medium bg-white border border-green-200 placeholder-gray-500 text-sm focus:outline-none focus:border-green-400 focus:bg-white"
                       type="text"
                       placeholder="Nama Belakang"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
                     />
                   </div>
                   
-                  {/* Nomor Telepon */}
                   <input
                     className="w-full px-5 py-3 rounded-lg font-medium bg-white border border-green-200 placeholder-gray-500 text-sm focus:outline-none focus:border-green-400 focus:bg-white"
                     type="tel"
                     placeholder="Nomor Telepon"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                   />
                   
-                  {/* Email */}
                   <input
                     className="w-full px-5 py-3 rounded-lg font-medium bg-white border border-green-200 placeholder-gray-500 text-sm focus:outline-none focus:border-green-400 focus:bg-white"
                     type="email"
                     placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                   
-                  {/* Password */}
+                  <input
+                    className="w-full px-5 py-3 rounded-lg font-medium bg-white border border-green-200 placeholder-gray-500 text-sm focus:outline-none focus:border-green-400 focus:bg-white"
+                    type="text"
+                    placeholder="Kota"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                  />
+                  
+                  <input
+                    className="w-full px-5 py-3 rounded-lg font-medium bg-white border border-green-200 placeholder-gray-500 text-sm focus:outline-none focus:border-green-400 focus:bg-white"
+                    type="text"
+                    placeholder="Alamat"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
+                  
                   <input
                     className="w-full px-5 py-3 rounded-lg font-medium bg-white border border-green-200 placeholder-gray-500 text-sm focus:outline-none focus:border-green-400 focus:bg-white"
                     type="password"
                     placeholder="Kata Sandi"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
 
-                {/* Sign Up Button */}
                 <div className="flex flex-col gap-1.5">
-                <button className="mt-5 tracking-wide font-semibold text-white w-full py-3 rounded-lg hover:opacity-90 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none" style={{backgroundColor: '#294B29'}}>
-                  <span className="ml-2 text-sm">Daftar</span>
-                </button>
-                <div className="block lg:hidden text-sm ">Belum punya akun? <Link href={"/auth/login"}><span className="font-bold text-green-700 hover:text-green-500 transition-colors duration-150 ease-out">daftar</span>  
-                </Link>
-                </div>
-                </div>
-
-                {/* Divider */}
-                <div className="my-4 border-b text-center">
-                  <div className="leading-none px-2 inline-block text-xs text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2">
-                    atau Lanjutkan dengan
-                  </div>
-                </div>
-
-                {/* Social Login Buttons */}
-                <div className="flex flex-col space-y-2">
-                  {/* --- Google Button --- */}
-                  <button className="w-full font-bold shadow-sm rounded-lg py-2.5 bg-green-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline">
-                    <div className="bg-white p-1.5 rounded-full">
-                      {/* Google Icon */}
-                      <svg className="w-3.5" viewBox="0 0 533.5 544.3">
-                        <path
-                          d="M533.5 278.4c0-18.5-1.5-37.1-4.7-55.3H272.1v104.8h147c-6.1 33.8-25.7 63.7-54.4 82.7v68h87.7c51.5-47.4 81.1-117.4 81.1-200.2z"
-                          fill="#4285f4"
-                        />
-                        <path
-                          d="M272.1 544.3c73.4 0 135.3-24.1 180.4-65.7l-87.7-68c-24.4 16.6-55.9 26-92.6 26-71 0-131.2-47.9-152.8-112.3H28.9v70.1c46.2 91.9 140.3 149.9 243.2 149.9z"
-                          fill="#34a853"
-                        />
-                        <path
-                          d="M119.3 324.3c-11.4-33.8-11.4-70.4 0-104.2V150H28.9c-38.6 76.9-38.6 167.5 0 244.4l90.4-70.1z"
-                          fill="#fbbc04"
-                        />
-                        <path
-                          d="M272.1 107.7c38.8-.6 76.3 14 104.4 40.8l77.7-77.7C405 24.6 339.7-.8 272.1 0 169.2 0 75.1 58 28.9 150l90.4 70.1c21.5-64.5 81.8-112.4 152.8-112.4z"
-                          fill="#ea4335"
-                        />
-                      </svg>
-                    </div>
-                    <span className="ml-3 text-sm">Daftar dengan Google</span>
+                  <button 
+                    type="submit" 
+                    className="mt-5 tracking-wide font-semibold text-white w-full py-3 rounded-lg hover:opacity-90 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none" 
+                    style={{backgroundColor: '#294B29'}}
+                    disabled={loading}
+                  >
+                    <span className="ml-2 text-sm">
+                      {loading ? 'Mendaftar...' : 'Daftar'}
+                    </span>
                   </button>
-
-                  {/* --- Facebook Button --- */}
-                  <button className="w-full font-bold shadow-sm rounded-lg py-2.5 bg-green-50 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline border border-green-200">
-                    <div className="bg-white p-1.5 rounded-full">
-                      {/* Facebook Icon */}
-                      <svg className="w-3.5" viewBox="0 0 24 24" fill="#1877F2">
-                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                      </svg>
-                    </div>
-                    <span className="ml-3 text-sm">Daftar dengan Facebook</span>
-                  </button>
+                  <div className="block pt-2 lg:hidden text-sm">Sudah punya akun? <Link href={"/auth/login"}><span className="font-bold text-green-700 hover:text-green-500 transition-colors duration-150 ease-out">masuk</span></Link></div>
                 </div>
-
-                {/* Terms */}
-                <p className="mt-4 text-xs text-gray-600 text-center">
-                  I agree to abide by Gidy's{" "}
-                  <a href="#" className="border-b border-green-600 border-dotted text-green-700">
-                    Terms of Service
-                  </a>{" "}
-                  and its{" "}
-                  <a href="#" className="border-b border-green-600 border-dotted text-green-700">
-                    Privacy Policy
-                  </a>
-                </p>
-              </div>
+              </form>
+              
+              {/* ... Bagian Terms ... */}
+              <p className="mt-4 text-xs text-gray-600 text-center">
+                I agree to abide by Gidy's{" "}
+                <a href="#" className="border-b border-green-600 border-dotted text-green-700">
+                  Terms of Service
+                </a>{" "}
+                and its{" "}
+                <a href="#" className="border-b border-green-600 border-dotted text-green-700">
+                  Privacy Policy
+                </a>
+              </p>
             </div>
           </div>
+        </div>
 
-          {/* Right side content - Welcome section */}
-          <div className="flex-1 hidden lg:flex lg:w-2/5 xl:w-5/12 relative overflow-hidden">
-            {/* Background Image */}
-            <Image
-              src="https://assets.ladiestory.id/gallery/1674010062369593176-pandawara-group.jpg"
-              alt="Team collaboration background"
-              fill
-              className="object-cover"
-            />
-            
-            {/* Dark overlay */}
-            <div className="absolute inset-0 bg-black opacity-50"></div>
-            
-            {/* Content overlay */}
-            <div className="relative z-10 flex flex-col justify-center items-center p-8 text-white w-full">
-              <div className="max-w-md text-center">
-                {/* Welcome Icon */}
-                <div className="mb-6">
-                  <div className="w-20 h-20 mx-auto bg-white bg-opacity-10 rounded-full flex items-center justify-center backdrop-blur-sm">
-                    <Users className="w-10 h-10 text-white" strokeWidth={1.5} />
-                  </div>
+        {/* Right side content */}
+        <div className="flex-1 hidden lg:flex lg:w-2/5 xl:w-5/12 relative overflow-hidden">
+          <Image
+            src="https://assets.ladiestory.id/gallery/1674010062369593176-pandawara-group.jpg"
+            alt="Team collaboration background"
+            fill
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-black opacity-50"></div>
+          <div className="relative z-10 flex flex-col justify-center items-center p-8 text-white w-full">
+            <div className="max-w-md text-center">
+              <div className="mb-6">
+                <div className="w-20 h-20 mx-auto bg-white bg-opacity-10 rounded-full flex items-center justify-center backdrop-blur-sm">
+                  <Users className="w-10 h-10 text-white" strokeWidth={1.5} />
                 </div>
-                
-                {/* Welcome Message */}
-                <h2 className="text-2xl xl:text-3xl font-bold mb-4">
-                  Selamat Datang di <span className="text-green-400">Harita</span> 
-                </h2>
-                
-                <p className="text-gray-200 text-base xl:text-lg mb-6 leading-relaxed">
-                  Bergabunglah dan jadikan Harita sebagai Solusi digital penanggulan sampah rumah anda sehari hari
+              </div>
+              
+              <h2 className="text-2xl xl:text-3xl font-bold mb-4">
+                Selamat Datang di <span className="text-green-400">Harita</span> 
+              </h2>
+              
+              <p className="text-gray-200 text-base xl:text-lg mb-6 leading-relaxed">
+                Bergabunglah dan jadikan Harita sebagai Solusi digital penanggulan sampah rumah anda sehari hari
+              </p>
+              
+              <div className="border-t border-white border-opacity-20 pt-6">
+                <p className="text-gray-200 text-sm mb-4">
+                  Sudah memiliki akun?
                 </p>
-                
-                
-                
-                {/* Already have account section */}
-                <div className="border-t border-white border-opacity-20 pt-6">
-                  <p className="text-gray-200 text-sm mb-4">
-                    Sudah memiliki akun?
-                  </p>
-                  <Link href="/auth/login">
-                    <button className="bg-white text-green-700 font-semibold py-2 px-8 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 shadow-lg">
-                      Masuk 
-                    </button>
-                  </Link>
-                </div>
+                <Link href="/auth/login">
+                  <button className="bg-white text-green-700 font-semibold py-2 px-8 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 shadow-lg">
+                    Masuk 
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
