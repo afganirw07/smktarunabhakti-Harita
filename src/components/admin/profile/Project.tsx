@@ -1,117 +1,91 @@
-import { MdModeEditOutline } from 'react-icons/md';
-import image1 from '/public/img/profile/image1.png';
-import image2 from '/public/img/profile/image2.png';
-import image3 from '/public/img/profile/image3.png';
+import React from 'react';
 import Card from 'components/card';
+import piagam from '/public/img/awards/piagam.png';
+import { MdOutlineStars } from 'react-icons/md'; 
 import Image from 'next/image';
 
-const Project = () => {
+const Awards = () => {
   return (
     <Card extra={'w-full p-4 h-full'}>
       <div className="mb-8 w-full">
         <p className="text-xl font-bold text-navy-700 dark:text-white">
-          All projects
+          Penghargaan
         </p>
         <p className="mt-2 text-base text-gray-600">
-          Here you can find more details about your projects. Keep you user
-          engaged by providing meaningful information.
+          Anda dapat melihat daftar pencapaian dan penghargaan yang telah Anda terima sebagai pengakuan atas dedikasi dan kinerja Anda.
         </p>
       </div>
-      {/* Project 1 */}
+      
+      {/* Penghargaan 1 */}
       <div className="flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-2xl shadow-gray-200 dark:!bg-navy-700 dark:shadow-none">
         <div className="flex items-center">
-          <div className="">
-            <Image
-              width="2"
-              height="20"
-              className="h-[83px] w-[83px] rounded-lg"
-              src={image1}
-              alt=""
-            />
+          <div className="h-[83px] w-[83px] flex items-center justify-center rounded-lg bg-gray-100 dark:bg-navy-600">
+            <Image src={piagam} alt="Penghargaan 1" className="h-full w-full object-contain" />
           </div>
           <div className="ml-4">
             <p className="text-base font-medium text-navy-700 dark:text-white">
-              Technology behind the Blockchain
+              Karyawan Teladan Bulan Ini
             </p>
             <p className="mt-2 text-sm text-gray-600">
-              Project #1 .
+              Diberikan atas kinerja luar biasa pada bulan Mei 2024.
               <a
-                className="ml-1 font-medium text-white hover:text-white dark:text-white"
-                href=" "
+                className="ml-1 font-medium text-[#294B29] hover:text-[#294B29] dark:text-[#86A789] dark:hover:text-[#86A789]"
+                href="#"
               >
-                See product details
+                Lihat detail penghargaan
               </a>
             </p>
           </div>
-        </div>
-        <div className="mr-4 flex items-center justify-center text-gray-600 dark:text-white">
-          <MdModeEditOutline />
         </div>
       </div>
-      {/* Project 1 */}
+
+      {/* Penghargaan 2 */}
       <div className="mt-3 flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-2xl shadow-gray-200 dark:!bg-navy-700 dark:shadow-none">
         <div className="flex items-center">
-          <div className="">
-            <Image
-              width="2"
-              height="20"
-              className="h-[83px] w-[83px] rounded-lg"
-              src={image3}
-              alt=""
-            />
+          <div className="h-[83px] w-[83px] flex items-center justify-center rounded-lg bg-gray-100 dark:bg-navy-600">
+            <Image src={piagam} alt="Penghargaan 1" className="h-full w-full object-contain" />
           </div>
           <div className="ml-4">
             <p className="text-base font-medium text-navy-700 dark:text-white">
-              Technology behind the Blockchain
+              Pencapaian Target Q1 2024
             </p>
             <p className="mt-2 text-sm text-gray-600">
-              Project #1 .
+              Penghargaan tim atas pencapaian target operasional kuartal pertama.
               <a
-                className="ml-1 font-medium text-white hover:text-white dark:text-white"
-                href=" "
+                className="ml-1 font-medium text-[#294B29] hover:text-[#294B29] dark:text-[#86A789] dark:hover:text-[#86A789]"
+                href="#"
               >
-                See product details
+                Lihat detail penghargaan
               </a>
             </p>
           </div>
-        </div>
-        <div className="mr-4 flex items-center justify-center text-gray-600 dark:text-white">
-          <MdModeEditOutline />
         </div>
       </div>
-      {/* Project 1 */}
+      
+      {/* Penghargaan 3 */}
       <div className="mt-3 flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-2xl shadow-gray-200 dark:!bg-navy-700 dark:shadow-none">
         <div className="flex items-center">
-          <div className="">
-            <Image
-              width="2"
-              height="20"
-              className="h-[83px] w-[83px] rounded-lg"
-              src={image2}
-              alt=""
-            />
+          <div className="h-[83px] w-[83px] flex items-center justify-center rounded-lg bg-gray-100 dark:bg-navy-600">
+            <Image src={piagam} alt="Penghargaan 1" className="h-full w-full object-contain" />
           </div>
           <div className="ml-4">
             <p className="text-base font-medium text-navy-700 dark:text-white">
-              Technology behind the Blockchain
+              Inovasi Terbaik
             </p>
             <p className="mt-2 text-sm text-gray-600">
-              Project #1 .
+              Diakui karena kontribusi dalam peningkatan alur kerja operasional.
               <a
-                className="ml-1 font-medium text-white hover:text-white dark:text-white"
-                href=" "
+                className="ml-1 font-medium text-[#294B29] hover:text-[#294B29] dark:text-[#86A789] dark:hover:text-[#86A789]"
+                href="#"
               >
-                See product details
+                Lihat detail penghargaan
               </a>
             </p>
           </div>
-        </div>
-        <div className="mr-4 flex items-center justify-center text-gray-600 dark:text-white">
-          <MdModeEditOutline />
         </div>
       </div>
     </Card>
   );
 };
 
-export default Project;
+export default Awards;

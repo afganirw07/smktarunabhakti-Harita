@@ -1,3 +1,4 @@
+import React from "react";
 import Card from "components/card";
 import CardMenu from "components/card/CardMenu";
 import Switch from "components/switch";
@@ -7,96 +8,92 @@ function Notification() {
     <Card extra={"w-full h-full p-3"}>
       <div className="relative mb-3 flex items-center justify-between pt-1">
         <h4 className="text-xl font-bold text-navy-700 dark:text-white">
-          Notifications
+          Pengaturan Notifikasi
         </h4>
         <CardMenu />
       </div>
       <div className="flex flex-col">
-        {/* the custom checkbox desing added in src/index.js */}
+        {/* Notifikasi Inventaris & Logistik */}
         <div className="mt-3 flex items-center gap-3">
-          <Switch id="switch1" />
+          <Switch id="notif-stok-kritis" />
           <label
-            htmlFor="checkbox1"
+            htmlFor="notif-stok-kritis"
             className="text-base font-medium text-navy-700 dark:text-white"
           >
-            Item comment notifications
+            Peringatan stok barang di bawah batas minimum
           </label>
         </div>
 
         <div className="mt-4 flex items-center gap-3">
-          <Switch id="switch2" />
+          <Switch id="notif-stok-habis" />
           <label
-            htmlFor="checkbox2"
+            htmlFor="notif-stok-habis"
             className="text-base font-medium text-navy-700 dark:text-white"
           >
-            Buyer review notifications
+            Notifikasi jika stok barang habis
+          </label>
+        </div>
+
+        {/* Notifikasi Pengguna & Akun */}
+        <div className="mt-4 flex items-center gap-3">
+          <Switch id="notif-akun-baru" />
+          <label
+            htmlFor="notif-akun-baru"
+            className="text-base font-medium text-navy-700 dark:text-white"
+          >
+            Notifikasi pendaftaran akun baru
           </label>
         </div>
 
         <div className="mt-4 flex items-center gap-3">
-          <Switch id="switch3" />
+          <Switch id="notif-ubah-profil" />
           <label
-            htmlFor="checkbox3"
+            htmlFor="notif-ubah-profil"
             className="text-base font-medium text-navy-700 dark:text-white"
           >
-            Rating reminders notifications
+            Notifikasi perubahan profil karyawan
+          </label>
+        </div>
+
+        {/* Notifikasi Operasional & Tugas */}
+        <div className="mt-4 flex items-center gap-3">
+          <Switch id="notif-tugas-selesai" />
+          <label
+            htmlFor="notif-tugas-selesai"
+            className="text-base font-medium text-navy-700 dark:text-white"
+          >
+            Notifikasi jika ada tugas yang selesai
           </label>
         </div>
 
         <div className="mt-4 flex items-center gap-3">
-          <Switch id="switch4" />
+          <Switch id="notif-tugas-terlambat" />
           <label
-            htmlFor="checkbox4"
+            htmlFor="notif-tugas-terlambat"
             className="text-base font-medium text-navy-700 dark:text-white"
           >
-            Meetups near you notifications
+            Peringatan tugas yang melewati tenggat waktu
+          </label>
+        </div>
+
+        {/* Notifikasi Aktivitas & Keamanan */}
+        <div className="mt-4 flex items-center gap-3">
+          <Switch id="notif-login-mencurigakan" />
+          <label
+            htmlFor="notif-login-mencurigakan"
+            className="text-base font-medium text-navy-700 dark:text-white"
+          >
+            Peringatan login mencurigakan
           </label>
         </div>
 
         <div className="mt-4 flex items-center gap-3">
-          <Switch id="switch5" />
+          <Switch id="notif-perubahan-sistem" />
           <label
-            htmlFor="checkbox5"
+            htmlFor="notif-perubahan-sistem"
             className="text-base font-medium text-navy-700 dark:text-white"
           >
-            Company news notifications
-          </label>
-        </div>
-
-        <div className="mt-4 flex items-center gap-3">
-          <Switch id="switch6" />
-          <label
-            htmlFor="checkbox6"
-            className="text-base font-medium text-navy-700 dark:text-white"
-          >
-            New launches and projects
-          </label>
-        </div>
-        <div className="mt-4 flex items-center gap-3">
-          <Switch id="switch7" />
-          <label
-            htmlFor="checkbox7"
-            className="text-base font-medium text-navy-700 dark:text-white"
-          >
-            Monthly product changes
-          </label>
-        </div>
-        <div className="mt-4 flex items-center gap-3">
-          <Switch id="switch8" />
-          <label
-            htmlFor="checkbox8"
-            className="text-base font-medium text-navy-700 dark:text-white"
-          >
-            Subscribe to newsletter
-          </label>
-        </div>
-        <div className="mt-4 flex items-center gap-3">
-          <Switch id="switch8" />
-          <label
-            htmlFor="checkbox8"
-            className="text-base font-medium text-navy-700 dark:text-white"
-          >
-            Email me when someone follows me
+            Pemberitahuan perubahan penting pada sistem
           </label>
         </div>
       </div>
