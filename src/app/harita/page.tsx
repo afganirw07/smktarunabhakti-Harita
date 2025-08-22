@@ -2,26 +2,31 @@ import { cn } from '@/public/lib/utils';
 import Navbar from '../../components/landingpage/navbar';
 import Image from 'next/image';
 import CountUp from 'components/landingpage/counter';
-import { Home, Truck, ClockPlus, Sprout, Star } from 'lucide-react';
+import { Home, Truck, ClockPlus, Sprout, Star, CalendarClock, CoinsIcon, CircleDollarSign } from 'lucide-react';
 import Collab from 'components/landingpage/marque section/collab';
 import About from 'components/landingpage/about/about';
 import Card from 'components/landingpage/cardFeature/card';
 import { DotPattern } from 'components/magicui/dot-pattern';
+import Benefit from 'components/landingpage/widgetBenefit/benefit';
+import Magnet from 'components/magicui/magnet';
+import Pricing from 'components/magicui/pricing';
+import { AnimatedTesti } from 'components/landingpage/testimonial/testi';
+import Footer from '../../components/landingpage/footer/footer';
 
 export default function landingPage() {
   return (
     <>
       <section className="relative z-20 flex h-auto w-full flex-col items-center justify-center bg-bgPrimary/60 px-6 py-20  sm:px-16 md:px-8 lg:px-20">
         <DotPattern
-        width={30}
-        height={35}
-        cx={1}
-        cy={1}
-        cr={1}
-        className={cn(
-          "[mask-image:linear-gradient(to_bottom,white,transparent)] opacity-70 -z-10 ",
-        )}
-      />
+          width={30}
+          height={35}
+          cx={1}
+          cy={1}
+          cr={1}
+          className={cn(
+            '-z-10 opacity-70 [mask-image:linear-gradient(to_bottom,white,transparent)] ',
+          )}
+        />
         <Navbar />
         <div className="heading mt-10 flex flex-col items-center justify-center gap-2">
           <h1 className="text-Black max-w-[600px]  text-wrap  text-center font-inter text-[2rem]/tight font-black md:text-[2.5rem]/tight ">
@@ -226,7 +231,7 @@ export default function landingPage() {
       </section>
 
       {/* feature section */}
-      <section className="h-auto w-full bg-white px-6 py-16 sm:px-16 lg:px-20">
+      <section className="h-auto w-full bg-bgPrimary px-6 py-16 sm:px-16 lg:px-20">
         {/* heading */}
         <div className="flex w-full flex-col items-center justify-between gap-6 lg:flex-row lg:gap-0">
           <h1 className="text-wrap text-center font-inter text-[2rem] font-semibold text-black lg:w-[300px] lg:text-left">
@@ -235,7 +240,8 @@ export default function landingPage() {
 
           <div className="flex flex-col items-center justify-center gap-8 lg:flex-row">
             <p className="text-wrap text-center font-nunito text-lg font-semibold text-black/40 lg:w-[550px] lg:text-left">
-              Kami Menyediakan fitur yang dapat di jadikan solusi permasalahan sampah pada masyarakat Indonesia
+              Kami Menyediakan fitur yang dapat di jadikan solusi permasalahan
+              sampah pada masyarakat Indonesia
             </p>
             <button className="rounded-full  bg-green-800 px-4  py-3 font-nunito text-lg font-bold text-white">
               Mulai Sekarang
@@ -244,7 +250,7 @@ export default function landingPage() {
         </div>
 
         {/* card */}
-        <div className="mt-12 flex w-full flex-col items-center justify-center gap-10 lg:flex-row lg:justify-evenly lg:gap-0">
+        <div className="mt-12 flex w-full flex-wrap items-center justify-center gap-10 lg:flex-row lg:justify-between lg:gap-0">
           {/* Card 1: Hijau Segar */}
           <Card
             heading="Lapor Sampah"
@@ -282,6 +288,73 @@ export default function landingPage() {
           />
         </div>
       </section>
+
+      {/* benefit section */}
+      <section className="relative flex h-auto w-full flex-col items-center justify-center overflow-hidden bg-[#FBFFF9] px-6 py-16 sm:px-16 lg:px-20 z-10">
+        {/* Lingkaran 1 */}
+        <div className="absolute right-[-200px] top-[-200px] h-[300px] w-[300px] rounded-full bg-[#6DD130] opacity-100 blur-[300px] lg:h-[300px] lg:w-[300px]"></div>
+
+        {/* Lingkaran 2 */}
+        <div className="absolute bottom-[-200px] left-[-200px] h-[300px] w-[300px] rounded-full bg-[#74C9A9] opacity-100 blur-[300px] lg:h-[300px] lg:w-[300px]"></div>
+
+        <h1 className="text-center font-inter text-[2rem] font-bold">
+          Benefit yang anda dapatkan
+        </h1>
+
+        <div className="z-30 mx-auto mt-12 flex max-w-[1000px] flex-wrap justify-center md:gap-20 gap-10 sm:mt-16 lg:mt-24">
+          <Magnet padding={30} disabled={false} magnetStrength={10}>
+          <div className='lg:-rotate-3 rotate-0 lg:hover:rotate-0 hover:-rotate-3 transition-all duration-300 ease-out'>
+            <Benefit
+            Name='GRATIS Pengguna Baru'
+            Desc='Bonus 14 hari masa berlangganan untuk Alamat baru '
+            />
+          </div>
+          </Magnet>
+
+          <Magnet padding={30} disabled={false} magnetStrength={10}>
+          <div className='lg:rotate-3 rotate-0 lg:hover:rotate-0 hover:rotate-3 transition-all duration-300 ease-out'>
+            <Benefit 
+            Icon={CalendarClock}
+            Name='Atur jadwal sesuka anda'
+            Desc='Susun jadwal sesuka anda kapan sampah dapat di ambil'
+            />
+          </div>
+          </Magnet>
+
+          <Magnet padding={30} disabled={false} magnetStrength={10}>
+          <div className='lg:-rotate-3 rotate-0 lg:hover:rotate-0 hover:-rotate-3 transition-all duration-300 ease-out'>
+            <Benefit
+            Icon={CircleDollarSign} 
+            Name='Pembayaran yang Transparant'
+            Desc='Pembayaran yang tercatat dan dapat dilihat pengguna'
+            />
+          </div>
+          </Magnet>
+
+          <Magnet padding={30} disabled={false} magnetStrength={10}>
+          <div className='lg:rotate-3 rotate-0 lg:hover:rotate-0 hover:rotate-3 transition-all duration-300 ease-out'>
+            <Benefit
+            Icon={CoinsIcon}
+            Name='Bonus HACOINS Tiap Bulan'
+            Desc='Dapatkan HACOINS dengan menukar sampah rumah anda'
+            />
+          </div>
+          </Magnet>
+        </div>
+      </section>
+
+      <section className='pricing w-full h-auto py-20 bg-[#FBFFF9]'>
+            <Pricing/>
+      </section>
+
+      <section className='w-full h-auto py-6 flex justify-center items-center '>
+        <div className='flex flex-col gap-8'>
+          <h1 className='text-[2.2rem] font-inter font-bold text-center'>Harita sudah dijadikan solusi</h1>
+        <AnimatedTesti/>
+          </div>
+      </section>
+
+      <Footer/>
     </>
   );
 }
