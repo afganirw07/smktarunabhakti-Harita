@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Users } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
-import { CircleChevronLeft } from 'lucide-react';
 
 // Inisialisasi Supabase
 const supabase = createClient(
@@ -23,12 +22,11 @@ export default function Register() {
   const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
   
-  // State untuk poin, role, plan, status, dan token
-  const [point, setPoint] = useState(0); // Poin awal 0
-  const [role, setRole] = useState('user'); // Role awal 'user'
-  const [plan, setPlan] = useState('free'); // Plan awal 'free'
-  const [status, setStatus] = useState('active'); // Status awal 'active'
-  const [activeToken, setActiveToken] = useState(Math.random().toString(36).substring(2, 15)); // Token acak
+  const [point, setPoint] = useState(0);
+  const [role, setRole] = useState('user'); 
+  const [plan, setPlan] = useState('trial'); 
+  const [status, setStatus] = useState('yes'); 
+  const [activeToken, setActiveToken] = useState(Math.random().toString(36).substring(2, 15));
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -39,21 +37,6 @@ export default function Register() {
     setError(null);
 
     try {
-      // Langkah 1: Validasi alamat
-      const { data: profiles, error: checkError } = await supabase
-        .from('profiles')
-        .select('address')
-        .eq('address', address);
-
-      if (checkError) {
-        throw new Error(checkError.message);
-      }
-
-      if (profiles.length > 0) {
-        throw new Error("Alamat sudah terdaftar sebelumnya.");
-      }
-
-      // Langkah 2: Pendaftaran akun pengguna dasar (Supabase Auth)
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: email,
         password: password,
@@ -65,27 +48,32 @@ export default function Register() {
       
       const userId = data.user.id;
       
-      // Langkah 3: Simpan data profil ke tabel 'profiles'
+      const insertData = { 
+        id: userId,
+        first_name: firstName,
+        last_name: lastName,
+        phone: phone,
+        city: city,
+        address: address,
+        point: point
+        role: role,
+        plan: plan,
+        status: status,
+        active_token: activeToken,
+      };
+
       const { error: insertError } = await supabase
         .from('profiles')
-        .insert([
-          { 
-            id: userId,
-            first_name: firstName,
-            last_name: lastName,
-            phone: phone,
-            city: city,
-            address: address,
-            poin: point, // Menggunakan 'poin' sesuai skema Anda
-            role: role,
-            plan: plan,
-            status: status,
-            active_token: activeToken,
-          },
-        ]);
-      
+        .insert([insertData]);
+
       if (insertError) {
-        throw new Error(insertError.message);
+        // Jika terjadi error pada insert profil, hapus akun yang baru dibuat
+        // Ini untuk mencegah data tidak sinkron.
+        await supabase.auth.admin.deleteUser(userId);
+        if (insertError.message.includes('duplicate key value violates unique constraint')) {
+          throw new Error("Alamat sudah terdaftar sebelumnya.");
+        }
+        throw new Error("Gagal menyimpan data profil. Akun telah dihapus. " + insertError.message);
       }
 
       toast.success(
