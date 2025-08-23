@@ -6,12 +6,14 @@ import Image from 'next/image';
 import { Users } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
+// Inisialisasi Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 );
 
 export default function Register() {
+  // State untuk setiap input
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
@@ -19,6 +21,14 @@ export default function Register() {
   const [city, setCity] = useState('');
   const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
+  
+  // State untuk poin, role, plan, status, dan token
+  const [point, setPoint] = useState(0); // Poin awal 0
+  const [role, setRole] = useState('user'); // Role awal 'user'
+  const [plan, setPlan] = useState('free'); // Plan awal 'free'
+  const [status, setStatus] = useState('active'); // Status awal 'active'
+  const [activeToken, setActiveToken] = useState(Math.random().toString(36).substring(2, 15)); // Token acak
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -27,34 +37,66 @@ export default function Register() {
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-          phone: phone,
-          city: city,
-          address: address,
-        },
-      },
-    });
+    try {
+      // Langkah 1: Validasi alamat
+      const { data: profiles, error: checkError } = await supabase
+        .from('profiles')
+        .select('address')
+        .eq('address', address);
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      toast.error('Pendaftaran gagal: ' + error.message); 
-      return;
-    }
+      if (checkError) {
+        throw new Error(checkError.message);
+      }
 
-    if (data.user) {
+      if (profiles.length > 0) {
+        throw new Error("Alamat sudah terdaftar sebelumnya.");
+      }
+
+      // Langkah 2: Pendaftaran akun pengguna dasar (Supabase Auth)
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+      });
+
+      if (signUpError) {
+        throw new Error(signUpError.message);
+      }
+      
+      const userId = data.user.id;
+      
+      // Langkah 3: Simpan data profil ke tabel 'profiles'
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert([
+          { 
+            id: userId,
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone,
+            city: city,
+            address: address,
+            poin: point, // Menggunakan 'poin' sesuai skema Anda
+            role: role,
+            plan: plan,
+            status: status,
+            active_token: activeToken,
+          },
+        ]);
+      
+      if (insertError) {
+        throw new Error(insertError.message);
+      }
+
       toast.success(
         'Pendaftaran berhasil! Silakan periksa email Anda untuk verifikasi.',
       );
+      
+    } catch (err) {
+      setError(err.message);
+      toast.error('Pendaftaran gagal: ' + err.message);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -72,17 +114,14 @@ export default function Register() {
                 </div>
               )}
               <form onSubmit={handleSignUp}>
-                {' '}
-                {/* 3. Tambahkan tag form */}
                 <div className="space-y-3">
-                  {/* ... Input Fields ... */}
                   <div className="grid grid-cols-2 gap-2">
                     <input
                       className="w-full rounded-lg border border-green-200 bg-white px-5 py-3 text-sm font-medium placeholder-gray-500 focus:border-green-400 focus:bg-white focus:outline-none"
                       type="text"
                       placeholder="Nama Depan"
                       value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)} // Tambahkan onChange handler
+                      onChange={(e) => setFirstName(e.target.value)}
                     />
                     <input
                       className="w-full rounded-lg border border-green-200 bg-white px-5 py-3 text-sm font-medium placeholder-gray-500 focus:border-green-400 focus:bg-white focus:outline-none"
@@ -155,7 +194,6 @@ export default function Register() {
                 </div>
               </form>
 
-              {/* ... Bagian Terms ... */}
               <p className="mt-4 text-center text-xs text-gray-600">
                 I agree to abide by Gidy's{' '}
                 <a
