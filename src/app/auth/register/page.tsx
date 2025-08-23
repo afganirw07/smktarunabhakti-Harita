@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Users } from 'lucide-react';
+import { CircleChevronLeft } from 'lucide-react';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -56,9 +57,17 @@ export default function Register() {
   };
 
   return (
-    <div className="h-screen bg-gray-100 text-gray-900 flex justify-center">
-      <div className="max-w-screen-xl m-0 sm:m-6 bg-white shadow sm:rounded-lg flex justify-center flex-1">
-        
+    <div className="h-screen bg-gray-100 text-gray-900 flex justify-center ">
+      <div className="max-w-screen-xl relative m-0 sm:m-6 bg-white shadow sm:rounded-lg flex justify-center flex-1">
+        <Link href={"/harita"}>
+        <div className='absolute left-6 top-6 z-40 cursor-pointer '> 
+              <CircleChevronLeft
+              width={30}
+              height={30}
+              className=' hover:stroke-green-800 stroke-green-600 transition-all duration-300 ease-out'
+              />
+            </div>
+            </Link>
         <div className="lg:w-3/5 xl:w-7/12 p-4 sm:p-8 flex flex-col justify-center">
           <div className="flex flex-col items-center">
             <h1 className="text-xl xl:text-2xl font-extrabold mb-4">Daftar</h1>

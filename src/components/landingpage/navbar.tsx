@@ -2,6 +2,7 @@
 
 import { Menu, X } from "lucide-react"
 import { useState } from "react"
+import Link from "next/link"
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,16 +34,18 @@ const Navbar = () => {
                         <div className="bg-green-600 h-[3px] w-0 group-hover:w-full transition-all duration-300 absolute left-0"></div>
                     </li>
                     <li className="relative group cursor-pointer text-lg font-family-nunito">
-                        Kontak
+                        Testimoni
                         <div className="bg-green-600 h-[3px] w-0 group-hover:w-full transition-all duration-300 absolute left-0"></div>
                     </li>
                 </ul>
             </div>
 
             <div className="button menu flex gap-4 md:justify-center items-center  h-full">
+                <Link href={"/auth/login"}>
                 <button className="bg-white text-black font-bold border-[1px] border-[#D2E3C8] px-6 py-2 rounded-lg shadow-[inset_0_-7px_8px_rgba(0,0,0,0.10),_0_4px_2px_rgba(0,0,0,0.15)] hover:bg-green-700 hover:text-white transition-all duration-200 sm:flex hidden">
                     Masuk
                 </button>
+                </Link>
                 
                 {/* Mobile Menu Button */}
                 <button 

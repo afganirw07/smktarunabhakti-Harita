@@ -1,5 +1,6 @@
 "use client"
 import { createClient } from '@supabase/supabase-js';
+import { CircleChevronLeft } from "lucide-react"
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -46,7 +47,7 @@ export default function Login() {
         <div className="max-w-screen-xl m-0 sm:m-6 bg-white shadow sm:rounded-lg flex justify-center flex-1">
           
           {/* Left side content - Welcome back section */}
-          <div className="flex-1 hidden lg:flex lg:w-2/5 xl:w-5/12 relative overflow-hidden">
+          <div className=" flex-1 hidden lg:flex lg:w-2/5 xl:w-5/12 relative overflow-hidden">
             {/* Background Image */}
             <Image
               src="https://assets.ladiestory.id/gallery/1674010062369593176-pandawara-group.jpg"
@@ -54,6 +55,16 @@ export default function Login() {
               fill
               className="object-cover"
             />
+
+            <Link href={'/harita'}>
+            <div className='absolute left-6 top-6 z-40 cursor-pointer '> 
+              <CircleChevronLeft
+              width={30}
+              height={30}
+              className='stroke-white hover:stroke-green-600 transition-all duration-300 ease-out'
+              />
+            </div>
+            </Link>
             
             {/* Dark overlay */}
             <div className="absolute inset-0 bg-black opacity-50"></div>
