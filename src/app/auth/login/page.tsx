@@ -1,5 +1,6 @@
 'use client';
 import { createClient } from '@supabase/supabase-js';
+import { CircleChevronLeft } from "lucide-react"
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -40,11 +41,12 @@ export default function Login() {
   };
 
   return (
-    <>
+    <div>
       <div className="flex h-screen justify-center bg-gray-100">
         <Toaster position="top-center" reverseOrder={false} />
         <div className="m-0 flex max-w-screen-xl flex-1 justify-center bg-white shadow sm:m-6 sm:rounded-lg">
           {/* Left side content - Welcome back section */}
+          <div className=" flex-1 hidden lg:flex lg:w-2/5 xl:w-5/12 relative overflow-hidden">
           <div className="relative hidden flex-1 overflow-hidden lg:flex lg:w-2/5 xl:w-5/12">
             {/* Background Image */}
             <Image
@@ -54,6 +56,16 @@ export default function Login() {
               className="object-cover"
             />
 
+            <Link href={'/harita'}>
+            <div className='absolute left-6 top-6 z-40 cursor-pointer '> 
+              <CircleChevronLeft
+              width={30}
+              height={30}
+              className='stroke-white hover:stroke-green-600 transition-all duration-300 ease-out'
+              />
+            </div>
+            </Link>
+            
             {/* Dark overlay */}
             <div className="absolute inset-0 bg-black opacity-50"></div>
 
@@ -192,6 +204,8 @@ export default function Login() {
           </div>
         </div>
       </div>
-    </>
+      </div>
+      </div>
+  
   );
-}
+};
