@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Users } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import { CircleChevronLeft } from 'lucide-react';
 
 // Inisialisasi Supabase
 const supabase = createClient(
