@@ -21,7 +21,7 @@ const routes = [
   {
     name: 'Manajemen Aset',
     layout: '/admin',
-    path: 'nft-marketplace',
+    path: 'manajemen-aset',
     icon: <MdOutlineArticle className="h-6 w-6" />,
 
     secondary: true,

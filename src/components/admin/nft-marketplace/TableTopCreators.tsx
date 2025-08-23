@@ -3,6 +3,7 @@ import Card from 'components/card';
 import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from '@tanstack/react-table';
 
 type RowObj = {
+  id: string;
   item: string;
   user: string;
   quantity: number;
@@ -17,6 +18,11 @@ function CheckTable(props: { tableData: RowObj[] }) {
   const [data, setData] = React.useState(() => [...tableData]);
 
   const columns = [
+    columnHelper.accessor('id', {
+      id: 'id',
+      header: () => <p className="text-sm font-bold text-gray-600 dark:text-white">ID</p>,
+      cell: (info) => <p className="text-sm font-medium text-navy-700 dark:text-white">{info.getValue()}</p>,
+    }),
     columnHelper.accessor('item', {
       id: 'item',
       header: () => <p className="text-sm font-bold text-gray-600 dark:text-white">Barang</p>,
