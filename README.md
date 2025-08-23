@@ -9,12 +9,12 @@
 [<img alt="Horizon UI Tailwind CSS NextJS" src="https://i.ibb.co/mtLkcYL/horizon-ui-nextjs-free.png" /> ](https://github.com/horizon-ui/horizon-tailwind-react-nextjs)
 
 <p>&nbsp;</p>
-
+d
 Get started and build your dream web app with Horizon UI Tailwind CSS NextJS, the trendiest & innovative Open Source Admin Template for Tailwind CSS, React & NextJS!
 
 ---
 Ngaji
-
+P
 ### Introduction
 
 Designed for those who like modern UI elements and beautiful websites. Made of
