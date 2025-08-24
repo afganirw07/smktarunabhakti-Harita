@@ -8,7 +8,8 @@ import {
   MdOutlineArticle,
   MdBarChart,
   MdPerson,
-  MdLogout 
+  MdLogout,
+  MdAddChart 
 } from 'react-icons/md';
 
 const routes = [
@@ -30,7 +31,7 @@ const routes = [
     name: 'Tambah Aset',
     layout: '/admin',
     path: 'tambah-aset',
-    icon: <MdOutlineArticle className="h-6 w-6" />,
+    icon: <MdAddChart  className="h-6 w-6" />,
 
     secondary: true,
   },
