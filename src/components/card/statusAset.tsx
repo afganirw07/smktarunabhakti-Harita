@@ -60,7 +60,7 @@ const NftCard = (props: {
                 className="btn linear rounded-[20px] bg-[#294B29] px-4 py-2 text-base font-medium text-white transition duration-200 hover:bg-[#86A789] active:bg-[#294B29]"
                 onClick={toggleModal}
               >
-              Lihat Detail
+              Hapus
             </button>
             <button
               className="btn linear rounded-[20px] bg-[#294B29] px-4 py-2 text-base font-medium text-white transition duration-200 hover:bg-[#86A789] active:bg-[#294B29]"

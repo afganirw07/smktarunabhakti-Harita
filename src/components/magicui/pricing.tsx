@@ -93,22 +93,6 @@ export default function WasteManagementPricing(): JSX.Element {
 
   const yearlyPlans: PricingPlan[] = [
     {
-      name: 'Percobaan',
-      subHead: 'Coba layanan kami selama 14 hari',
-      price: 0,
-      duration: '/14 hari',
-      icon: <Star className="w-6 h-6" />,
-      features: [
-        'Pengangkutan 2x seminggu',
-        'Maksimal 10kg per pickup',
-        'Notifikasi jadwal',
-        'Customer support AI Chat Bot',
-      ],
-      popular: false,
-      buttonText: 'Mulai Trial Gratis',
-      isTrial: true,
-    },
-    {
       name: 'Standar',
       subHead: 'Standar membership',
       price: 1250000,
@@ -218,9 +202,14 @@ export default function WasteManagementPricing(): JSX.Element {
         </div>
 
         {/* Pricing Cards */}
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto transition-all duration-500 ${
-          isAnimating ? 'opacity-0 transform translate-y-4' : 'opacity-100 transform translate-y-0'
-        }`}>
+        <div
+          className={`
+            grid grid-cols-1 md:grid-cols-2 
+            ${currentPlans.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-2"} 
+            gap-8 max-w-6xl mx-auto transition-all duration-500 
+            ${isAnimating ? "opacity-0 transform translate-y-4" : "opacity-100 transform translate-y-0"}
+          `}
+        >
           {currentPlans.map((plan, index) => (
             <div
               key={`${plan.name}-${billingPeriod}`}
