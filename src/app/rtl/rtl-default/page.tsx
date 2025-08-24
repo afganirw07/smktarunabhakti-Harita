@@ -1,5 +1,5 @@
 'use client';
-import MiniCalendar from 'components/calendar/MiniCalendar';
+import MiniCalendar from 'components/miniCalendar/MiniCalendar';
 import WeeklyRevenue from 'components/rtl/dashboard/WeeklyRevenue';
 import TotalSpent from 'components/rtl/dashboard/TotalSpent';
 import PieChartCard from 'components/rtl/dashboard/PieCard';

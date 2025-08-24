@@ -1,5 +1,5 @@
 'use client';
-import MiniCalendar from 'components/calendar/MiniCalendar';
+import MiniCalendar from 'components/miniCalendar/MiniCalendar';
 import WeeklyRevenue from 'components/admin/default/WeeklyRevenue';
 import TotalSpent from 'components/admin/default/TotalSpent';
 import PieChartCard from 'components/admin/default/PieChartCard';
