@@ -1,14 +1,9 @@
 'use client';
-// import Banner from 'components/admin/nft-marketplace/Banner';
-import pupuk from '/public/img/barang/pupuk.png';
-import bricket from '/public/img/barang/briket.png';
-import kerajinan from '/public/img/barang/kerajinan.png';
+
 import truk from '/public/img/aset/truk.png';
 import alat from '/public/img/aset/alat.png';
 import gudang from '/public/img/aset/gudang.png';
-import avatar1 from '/public/img/avatars/avatar1.png';
-import avatar2 from '/public/img/avatars/avatar2.png';
-import avatar3 from '/public/img/avatars/avatar3.png';
+
 
 import tableDataTopCreators from 'variables/nfts/marketplace/tableDataTopCreators';
 import HistoryItem from 'components/admin/nft-marketplace/HistoryItem';
@@ -30,30 +25,8 @@ const Marketplace = () => {
           </h4>
         </div>
 
-        {/* NFTs trending card */}
-        <div className="z-20 grid grid-cols-1 gap-5 md:grid-cols-3">
-          <NftCard
-            bidders={[avatar1, avatar2, avatar3]}
-            title="Pupuk Kompos"
-            desc="Pupuk organik ramah lingkungan dari limbah dapur"
-            price="0.91"
-            image={pupuk}
-          />
-          <NftCard
-            bidders={[avatar1, avatar2, avatar3]}
-            title="Bricket"
-            desc="Bahan bakar alternatif dari limbah biomassa yang efisien"
-            price="0.7"
-            image={bricket}
-          />
-          <NftCard
-            bidders={[avatar1, avatar2, avatar3]}
-            title="Kerajinan Tangan"
-            desc="Produk kreatif berbahan daur ulang dengan sentuhan lokal"
-            price="2.91"
-            image={kerajinan}
-          />
-        </div>
+      
+          <NftCard/>
 
         {/* Recenlty Added setion */}
         <div className="mb-5 mt-5 flex items-center justify-between px-[26px]">
