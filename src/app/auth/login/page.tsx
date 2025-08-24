@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { Leaf } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import toast, { Toaster } from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -42,170 +43,374 @@ export default function Login() {
 
   return (
     <div>
-      <div className="flex h-screen justify-center bg-gray-100">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        className="flex h-screen justify-center bg-gray-100"
+      >
         <Toaster position="top-center" reverseOrder={false} />
-        <div className="m-0 flex max-w-screen-xl flex-1 justify-center bg-white shadow sm:m-6 sm:rounded-lg">
+        <motion.div 
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="m-0 flex max-w-screen-xl flex-1 justify-center bg-white shadow sm:m-6 sm:rounded-lg overflow-hidden"
+        >
           {/* Left side content - Welcome back section */}
-          <div className=" flex-1 hidden lg:flex lg:w-2/5 xl:w-5/12 relative overflow-hidden">
-          <div className="relative hidden flex-1 overflow-hidden lg:flex lg:w-2/5 xl:w-5/12">
-            {/* Background Image */}
-            <Image
-              src="https://assets.ladiestory.id/gallery/1674010062369593176-pandawara-group.jpg"
-              alt="Welcome back background"
-              fill
-              className="object-cover"
-            />
+          <div className="flex-1 hidden lg:flex lg:w-2/5 xl:w-5/12 relative overflow-hidden">
+            <motion.div 
+              initial={{ x: -100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="relative hidden flex-1 overflow-hidden lg:flex lg:w-2/5 xl:w-5/12"
+            >
+              {/* Background Image */}
+              <motion.div
+                initial={{ scale: 1.2 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 1.2, ease: "easeOut" }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src="https://assets.ladiestory.id/gallery/1674010062369593176-pandawara-group.jpg"
+                  alt="Welcome back background"
+                  fill
+                  className="object-cover"
+                />
+              </motion.div>
 
-            <Link href={'/harita'}>
-            <div className='absolute left-6 top-6 z-40 cursor-pointer '> 
-              <CircleChevronLeft
-              width={30}
-              height={30}
-              className='stroke-white hover:stroke-green-600 transition-all duration-300 ease-out'
-              />
-            </div>
-            </Link>
-            
-            {/* Dark overlay */}
-            <div className="absolute inset-0 bg-black opacity-50"></div>
-
-            {/* Content overlay */}
-            <div className="relative z-10 flex w-full flex-col items-center justify-center p-8 text-white">
-              <div className="max-w-md text-center">
-                {/* Welcome Icon */}
-                <div className="mb-6">
-                  <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-white bg-opacity-10 backdrop-blur-sm">
-                    <Leaf className="h-10 w-10 text-white" strokeWidth={1.5} />
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+              >
+                <Link href={'/harita'}>
+                  <div className='absolute left-6 top-6 z-50 cursor-pointer '> 
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <CircleChevronLeft
+                        width={30}
+                        height={30}
+                        className='stroke-white hover:stroke-green-400 transition-all duration-300 ease-out '
+                      />
+                    </motion.div>
                   </div>
+                </Link>
+              </motion.div>
+              
+              {/* Dark overlay */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                className="absolute inset-0 bg-black"
+              />
+
+              {/* Content overlay */}
+              <motion.div 
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+                className="relative z-10 flex w-full flex-col items-center justify-center p-8 text-white"
+              >
+                <div className="max-w-md text-center">
+                  {/* Welcome Icon */}
+                  <motion.div 
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ 
+                      duration: 0.8, 
+                      delay: 1,
+                      type: "spring",
+                      stiffness: 200 
+                    }}
+                    className="mb-6"
+                  >
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-white bg-opacity-10 backdrop-blur-sm">
+                      <motion.div
+                        animate={{ 
+                          rotate: [0, 5, -5, 0],
+                          scale: [1, 1.05, 1]
+                        }}
+                        transition={{ 
+                          duration: 3,
+                          repeat: Infinity,
+                          repeatDelay: 2
+                        }}
+                      >
+                        <Leaf className="h-10 w-10 text-white" strokeWidth={1.5} />
+                      </motion.div>
+                    </div>
+                  </motion.div>
+
+                  {/* Welcome Message */}
+                  <motion.h2 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 1.2 }}
+                    className="mb-4 text-2xl font-bold xl:text-3xl font-inter"
+                  >
+                    Selamat Datang Kembali di{' '}
+                    <motion.span 
+                      animate={{ 
+                        color: ["#4ade80", "#22c55e", "#16a34a", "#4ade80"]
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                      className="text-green-400"
+                    >
+                      Harita
+                    </motion.span>
+                  </motion.h2>
+
+                  <motion.p 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 1.4 }}
+                    className="mb-6 text-base leading-relaxed text-gray-200 xl:text-lg font-nunito"
+                  >
+                    Masuk ke akun Anda dan lanjutkan perjalanan menuju solusi
+                    digital pengelolaan sampah yang lebih baik.
+                  </motion.p>
+
+                  {/* Don't have account section */}
+                  <motion.div 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 1.6 }}
+                    className="border-t border-white border-opacity-20 pt-6"
+                  >
+                    <p className="mb-4 text-sm text-gray-200 font-nunito">
+                      Belum memiliki akun?
+                    </p>
+                    <Link href="/auth/register">
+                      <motion.button 
+                        whileHover={{ 
+                          scale: 1.05, 
+                          y: -2,
+                          boxShadow: "0 10px 25px rgba(0,0,0,0.3)"
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                        className="rounded-lg bg-white px-8 py-2 font-semibold text-green-700 shadow-lg transition-all duration-300 ease-in-out hover:bg-green-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 font-inter"
+                      >
+                        Daftar Sekarang
+                      </motion.button>
+                    </Link>
+                  </motion.div>
                 </div>
-
-                {/* Welcome Message */}
-                <h2 className="mb-4 text-2xl font-bold xl:text-3xl">
-                  Selamat Datang Kembali di{' '}
-                  <span className="text-green-400">Harita</span>
-                </h2>
-
-                <p className="mb-6 text-base leading-relaxed text-gray-200 xl:text-lg">
-                  Masuk ke akun Anda dan lanjutkan perjalanan menuju solusi
-                  digital pengelolaan sampah yang lebih baik.
-                </p>
-
-                {/* Don't have account section */}
-                <div className="border-t border-white border-opacity-20 pt-6">
-                  <p className="mb-4 text-sm text-gray-200">
-                    Belum memiliki akun?
-                  </p>
-                  <Link href="/auth/register">
-                    <button className="rounded-lg bg-white px-8 py-2 font-semibold text-green-700 shadow-lg transition-all duration-300 ease-in-out hover:bg-green-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">
-                      Daftar Sekarang
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
 
-          <div className="flex flex-col justify-center p-4 sm:p-8 lg:w-3/5 xl:w-7/12">
-            <div className="flex flex-col items-center">
-              <h1 className="mb-4 text-xl font-extrabold xl:text-2xl">Masuk</h1>
+          <motion.div 
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="flex flex-col justify-center p-4 sm:p-8 lg:w-3/5 xl:w-7/12"
+          >
+            <motion.div 
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="flex flex-col items-center"
+            >
+              <motion.h1 
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 1 }}
+                className="mb-4 text-xl font-extrabold xl:text-2xl font-inter"
+              >
+                Masuk
+              </motion.h1>
 
-              <div className="w-full max-w-sm">
-                {/* Tampilkan pesan error jika ada */}
-                {error && (
-                  <div className="mb-4 text-center text-sm text-red-500">
-                    {error}
-                  </div>
-                )}
+              <motion.div 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 1.2 }}
+                className="w-full max-w-sm"
+              >
+                {/* Error message with animation */}
+                <AnimatePresence>
+                  {error && (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0, y: -10 }}
+                      animate={{ opacity: 1, height: "auto", y: 0 }}
+                      exit={{ opacity: 0, height: 0, y: -10 }}
+                      transition={{ duration: 0.3 }}
+                      className="mb-4 text-center text-sm text-red-500 bg-red-50 p-3 rounded-lg border border-red-200"
+                    >
+                      <p className="font-nunito">{error}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-                {/* 3. Bungkus form dengan tag <form> dan tambahkan onSubmit handler */}
-                <form onSubmit={handleLogin}>
+                {/* Form with staggered animations */}
+                <motion.form 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 1.4 }}
+                  onSubmit={handleLogin}
+                >
                   <div className="space-y-4">
                     {/* Email */}
-                    <input
-                      className="w-full rounded-lg border border-green-200 bg-white px-5 py-3 text-sm font-medium placeholder-gray-500 focus:border-green-400 focus:bg-white focus:outline-none"
-                      type="email"
-                      placeholder="Email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
+                    <motion.div
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 1.5 }}
+                    >
+                      <motion.input
+                        whileFocus={{ scale: 1.02, borderColor: "#4ade80" }}
+                        transition={{ duration: 0.2 }}
+                        className="w-full rounded-lg border border-green-200 bg-white px-5 py-3 text-sm font-medium placeholder-gray-500 focus:border-green-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-100 font-nunito"
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </motion.div>
 
                     {/* Password */}
-                    <input
-                      className="w-full rounded-lg border border-green-200 bg-white px-5 py-3 text-sm font-medium placeholder-gray-500 focus:border-green-400 focus:bg-white focus:outline-none"
-                      type="password"
-                      placeholder="Kata Sandi"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
+                    <motion.div
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 1.6 }}
+                    >
+                      <motion.input
+                        whileFocus={{ scale: 1.02, borderColor: "#4ade80" }}
+                        transition={{ duration: 0.2 }}
+                        className="w-full rounded-lg border border-green-200 bg-white px-5 py-3 text-sm font-medium placeholder-gray-500 focus:border-green-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-100 font-nunito"
+                        type="password"
+                        placeholder="Kata Sandi"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                    </motion.div>
 
                     {/* Remember me & Forgot password */}
-                    <div className="flex items-center justify-between text-sm">
-                      <label className="flex items-center">
+                    <motion.div 
+                      initial={{ y: 10, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 1.7 }}
+                      className="flex items-center justify-between text-sm"
+                    >
+                      <motion.label 
+                        whileHover={{ scale: 1.02 }}
+                        className="flex items-center cursor-pointer"
+                      >
                         <input
                           type="checkbox"
                           className="mr-2 text-green-600 focus:ring-green-500"
                         />
-                        <span className="text-gray-600">Ingat saya</span>
-                      </label>
-                      <Link
-                        href="/forgot-password"
-                        className="font-medium text-green-700 hover:text-green-800"
+                        <span className="text-gray-600 font-nunito">Ingat saya</span>
+                      </motion.label>
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
                       >
-                        Lupa kata sandi?
-                      </Link>
-                    </div>
+                        <Link
+                          href="/auth/lupa_password"
+                          className="font-medium text-green-700 hover:text-green-800 transition-colors duration-200 font-nunito"
+                        >
+                          Lupa kata sandi?
+                        </Link>
+                      </motion.div>
+                    </motion.div>
                   </div>
 
-                  <div className="flex flex-col gap-1.5">
+                  <motion.div 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 1.8 }}
+                    className="flex flex-col gap-1.5"
+                  >
                     {/* Login Button */}
-                    <button
+                    <motion.button
+                      whileHover={{ 
+                        scale: 1.02, 
+                        y: -2,
+                        boxShadow: "0 8px 25px rgba(41, 75, 41, 0.3)"
+                      }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ duration: 0.2 }}
                       type="submit"
-                      className="focus:shadow-outline mt-6 flex w-full items-center justify-center rounded-lg py-3 font-semibold tracking-wide text-white transition-all duration-300 ease-in-out hover:opacity-90 focus:outline-none"
+                      className="focus:shadow-outline mt-6 flex w-full items-center justify-center rounded-lg py-3 font-semibold tracking-wide text-white transition-all duration-300 ease-in-out focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed font-inter shadow-lg"
                       style={{ backgroundColor: '#294B29' }}
-                      disabled={loading} // Nonaktifkan tombol saat loading
+                      disabled={loading}
                     >
-                      <span className="ml-2 text-sm">
-                        {loading ? 'Memuat...' : 'Masuk'}
-                      </span>
-                    </button>
-                    <div className="block text-sm lg:hidden ">
-                      Belum punya akun?{' '}
-                      <Link href={'/auth/register'}>
-                        <span className="font-bold text-green-700 transition-colors duration-150 ease-out hover:text-green-500">
-                          daftar
-                        </span>
-                      </Link>
-                    </div>
-                  </div>
-                </form>
+                      {loading ? (
+                        <motion.div 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="flex items-center"
+                        >
+                          <motion.div 
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"
+                          />
+                          <span className="text-sm">Memuat...</span>
+                        </motion.div>
+                      ) : (
+                        <span className="ml-2 text-sm">Masuk</span>
+                      )}
+                    </motion.button>
+
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 1.9 }}
+                      className="block text-sm lg:hidden"
+                    >
+                      <span className="font-nunito">Belum punya akun? </span>
+                      <motion.span whileHover={{ scale: 1.05 }} className="inline-block">
+                        <Link href={'/auth/register'}>
+                          <span className="font-bold text-green-700 transition-colors duration-150 ease-out hover:text-green-500 font-nunito">
+                            daftar
+                          </span>
+                        </Link>
+                      </motion.span>
+                    </motion.div>
+                  </motion.div>
+                </motion.form>
 
                 {/* Terms */}
-                <p className="mt-4 text-center text-xs text-gray-600">
+                <motion.p 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 2 }}
+                  className="mt-4 text-center text-xs text-gray-600 font-nunito"
+                >
                   Dengan masuk, Anda menyetujui{' '}
-                  <a
+                  <motion.a
+                    whileHover={{ scale: 1.02 }}
                     href="#"
-                    className="border-b border-dotted border-green-600 text-green-700"
+                    className="border-b border-dotted border-green-600 text-green-700 transition-colors duration-200 hover:text-green-800"
                   >
                     Syarat & Ketentuan
-                  </a>{' '}
+                  </motion.a>{' '}
                   dan{' '}
-                  <a
+                  <motion.a
+                    whileHover={{ scale: 1.02 }}
                     href="#"
-                    className="border-b border-dotted border-green-600 text-green-700"
+                    className="border-b border-dotted border-green-600 text-green-700 transition-colors duration-200 hover:text-green-800"
                   >
                     Kebijakan Privasi
-                  </a>{' '}
+                  </motion.a>{' '}
                   Harita
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      </div>
-      </div>
-  
+                </motion.p>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      </motion.div>
+    </div>
   );
 };
