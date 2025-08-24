@@ -27,6 +27,14 @@ const routes = [
     secondary: true,
   },
   {
+    name: 'Tambah Aset',
+    layout: '/admin',
+    path: 'tambah-aset',
+    icon: <MdOutlineArticle className="h-6 w-6" />,
+
+    secondary: true,
+  },
+  {
     name: 'Data Tables',
     layout: '/admin',
     icon: <MdBarChart className="h-6 w-6" />,
