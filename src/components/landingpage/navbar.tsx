@@ -2,6 +2,7 @@
 
 import { Menu, X } from "lucide-react"
 import { useState } from "react"
+import Link from "next/link"
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -135,6 +136,7 @@ const Navbar = () => {
                 </div>
 
                 {/* Bottom Action */}
+                <Link href="/auth/login">
                 <div className="p-6 border-t border-gray-200">
                     <button 
                         className="w-full bg-green-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-all duration-200 shadow-lg sm:hidden flex justify-center items-center"
@@ -143,6 +145,7 @@ const Navbar = () => {
                         Masuk
                     </button>
                 </div>
+                </Link>
             </div>
         </div>
         </>
