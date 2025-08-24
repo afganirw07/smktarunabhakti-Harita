@@ -22,7 +22,7 @@ export default function Register() {
   const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
   
-  const [point, setPoint] = useState(0);
+  const [poin, setPoin] = useState(0); 
   const [role, setRole] = useState('user'); 
   const [plan, setPlan] = useState('trial'); 
   const [status, setStatus] = useState('yes'); 
@@ -37,43 +37,43 @@ export default function Register() {
     setError(null);
 
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      // LANGKAH 1: COBA DAFTAR DENGAN EMAIL/PASSWORD
+      // Supabase secara otomatis akan memeriksa duplikasi email di tabel auth.
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: email,
         password: password,
       });
 
       if (signUpError) {
-        throw new Error(signUpError.message);
+        throw signUpError; // Lempar error Supabase ke blok catch
       }
       
-      const userId = data.user.id;
+      const userId = signUpData.user.id;
       
-      const insertData = { 
-        id: userId,
-        first_name: firstName,
-        last_name: lastName,
-        phone: phone,
-        city: city,
-        address: address,
-        point: point
-        role: role,
-        plan: plan,
-        status: status,
-        active_token: activeToken,
-      };
-
+      // LANGKAH 2: SIMPAN DATA PROFIL KE TABEL 'PROFILES'
+      // Ini akan gagal jika ada duplikasi email/alamat di tabel profiles
+      // (asumsi kolom tersebut sudah diatur sebagai UNIQUE).
       const { error: insertError } = await supabase
         .from('profiles')
-        .insert([insertData]);
+        .insert({ 
+          id: userId,
+          first_name: firstName,
+          last_name: lastName,
+          phone: phone,
+          email: email,
+          city: city,
+          address: address,
+          point: poin,
+          role: role,
+          plan: plan,
+          status: status,
+          active_token: activeToken,
+        });
 
       if (insertError) {
-        // Jika terjadi error pada insert profil, hapus akun yang baru dibuat
-        // Ini untuk mencegah data tidak sinkron.
+        // Jika insert gagal, hapus akun yang baru dibuat untuk mencegah inkonsistensi
         await supabase.auth.admin.deleteUser(userId);
-        if (insertError.message.includes('duplicate key value violates unique constraint')) {
-          throw new Error("Alamat sudah terdaftar sebelumnya.");
-        }
-        throw new Error("Gagal menyimpan data profil. Akun telah dihapus. " + insertError.message);
+        throw insertError; // Lempar error insert ke blok catch
       }
 
       toast.success(
@@ -81,8 +81,29 @@ export default function Register() {
       );
       
     } catch (err) {
-      setError(err.message);
-      toast.error('Pendaftaran gagal: ' + err.message);
+      // TANGANI SEMUA ERROR DI SATU BLOK CATCH
+      let errorMessage = "Pendaftaran gagal. Silakan coba lagi.";
+      
+      // Error dari Supabase Auth
+      if (err.message.includes('User already registered')) {
+        errorMessage = "Email sudah terdaftar. Silakan gunakan email lain.";
+      } 
+      // Error dari database 'profiles' (karena unique constraint)
+      else if (err.message.includes('profiles_address_key')) {
+        errorMessage = "Alamat sudah terdaftar. Silakan gunakan alamat lain.";
+      }
+      // Tambahan: cek untuk duplikasi email di tabel profiles
+      else if (err.message.includes('profiles_email_key')) {
+        errorMessage = "Email sudah terdaftar. Silakan gunakan email lain.";
+      }
+      // Error lainnya
+      else {
+        errorMessage = err.message;
+      }
+
+      setError(errorMessage);
+      toast.error(errorMessage);
+      
     } finally {
       setLoading(false);
     }
