@@ -36,26 +36,11 @@ const Marketplace = () => {
         </div>
 
      
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+        
   <StatusAset
-    title="Status Armada"
-    desc="Total Kendaraan: 30, Sedang Beroperasi: 15, Perlu Perawatan: 5."
-    price="0.91"
-    image={truk}
   />
-  <StatusAset
-    title="Status Peralatan"
-    desc="Total Alat: 25, Sedang Beroperasi: 20, Perlu Perawatan: 4"
-    price="0.7"
-    image={alat}
-  />
-  <StatusAset
-    title="Status Gudang"
-   desc="Gudang menyimpan 120 barang, 90 tersedia, 15 perlu segera dilengkapi."
-    price="1.1"
-    image={gudang}
-  />
-</div>
+
+
       </div>
 
       {/* right side section */}
