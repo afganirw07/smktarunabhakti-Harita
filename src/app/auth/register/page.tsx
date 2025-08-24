@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Users } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 // Inisialisasi Supabase
 const supabase = createClient(
@@ -13,7 +14,6 @@ const supabase = createClient(
 );
 
 export default function Register() {
-  // State untuk setiap input
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
@@ -30,6 +30,7 @@ export default function Register() {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+   const router = useRouter();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -37,8 +38,7 @@ export default function Register() {
     setError(null);
 
     try {
-      // LANGKAH 1: COBA DAFTAR DENGAN EMAIL/PASSWORD
-      // Supabase secara otomatis akan memeriksa duplikasi email di tabel auth.
+      // Daftar pengguna
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: email,
         password: password,
@@ -49,10 +49,8 @@ export default function Register() {
       }
       
       const userId = signUpData.user.id;
-      
-      // LANGKAH 2: SIMPAN DATA PROFIL KE TABEL 'PROFILES'
-      // Ini akan gagal jika ada duplikasi email/alamat di tabel profiles
-      // (asumsi kolom tersebut sudah diatur sebagai UNIQUE).
+
+      // Simpan data profil ke tabel 'profiles'
       const { error: insertError } = await supabase
         .from('profiles')
         .insert({ 
@@ -79,9 +77,11 @@ export default function Register() {
       toast.success(
         'Pendaftaran berhasil! Silakan periksa email Anda untuk verifikasi.',
       );
-      
+      setTimeout(() => {
+        router.push('/auth/login');
+      }, 2000);
+
     } catch (err) {
-      // TANGANI SEMUA ERROR DI SATU BLOK CATCH
       let errorMessage = "Pendaftaran gagal. Silakan coba lagi.";
       
       // Error dari Supabase Auth
