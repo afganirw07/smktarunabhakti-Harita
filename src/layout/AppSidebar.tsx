@@ -24,15 +24,16 @@ const navItems: NavItem[] = [
   {
     icon: <LayoutPanelLeft />,
     name: "Layanan",
-    subItems: [{ name: "Trash House", path: "/", plus: true },
+    subItems: [{ name: "Trash House", path: "/user/layanan/house", plus: true },
                 {name: 'Asisten AI', path: '/user/layanan/ai', plus: true},
-                {name: 'Lapor sampah', path: '/user', plus: false},
+                {name: 'Lapor sampah', path: '/user/layanan/lapor', plus: false},
+                {name: 'Berlangganan', path: '/user/layanan/langganan', plus: false},
     ],
   },
   {
     name: "Toko",
     icon: <ShoppingBag/>,
-    path: '/tukar'
+    path: '/user/toko'
   },
   {
     icon: <CircleUserIcon />,
@@ -59,8 +60,8 @@ const AppSidebar: React.FC = () => {
               onClick={() => handleSubmenuToggle(index, menuType)}
               className={`menu-item group w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                 openSubmenu?.type === menuType && openSubmenu?.index === index
-                  ? "menu-item-active bg-green-800 text-amber-200"
-                  : "menu-item-inactive text-white font-bold hover:bg-green-800 hover:text-amber-200"
+                  ? "menu-item-active bg-green-800 text-white shadow-md"
+                  : "menu-item-inactive text-green-800 font-bold hover:bg-green-100 hover:text-green-800"
               } ${
                 !isExpanded && !isHovered
                   ? "lg:justify-center lg:px-2"
@@ -70,8 +71,8 @@ const AppSidebar: React.FC = () => {
               <span
                 className={`flex-shrink-0 w-5 h-5 flex items-center justify-center ${
                   openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? "menu-item-icon-active text-amber-200"
-                    : "menu-item-icon-inactive text-white"
+                    ? "menu-item-icon-active text-white"
+                    : "menu-item-icon-inactive text-green-800 group-hover:text-green-800"
                 }`}
               >
                 {nav.icon}
@@ -85,8 +86,8 @@ const AppSidebar: React.FC = () => {
                     className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${
                       openSubmenu?.type === menuType &&
                       openSubmenu?.index === index
-                        ? "rotate-180 text-amber-200"
-                        : "text-white"
+                        ? "rotate-180 text-white"
+                        : "text-green-800 group-hover:text-green-800"
                     }`}
                   />
                 </>
@@ -98,8 +99,8 @@ const AppSidebar: React.FC = () => {
                 href={nav.path}
                 className={`menu-item group w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                   isActive(nav.path) 
-                    ? "menu-item-active bg-green-800 text-amber-200" 
-                    : "menu-item-inactive text-white hover:bg-green-800 hover:text-amber-200"
+                    ? "menu-item-active bg-green-800 text-white shadow-md" 
+                    : "menu-item-inactive text-green-800 hover:bg-green-100 hover:text-green-800"
                 } ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center lg:px-2"
@@ -109,8 +110,8 @@ const AppSidebar: React.FC = () => {
                 <span
                   className={`flex-shrink-0 w-5 h-5 flex items-center justify-center ${
                     isActive(nav.path)
-                      ? "menu-item-icon-active text-amber-200"
-                      : "menu-item-icon-inactive text-white"
+                      ? "menu-item-icon-active text-white"
+                      : "menu-item-icon-inactive text-green-800 group-hover:text-green-800"
                   }`}
                 >
                   {nav.icon}
@@ -143,8 +144,8 @@ const AppSidebar: React.FC = () => {
                       href={subItem.path}
                       className={`menu-dropdown-item flex items-center justify-between px-4 py-2 rounded-md text-sm transition-all duration-200 ${
                         isActive(subItem.path)
-                          ? "menu-dropdown-item-active bg-green-800 text-amber-200"
-                          : "menu-dropdown-item-inactive text-white hover:bg-green-800 hover:text-amber-200"
+                          ? "menu-dropdown-item-active bg-green-800 text-white shadow-sm"
+                          : "menu-dropdown-item-inactive text-green-800 hover:bg-green-100 hover:text-green-800"
                       }`}
                     >
                       <span>{subItem.name}</span>
@@ -153,8 +154,8 @@ const AppSidebar: React.FC = () => {
                           <span
                             className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                               isActive(subItem.path)
-                                ? "menu-dropdown-badge-active bg-amber-200 text-green-800"
-                                : "menu-dropdown-badge-inactive bg-amber-200 text-green-800"
+                                ? "menu-dropdown-badge-active bg-white text-green-800"
+                                : "menu-dropdown-badge-inactive bg-green-800 text-white"
                             }`}
                           >
                             new
@@ -164,8 +165,8 @@ const AppSidebar: React.FC = () => {
                           <span
                             className={`text-xs px-2 py-0.5 rounded-full font-bold ${
                               isActive(subItem.path)
-                                ? "menu-dropdown-badge-active bg-gradient-to-r from-lime-400 via-lime-600 to-green-700 text-white shadow-sm shadow-green-400/50"
-                                : "menu-dropdown-badge-inactive bg-gradient-to-r from-lime-400 via-lime-600 to-green-700 text-white font-semibold shadow-sm shadow-green-400/50"
+                                ? "menu-dropdown-badge-active bg-gradient-to-r from-green-700 via-green-800 to-green-900 text-white shadow-sm"
+                                : "menu-dropdown-badge-inactive bg-gradient-to-r from-green-700 via-green-800 to-green-900 text-white font-semibold shadow-sm"
                             }`}
                           >
                             Plus
@@ -248,7 +249,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-green-900 text-white h-screen transition-all duration-300 ease-in-out z-50 border-r border-green-800 
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white text-green-800 h-screen transition-all duration-300 ease-in-out z-50 border-r border-green-200 
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
@@ -299,7 +300,7 @@ const AppSidebar: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-white font-semibold ${
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-green-800 font-semibold ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -308,7 +309,7 @@ const AppSidebar: React.FC = () => {
                 {isExpanded || isHovered || isMobileOpen ? (
                   "Menu"
                 ) : (
-                  <ShoppingBag className="text-white" />
+                  <ShoppingBag className="text-green-800" />
                 )}
               </h2>
               {renderMenuItems(navItems, "main")}
