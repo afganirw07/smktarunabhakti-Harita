@@ -191,7 +191,7 @@ const StatusCard = (props) => {
                   <span className="text-sm font-bold text-green-700">{beroperasi}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-orange-600">PaPerawatan:</span>
+                  <span className="text-sm font-medium text-orange-600">Perawatan:</span>
                   <span className="text-sm font-bold text-orange-700">{perawatan}</span>
                 </div>
                 {idle > 0 && (
@@ -242,7 +242,7 @@ const StatusCard = (props) => {
             <form onSubmit={handleEditSubmit}>
               <div className="flex items-center justify-between rounded-t border-b border-gray-200 p-4 dark:border-gray-600 md:p-5">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Edit Status Kendaraan
+                  Edit Status
                 </h3>
                 <button
                   type="button"
@@ -262,10 +262,10 @@ const StatusCard = (props) => {
                   </p>
                 </div>
 
-                {/* Input Total Kendaraan */}
+                {/* Input Total  */}
                 <div>
                   <label htmlFor="total" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Total Kendaraan
+                    Total 
                   </label>
                   <input
                     type="number"
@@ -280,7 +280,7 @@ const StatusCard = (props) => {
                   />
                 </div>
 
-                {/* Input Kendaraan Beroperasi */}
+                {/* Input  Beroperasi */}
                 <div>
                   <label htmlFor="beroperasi" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Sedang Beroperasi
@@ -322,7 +322,7 @@ const StatusCard = (props) => {
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
                   <h4 className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">Preview:</h4>
                   <p className="text-xs text-blue-800 dark:text-blue-300">
-                    <strong>Total Kendaraan:</strong> {editForm.total}, 
+                    <strong>Total :</strong> {editForm.total}, 
                     <strong> Sedang Beroperasi:</strong> {editForm.beroperasi}, 
                     <strong> Perlu Perawatan:</strong> {editForm.perawatan}
                   </p>
