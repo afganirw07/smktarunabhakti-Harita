@@ -43,7 +43,7 @@ function AssetTable() {
       // Fetch asset data
       const { data, error } = await supabase
         .from('aset_barang')
-        .select('id, nama, stock, status, created_at');
+        .select('id, nama, stock, status, poin, created_at');
 
       if (error) throw error;
 
@@ -135,6 +135,19 @@ function AssetTable() {
               ? 'bg-green-100 p-4 text-green-800 '
               : 'bg-red-100 text-red-800 p-4'
           }`}>
+            {info.getValue() || 0}
+          </span>
+        </div>
+      ),
+    }),
+    columnHelper.accessor('poin', {
+      id: 'poin',
+      header: () => (
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Poin</p>
+      ),
+      cell: (info) => (
+        <div className="flex items-center">
+          <span className={'inline-flex items-center justify-center w-6 rounded-full text-xs font-medium'}>
             {info.getValue() || 0}
           </span>
         </div>
