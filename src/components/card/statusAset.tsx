@@ -25,7 +25,8 @@ const StatusCardList = () => {
 
       const { data, error } = await supabase
         .from('status_aset')
-        .select('id, nama, img, total, beroperasi, perawatan');
+        .select('id, nama, img, total, beroperasi, perawatan, updated_at')
+        .order('id', {ascending: true});
 
       if (error) throw error;
 

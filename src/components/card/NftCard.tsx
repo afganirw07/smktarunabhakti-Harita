@@ -8,7 +8,10 @@ import toast, { Toaster } from 'react-hot-toast';
 // Inisialisasi Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
+const supabase =
+  supabaseUrl && supabaseAnonKey
+    ? createClient(supabaseUrl, supabaseAnonKey)
+    : null;
 
 // Komponen untuk menampilkan list assets
 const AssetCardList = () => {
@@ -25,7 +28,8 @@ const AssetCardList = () => {
 
       const { data, error } = await supabase
         .from('aset_barang')
-        .select('id, nama, desc, img, stock');
+        .select('id, nama, desc, img, stock, status, poin')
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -38,15 +42,15 @@ const AssetCardList = () => {
   };
 
   if (loading) {
-    return <div className="text-center p-4">Loading...</div>;
+    return <div className="p-4 text-center">Loading...</div>;
   }
 
   if (assets.length === 0) {
-    return <div className="text-center p-4">Tidak ada data</div>;
+    return <div className="p-4 text-center">Tidak ada data</div>;
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-6 p-7">
+    <div className="grid grid-cols-1 gap-6 p-7 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
       {assets.map((asset) => (
         <NftCard
           key={asset.id}
@@ -55,9 +59,9 @@ const AssetCardList = () => {
           desc={asset.desc}
           image={asset.img}
           stock={asset.stock}
-          price="0.91"
+          poin={asset.poin}
           bidders={[]}
-          onDataChange={fetchAssets} 
+          onDataChange={fetchAssets}
         />
       ))}
     </div>
@@ -65,16 +69,17 @@ const AssetCardList = () => {
 };
 
 const NftCard = (props) => {
-  const { id, title, desc, stock, image, bidders, extra, onDataChange } = props;
+  const { id, title, desc, stock, image, poin, extra, onDataChange } = props;
   const [heart, setHeart] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   // State untuk form edit
   const [editForm, setEditForm] = useState({
     nama: title || '',
     desc: desc || '',
     img: image || '',
-    stock: stock || 0
+    stock: stock || 0,
+    poin: poin || 0,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -85,7 +90,8 @@ const NftCard = (props) => {
         nama: title || '',
         desc: desc || '',
         img: image || '',
-        stock: stock || 0
+        stock: stock || 0,
+        poin: poin || 0,
       });
     }
   }, [isModalOpen, title, desc, image, stock]);
@@ -97,17 +103,21 @@ const NftCard = (props) => {
   // Handle input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditForm(prev => ({
+    setEditForm((prev) => ({
       ...prev,
-      [name]: name === 'stock' ? parseInt(value) || 0 : value
+      [name]: name === 'stock' ? parseInt(value) || 0 : value,
     }));
   };
 
   // Handle edit submit
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!editForm.nama.trim() || !editForm.desc.trim() || !editForm.img.trim()) {
+
+    if (
+      !editForm.nama.trim() ||
+      !editForm.desc.trim() ||
+      !editForm.img.trim()
+    ) {
       toast.error('Semua field harus diisi!');
       return;
     }
@@ -122,13 +132,17 @@ const NftCard = (props) => {
     try {
       if (!supabase || !id) return;
 
+      const newStatus = editForm.stock === 0 ? 'Tidak Tersedia' : 'Tersedia';
+
       const { error } = await supabase
         .from('aset_barang')
         .update({
           nama: editForm.nama.trim(),
           desc: editForm.desc.trim(),
           img: editForm.img.trim(),
-          stock: editForm.stock
+          stock: editForm.stock,
+          poin: editForm.poin,
+          status: newStatus,
         })
         .eq('id', id);
 
@@ -136,11 +150,10 @@ const NftCard = (props) => {
 
       toast.success('Asset berhasil diperbarui!');
       toggleModal();
-      
+
       setTimeout(() => {
         if (onDataChange) onDataChange();
       }, 1000);
-
     } catch (error) {
       console.error('Error updating asset:', error);
       toast.error('Gagal memperbarui asset!');
@@ -172,15 +185,12 @@ const NftCard = (props) => {
 
   return (
     <>
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
-      />
+      <Toaster position="top-center" reverseOrder={false} />
       <Card
         extra={`flex flex-col w-full h-full !p-4 3xl:p-![18px] bg-white ${extra}`}
       >
         <div className="h-full w-full">
-          <div className="relative w-full aspect-square mb-3">
+          <div className="relative mb-3 aspect-square w-full">
             <Image
               fill
               className="rounded-xl object-cover"
@@ -190,22 +200,29 @@ const NftCard = (props) => {
             />
           </div>
 
-          <div className="mb-3 flex items-center justify-between px-1 md:flex-col md:items-start lg:flex-row lg:justify-between xl:flex-col xl:items-start 3xl:flex-row 3xl:justify-between">
-            <div className="mb-2">
+          {/* Bagian konten yang diperbarui */}
+          <div className="mb-3 px-1">
+            {/* Mengatur judul dan poin dalam satu baris, sejajar di kedua sisi */}
+            <div className="flex items-start justify-between">
               <p className="text-lg font-bold text-navy-700 dark:text-white">
                 {title}
               </p>
-              <p className="mt-1 text-sm font-medium text-gray-600 md:mt-2">
-                {desc}
-              </p>
-              <p className="mt-1 text-sm font-medium text-gray-600 md:mt-2">
-                Stok : <span className='text-gray-600 font-bold'>{stock}</span>
+              <p className="text-sm font-medium text-gray-600">
+                <span className="font-bold text-gray-600">{poin} Koin</span>
               </p>
             </div>
+
+            {/* Deskripsi dan Stok ditempatkan di bawah judul */}
+            <p className="mt-1 text-sm font-medium text-gray-600 md:mt-2">
+              {desc}
+            </p>
+            <p className="mt-1 text-sm font-medium text-gray-600 md:mt-2">
+              Stok : <span className="font-bold text-gray-600">{stock}</span>
+            </p>
           </div>
 
           <div className="flex items-center justify-between md:flex-col md:items-start lg:flex-row lg:justify-between xl:flex-col 2xl:items-start 3xl:flex-row 3xl:items-center 3xl:justify-between">
-            <div className='flex gap-3'>
+            <div className="flex gap-3">
               <button
                 className="btn linear rounded-[20px] bg-red-500 px-4 py-2 text-base font-medium text-white transition duration-200 hover:bg-red-600 active:bg-red-700"
                 onClick={handleDelete}
@@ -226,7 +243,7 @@ const NftCard = (props) => {
       {/* Modal Edit */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 dark:bg-opacity-80">
-          <div className="max-h-full w-full max-w-lg rounded-lg bg-white shadow-sm dark:bg-gray-700 overflow-y-auto">
+          <div className="max-h-full w-full max-w-lg overflow-y-auto rounded-lg bg-white shadow-sm dark:bg-gray-700">
             <form onSubmit={handleEditSubmit}>
               <div className="flex items-center justify-between rounded-t border-b border-gray-200 p-4 dark:border-gray-600 md:p-5">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -235,19 +252,19 @@ const NftCard = (props) => {
                 <button
                   type="button"
                   onClick={toggleModal}
-                  className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                  className="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-lg text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="p-4 md:p-5 space-y-4">
+              <div className="space-y-4 p-4 md:p-5">
                 {/* Preview Gambar Current */}
                 <div className="mb-4">
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
                     Preview Gambar Saat Ini
                   </label>
-                  <div className="relative w-full h-32 mb-2">
+                  <div className="relative mb-2 h-32 w-full">
                     <Image
                       fill
                       className="rounded-lg object-cover"
@@ -260,7 +277,10 @@ const NftCard = (props) => {
 
                 {/* Input Nama */}
                 <div>
-                  <label htmlFor="nama" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <label
+                    htmlFor="nama"
+                    className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
                     Nama Asset
                   </label>
                   <input
@@ -269,7 +289,7 @@ const NftCard = (props) => {
                     name="nama"
                     value={editForm.nama}
                     onChange={handleInputChange}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
                     placeholder="Masukkan nama asset"
                     required
                   />
@@ -277,7 +297,10 @@ const NftCard = (props) => {
 
                 {/* Input Deskripsi */}
                 <div>
-                  <label htmlFor="desc" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <label
+                    htmlFor="desc"
+                    className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
                     Deskripsi
                   </label>
                   <textarea
@@ -286,7 +309,7 @@ const NftCard = (props) => {
                     value={editForm.desc}
                     onChange={handleInputChange}
                     rows="3"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
                     placeholder="Masukkan deskripsi asset"
                     required
                   />
@@ -294,7 +317,10 @@ const NftCard = (props) => {
 
                 {/* Input URL Gambar */}
                 <div>
-                  <label htmlFor="img" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <label
+                    htmlFor="img"
+                    className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
                     URL Gambar
                   </label>
                   <input
@@ -303,7 +329,7 @@ const NftCard = (props) => {
                     name="img"
                     value={editForm.img}
                     onChange={handleInputChange}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
                     placeholder="https://example.com/image.jpg"
                     required
                   />
@@ -311,7 +337,10 @@ const NftCard = (props) => {
 
                 {/* Input Stock */}
                 <div>
-                  <label htmlFor="stock" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <label
+                    htmlFor="stock"
+                    className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
                     Stock
                   </label>
                   <input
@@ -321,19 +350,38 @@ const NftCard = (props) => {
                     value={editForm.stock}
                     onChange={handleInputChange}
                     min="0"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
                     placeholder="0"
                     required
                   />
                 </div>
-
+                {/* Input Poin */}
+                <div>
+                  <label
+                    htmlFor="poin"
+                    className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Poin
+                  </label>
+                  <input
+                    type="number"
+                    id="poin"
+                    name="poin"
+                    value={editForm.poin}
+                    onChange={handleInputChange}
+                    min="0"
+                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
+                    placeholder="0"
+                    required
+                  />
+                </div>
                 {/* Preview Gambar Baru (jika URL berubah) */}
                 {editForm.img !== image && editForm.img && (
                   <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
                       Preview Gambar Baru
                     </label>
-                    <div className="relative w-full h-32">
+                    <div className="relative h-32 w-full">
                       <Image
                         fill
                         className="rounded-lg object-cover"
@@ -353,14 +401,14 @@ const NftCard = (props) => {
                 <button
                   type="button"
                   onClick={toggleModal}
-                  className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-center text-sm font-medium text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                  className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-center text-sm font-medium text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-500 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white dark:focus:ring-gray-600"
                   disabled={isSubmitting}
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="rounded-lg bg-[#294B29] hover:bg-[#86A789] focus:bg-[#294B29] px-5 py-2.5 text-center text-sm font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-lg bg-[#294B29] px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-[#86A789] focus:bg-[#294B29] disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
@@ -375,3 +423,4 @@ const NftCard = (props) => {
 };
 
 export default AssetCardList;
+  
