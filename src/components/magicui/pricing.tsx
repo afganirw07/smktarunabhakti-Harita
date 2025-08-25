@@ -271,7 +271,7 @@ export default function WasteManagementPricing(): JSX.Element {
                       : plan.isTrial
                       ? 'bg-green-800 text-white hover:bg-green-500 shadow-md hover:shadow-lg'
                       : isPremiumPlan(plan.name)
-                      ? 'bg-gradient-to-r from-green-800 to-green-500 text-white hover:from-green-500 hover:to-green-400 shadow-md hover:shadow-lg'
+                      ? 'bg-gradient-to-r from-green-800 to-green-500 text-white hover:bg-green-500  shadow-md hover:shadow-lg'
                       : 'bg-gray-100 text-gray-900 hover:bg-gray-200 border border-gray-200'
                   }`}>
                     {plan.buttonText}
