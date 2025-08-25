@@ -12,7 +12,7 @@ export default function Home() {
       router.push('/admin/default');
     } else if (user_role === 'user') {
       router.push('/user/homepage');
-    } else {
+    }else {
       router.push('/harita');
     }
   }, []);
