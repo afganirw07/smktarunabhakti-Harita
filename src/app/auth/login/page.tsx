@@ -142,19 +142,6 @@ export default function Login() {
                 transition={{ duration: 1.2, ease: "easeOut" }}
                 className="absolute inset-0"
               >
-                <Image
-                  src="https://assets.ladiestory.id/gallery/1674010062369593176-pandawara-group.jpg"
-                  alt="Welcome back background"
-                  fill
-                  className="object-cover"
-                />
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-              >
                 <Link href={'/harita'}>
                   <div className='absolute left-6 top-6 z-50 cursor-pointer '> 
                     <motion.div
@@ -170,6 +157,19 @@ export default function Login() {
                     </motion.div>
                   </div>
                 </Link>
+                <Image
+                  src="https://assets.ladiestory.id/gallery/1674010062369593176-pandawara-group.jpg"
+                  alt="Welcome back background"
+                  fill
+                  className="object-cover"
+                />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+              >
               </motion.div>
               
               {/* Dark overlay */}

@@ -99,7 +99,7 @@ const Dashboard = () => {
         <Widget
           icon={<FaUserFriends className="h-7 w-7" />}
           title={'Pengguna Terdaftar'}
-          subtitle={loading ? 'Memuat...' : totalUsers}
+          subtitle={loading ? 'Memuat...' : String(totalUsers)}
         />
         <Widget
           icon={<MdDashboard className="h-6 w-6" />}
@@ -114,7 +114,7 @@ const Dashboard = () => {
         <Widget
           icon={<MdBarChart className="h-6 w-6" />}
           title={'Karyawan'}
-          subtitle={loading ? 'Memuat...' : totalKaryawan}
+          subtitle={loading ? 'Memuat...' : String(totalKaryawan)}
         />
       </div>
 
