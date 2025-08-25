@@ -1,59 +1,145 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import CardMenu from 'components/card/CardMenu';
 import Card from 'components/card';
-import Progress from 'components/progress';
-import { MdCancel, MdCheckCircle, MdOutlineError } from 'react-icons/md';
+import { BsCheckCircleFill, BsXCircleFill } from 'react-icons/bs';
+import { createClient } from '@supabase/supabase-js';
+
+// Inisialisasi Supabase Client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase =
+  supabaseUrl && supabaseAnonKey
+    ? createClient(supabaseUrl, supabaseAnonKey)
+    : null;
 
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  SortingState,
   useReactTable,
 } from '@tanstack/react-table';
 
-// Mengubah tipe data untuk mencerminkan skema inventaris barang
-type RowObj = {
-  id: number;
-  namaBarang: string;
-  status: 'tersedia' | 'habis' | 'dipesan';
-  jumlah: number;
-  tanggalUpdate: string;
-};
+const columnHelper = createColumnHelper();
 
-const columnHelper = createColumnHelper<RowObj>();
+function AssetTable() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sorting, setSorting] = useState([]);
+  const [expandedIds, setExpandedIds] = useState(new Set());
 
-export default function ComplexTable(props: { tableData: any }) {
-  const { tableData } = props;
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  let defaultData = tableData;
+  useEffect(() => {
+    // Fetch asset data when the component mounts
+    fetchAset();
+  }, []);
+
+  const fetchAset = async () => {
+    try {
+      if (!supabase) {
+        console.error('Supabase client not initialized');
+        return;
+      }
+
+      // Fetch asset data
+      const { data, error } = await supabase
+        .from('aset_barang')
+        .select('id, nama, stock, status, created_at');
+
+      if (error) throw error;
+
+      setData(data || []);
+    } catch (error) {
+      console.error('Error fetching asset data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleIdExpansion = (id) => {
+    const newExpandedIds = new Set(expandedIds);
+    if (newExpandedIds.has(id)) {
+      newExpandedIds.delete(id);
+    } else {
+      newExpandedIds.add(id);
+    }
+    setExpandedIds(newExpandedIds);
+  };
+
+  const truncateId = (id) => {
+    if (typeof id !== 'string') return id;
+    return id.length > 5 ? `${id.substring(0, 5)}...` : id;
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('id-ID', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  // Define table columns for asset data
   const columns = [
-    // Kolom 0: ID
     columnHelper.accessor('id', {
       id: 'id',
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">ID</p>
       ),
-      cell: (info) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
-          {info.getValue()}
-        </p>
-      ),
+      cell: (info) => {
+        const id = info.getValue();
+        const isExpanded = expandedIds.has(id);
+
+        return (
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-bold text-navy-700 dark:text-white">
+              {isExpanded ? id : truncateId(id)}
+            </p>
+            {id && id.length > 5 && (
+              <button
+                onClick={() => toggleIdExpansion(id)}
+                className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                title={
+                  isExpanded ? 'Sembunyikan ID lengkap' : 'Tampilkan ID lengkap'
+                }
+              >
+                <span className="text-xs font-bold">
+                  {isExpanded ? '−' : '⋯'}
+                </span>
+              </button>
+            )}
+          </div>
+        );
+      },
     }),
-    // Kolom 1: Nama Barang
-    columnHelper.accessor('namaBarang', {
-      id: 'namaBarang',
+    columnHelper.accessor('nama', {
+      id: 'nama',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">Nama Barang</p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Nama Aset</p>
       ),
       cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
-          {info.getValue()}
+          {info.getValue() || '-'}
         </p>
       ),
     }),
-    // Kolom 2: Status
+    columnHelper.accessor('stock', {
+      id: 'stock',
+      header: () => (
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Stok</p>
+      ),
+      cell: (info) => (
+        <div className="flex items-center">
+          <span className={`inline-flex items-center justify-center w-8 h-6 rounded-full text-xs font-medium ${
+            info.getValue() > 0 
+              ? 'bg-green-100 p-4 text-green-800 '
+              : 'bg-red-100 text-red-800 p-4'
+          }`}>
+            {info.getValue() || 0}
+          </span>
+        </div>
+      ),
+    }),
     columnHelper.accessor('status', {
       id: 'status',
       header: () => (
@@ -62,47 +148,38 @@ export default function ComplexTable(props: { tableData: any }) {
         </p>
       ),
       cell: (info) => (
-        <div className="flex items-center">
-          {info.getValue() === 'tersedia' ? (
-            <MdCheckCircle className="me-1 text-green-500 dark:text-green-300" />
-          ) : info.getValue() === 'dipesan' ? (
-            <MdOutlineError className="me-1 text-amber-500 dark:text-amber-300" />
-          ) : info.getValue() === 'habis' ? (
-            <MdCancel className="me-1 text-red-500 dark:text-red-300" />
-          ) : null}
-          <p className="text-sm font-bold text-navy-700 dark:text-white">
-            {info.getValue().charAt(0).toUpperCase() + info.getValue().slice(1)}
-          </p>
+        <div className="flex h-full min-h-[24px] items-center justify-start">
+          <span className="flex items-center gap-2">
+            {info.getValue() === 'Tersedia' || info.getValue() === 'active' ? (
+              <BsCheckCircleFill className="text-base text-green-500" />
+            ) : (
+              <BsXCircleFill className="text-base text-red-500" />
+            )}
+            <span className="text-sm font-medium text-navy-700 dark:text-white">
+              {info.getValue()
+                ? info.getValue().charAt(0).toUpperCase() +
+                  info.getValue().slice(1)
+                : 'Tidak Aktif'}
+            </span>
+          </span>
         </div>
       ),
     }),
-    // Kolom 3: Jumlah
-    columnHelper.accessor('jumlah', {
-      id: 'jumlah',
+    columnHelper.accessor('created_at', {
+      id: 'created_at',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">Jumlah</p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">
+          Tanggal Dibuat
+        </p>
       ),
       cell: (info) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
-          {info.getValue()}
+        <p className="text-sm font-medium text-navy-700 dark:text-white">
+          {formatDate(info.getValue())}
         </p>
       ),
     }),
-    // Kolom 4: Tanggal Update
-    columnHelper.accessor('tanggalUpdate', {
-      id: 'tanggalUpdate',
-      header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">Tanggal Update</p>
-      ),
-      cell: (info) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
-          {info.getValue()}
-        </p>
-      ),
-    }),
-  ]; 
+  ];
 
-  const [data, setData] = React.useState(() => [...defaultData]);
   const table = useReactTable({
     data,
     columns,
@@ -115,17 +192,48 @@ export default function ComplexTable(props: { tableData: any }) {
     debugTable: true,
   });
 
+  if (loading) {
+    return (
+      <Card extra={'w-full h-full sm:overflow-auto px-6'}>
+        <div className="p-8 text-center">
+          <div className="text-lg text-gray-600 dark:text-white">Memuat data aset...</div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <Card extra={'w-full h-full sm:overflow-auto px-6'}>
+        <header className="relative flex items-center justify-between pt-4">
+          <div className="text-xl font-bold text-navy-700 dark:text-white">
+            Data Aset
+          </div>
+          <CardMenu />
+        </header>
+        <div className="p-8 text-center">
+          <div className="text-lg text-gray-600 dark:text-white">
+            Tidak ada data aset
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
   return (
-    <Card extra={'w-full h-full px-6 pb-6 sm:overflow-x-auto'}>
-      <div className="relative flex items-center justify-between pt-4">
+    <Card extra={'w-full h-full sm:overflow-auto px-6'}>
+      <header className="relative flex items-center justify-between pt-4">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-          Inventaris Barang
+          Data Aset ({data.length} item)
         </div>
         <CardMenu />
-      </div>
-
-      <div className="mt-8 overflow-x-scroll scrollbar-thin">
-        <table className="w-full">
+      </header>
+      {/* The wrapper div for the table is now scrollable */}
+      <div
+        className="scrollbar-thin mt-4 w-full"
+        style={{ maxHeight: '300px', overflowY: 'scroll' }}
+      >
+        <table className="w-full min-w-[700px] table-auto">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="!border-px !border-gray-400">
@@ -135,7 +243,7 @@ export default function ComplexTable(props: { tableData: any }) {
                       key={header.id}
                       colSpan={header.colSpan}
                       onClick={header.column.getToggleSortingHandler()}
-                      className="cursor-pointer border-b border-gray-200 pb-2 px-4 pt-4 text-start dark:border-white/30"
+                      className="cursor-pointer border-b border-gray-200 px-5 pb-2 pt-4 text-start dark:border-white/30"
                     >
                       <div className="items-center justify-between text-xs text-gray-200">
                         {flexRender(
@@ -143,9 +251,9 @@ export default function ComplexTable(props: { tableData: any }) {
                           header.getContext(),
                         )}
                         {{
-                          asc: '',
-                          desc: '',
-                        }[header.column.getIsSorted() as string] ?? null}
+                          asc: ' ↑',
+                          desc: ' ↓',
+                        }[header.column.getIsSorted()] ?? null}
                       </div>
                     </th>
                   );
@@ -154,31 +262,33 @@ export default function ComplexTable(props: { tableData: any }) {
             ))}
           </thead>
           <tbody>
-            {table
-              .getRowModel()
-              .rows.slice(0, 5)
-              .map((row) => {
-                return (
-                  <tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <td
-                          key={cell.id}
-                          className="min-w-[150px] border-white/0 py-3 "
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
+            {table.getRowModel().rows.map((row) => {
+              return (
+                <tr
+                  key={row.id}
+                  className="border-b border-gray-100 dark:border-gray-700"
+                >
+                  {row.getVisibleCells().map((cell) => {
+                    return (
+                      <td
+                        key={cell.id}
+                        className="min-w-[150px] px-5 py-3 text-left align-middle"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
     </Card>
   );
 }
+
+export default AssetTable;
