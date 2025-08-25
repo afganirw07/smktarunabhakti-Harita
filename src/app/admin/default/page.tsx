@@ -113,7 +113,7 @@ const Dashboard = () => {
         />
         <Widget
           icon={<MdBarChart className="h-6 w-6" />}
-          title={'Mitra Aktif'}
+          title={'Karyawan'}
           subtitle={loading ? 'Memuat...' : totalKaryawan}
         />
       </div>

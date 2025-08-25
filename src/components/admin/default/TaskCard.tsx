@@ -1,7 +1,7 @@
-import CardMenu from "components/card/CardMenu";
-import Checkbox from "components/checkbox";
-import { MdDragIndicator, MdCheckCircle } from "react-icons/md";
-import Card from "components/card";
+import CardMenu from 'components/card/CardMenu';
+import Checkbox from 'components/checkbox';
+import { MdDragIndicator, MdCheckCircle } from 'react-icons/md';
+import Card from 'components/card';
 
 const TaskCard = () => {
   return (
@@ -9,9 +9,6 @@ const TaskCard = () => {
       {/* task header */}
       <div className="relative flex flex-row justify-between">
         <div className="flex items-center">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-100 dark:bg-white/5">
-            <MdCheckCircle className="h-6 w-6 text-white dark:text-white" />
-          </div>
           <h4 className="ml-4 text-xl font-bold text-navy-700 dark:text-white">
             Tugas Hari Ini
           </h4>
