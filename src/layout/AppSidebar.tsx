@@ -5,35 +5,39 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../contexts/SidebarContextUser";
-import {Home, Calendar, ChevronDown, FoldHorizontalIcon, CircleUserIcon } from "lucide-react"
+import {Home, LayoutPanelLeft, ChevronDown, ShoppingBag, CircleUserIcon } from "lucide-react"
 
 type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  subItems?: { name: string; path: string; plus?: boolean; new?: boolean }[];
 };
 
 const navItems: NavItem[] = [
   {
     icon: <Home />,
-    name: "Home",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+    name: "Beranda",
+    path: "/user/home",
+    
   },
   {
-    icon: <Calendar />,
-    name: "Calendar",
-    path: "/calendar",
+    icon: <LayoutPanelLeft />,
+    name: "Layanan",
+    subItems: [{ name: "Trash House", path: "/", plus: true },
+                {name: 'Asisten AI', path: '/user/layanan/ai', plus: true},
+                {name: 'Lapor sampah', path: '/user', plus: false},
+    ],
+  },
+  {
+    name: "Toko",
+    icon: <ShoppingBag/>,
+    path: '/tukar'
   },
   {
     icon: <CircleUserIcon />,
-    name: "User Profile",
-    path: "/profile",
-  },
-  {
-    name: "Forms",
-    icon: <FoldHorizontalIcon/>,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
+    name: "Profile",
+    path: "/user/profile",
   },
 ];
 
@@ -55,8 +59,8 @@ const AppSidebar: React.FC = () => {
               onClick={() => handleSubmenuToggle(index, menuType)}
               className={`menu-item group w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                 openSubmenu?.type === menuType && openSubmenu?.index === index
-                  ? "menu-item-active bg-blue-50 text-blue-600"
-                  : "menu-item-inactive text-black hover:bg-gray-50"
+                  ? "menu-item-active bg-green-800 text-amber-200"
+                  : "menu-item-inactive text-white font-bold hover:bg-green-800 hover:text-amber-200"
               } ${
                 !isExpanded && !isHovered
                   ? "lg:justify-center lg:px-2"
@@ -66,8 +70,8 @@ const AppSidebar: React.FC = () => {
               <span
                 className={`flex-shrink-0 w-5 h-5 flex items-center justify-center ${
                   openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? "menu-item-icon-active text-blue-600"
-                    : "menu-item-icon-inactive text-gray-500"
+                    ? "menu-item-icon-active text-amber-200"
+                    : "menu-item-icon-inactive text-white"
                 }`}
               >
                 {nav.icon}
@@ -81,8 +85,8 @@ const AppSidebar: React.FC = () => {
                     className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${
                       openSubmenu?.type === menuType &&
                       openSubmenu?.index === index
-                        ? "rotate-180 text-blue-600"
-                        : "text-gray-400"
+                        ? "rotate-180 text-amber-200"
+                        : "text-white"
                     }`}
                   />
                 </>
@@ -94,8 +98,8 @@ const AppSidebar: React.FC = () => {
                 href={nav.path}
                 className={`menu-item group w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                   isActive(nav.path) 
-                    ? "menu-item-active bg-blue-50 text-blue-600" 
-                    : "menu-item-inactive text-black hover:bg-gray-50"
+                    ? "menu-item-active bg-green-800 text-amber-200" 
+                    : "menu-item-inactive text-white hover:bg-green-800 hover:text-amber-200"
                 } ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center lg:px-2"
@@ -105,8 +109,8 @@ const AppSidebar: React.FC = () => {
                 <span
                   className={`flex-shrink-0 w-5 h-5 flex items-center justify-center ${
                     isActive(nav.path)
-                      ? "menu-item-icon-active text-blue-600"
-                      : "menu-item-icon-inactive text-gray-500"
+                      ? "menu-item-icon-active text-amber-200"
+                      : "menu-item-icon-inactive text-white"
                   }`}
                 >
                   {nav.icon}
@@ -139,8 +143,8 @@ const AppSidebar: React.FC = () => {
                       href={subItem.path}
                       className={`menu-dropdown-item flex items-center justify-between px-4 py-2 rounded-md text-sm transition-all duration-200 ${
                         isActive(subItem.path)
-                          ? "menu-dropdown-item-active bg-blue-50 text-blue-600"
-                          : "menu-dropdown-item-inactive text-black hover:bg-gray-50"
+                          ? "menu-dropdown-item-active bg-green-800 text-amber-200"
+                          : "menu-dropdown-item-inactive text-white hover:bg-green-800 hover:text-amber-200"
                       }`}
                     >
                       <span>{subItem.name}</span>
@@ -149,22 +153,22 @@ const AppSidebar: React.FC = () => {
                           <span
                             className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                               isActive(subItem.path)
-                                ? "menu-dropdown-badge-active bg-blue-100 text-blue-700"
-                                : "menu-dropdown-badge-inactive bg-green-100 text-green-700"
+                                ? "menu-dropdown-badge-active bg-amber-200 text-green-800"
+                                : "menu-dropdown-badge-inactive bg-amber-200 text-green-800"
                             }`}
                           >
                             new
                           </span>
                         )}
-                        {subItem.pro && (
+                        {subItem.plus && (
                           <span
-                            className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            className={`text-xs px-2 py-0.5 rounded-full font-bold ${
                               isActive(subItem.path)
-                                ? "menu-dropdown-badge-active bg-blue-100 text-blue-700"
-                                : "menu-dropdown-badge-inactive bg-yellow-100 text-yellow-700"
+                                ? "menu-dropdown-badge-active bg-gradient-to-r from-lime-400 via-lime-600 to-green-700 text-white shadow-sm shadow-green-400/50"
+                                : "menu-dropdown-badge-inactive bg-gradient-to-r from-lime-400 via-lime-600 to-green-700 text-white font-semibold shadow-sm shadow-green-400/50"
                             }`}
                           >
-                            pro
+                            Plus
                           </span>
                         )}
                       </span>
@@ -244,7 +248,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-green-900 text-white h-screen transition-all duration-300 ease-in-out z-50 border-r border-green-800 
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
@@ -295,7 +299,7 @@ const AppSidebar: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-white font-semibold ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -304,7 +308,7 @@ const AppSidebar: React.FC = () => {
                 {isExpanded || isHovered || isMobileOpen ? (
                   "Menu"
                 ) : (
-                  <FoldHorizontalIcon />
+                  <ShoppingBag className="text-white" />
                 )}
               </h2>
               {renderMenuItems(navItems, "main")}
