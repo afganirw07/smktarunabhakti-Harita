@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import CardMenu from 'components/card/CardMenu';
 import Card from 'components/card';
@@ -40,9 +42,11 @@ function CheckTable() {
         return;
       }
 
+      // Filter data untuk hanya mengambil user dengan role 'admin'
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, city, address, phone, plan, status');
+        .select('id, first_name, last_name, email, city, address, phone, status, role')
+        .eq('role', 'admin'); // Hanya ambil data yang role-nya 'admin'
 
       if (error) throw error;
 
@@ -164,17 +168,7 @@ function CheckTable() {
         </p>
       ),
     }),
-    columnHelper.accessor('plan', {
-      id: 'plan',
-      header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">Plan</p>
-      ),
-      cell: (info) => (
-        <p className="text-sm font-medium text-navy-700 dark:text-white">
-          {info.getValue() || '-'}
-        </p>
-      ),
-    }),
+
     columnHelper.accessor('status', {
       id: 'status',
       header: () => (
@@ -244,7 +238,7 @@ function CheckTable() {
     <Card extra={'w-full h-full sm:overflow-auto px-6'}>
       <header className="relative flex items-center justify-between pt-4">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-          Data Pengguna ({data.length} pengguna)
+          Data Admin ({data.length} admin)
         </div>
         <CardMenu />
       </header>
