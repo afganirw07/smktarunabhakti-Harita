@@ -1,7 +1,5 @@
 import React from 'react';
 
-// Admin Imports
-
 // Icon Imports
 import {
   MdHome,
@@ -50,7 +48,7 @@ const routes = [
   {
     name: 'Log Out',
     layout: '/admin',
-    path: 'log-out',
+    path: 'logout', 
     icon: <MdLogout   className="h-6 w-6" />,
   }
 ];

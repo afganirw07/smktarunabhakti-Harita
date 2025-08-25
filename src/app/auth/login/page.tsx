@@ -87,12 +87,12 @@ export default function Login() {
         toast.success('Login berhasil! Selamat datang, Admin!');
         setTimeout(() => {
           router.push('/admin/default');
-        }, 2000);
+        }, 1000);
       } else if (userRole === 'user') {
         toast.success('Login berhasil! Selamat datang!');
         setTimeout(() => {
           router.push('/user/homepage');
-        }, 2000);
+        }, 1000);
       } else {
         // Fallback for an unknown role
         console.warn('Unknown role:', userRole, 'defaulting to user homepage');
