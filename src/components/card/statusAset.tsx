@@ -191,7 +191,7 @@ const StatusCard = (props) => {
                   <span className="text-sm font-bold text-green-700">{beroperasi}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-orange-600">Perawatan:</span>
+                  <span className="text-sm font-medium text-orange-600">PaPerawatan:</span>
                   <span className="text-sm font-bold text-orange-700">{perawatan}</span>
                 </div>
                 {idle > 0 && (
