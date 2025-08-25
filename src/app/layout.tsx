@@ -3,6 +3,7 @@ import AppWrappers from './AppWrappers';
 // import '@asseinfo/react-kanban/dist/styles.css';
 // import '/public/styles/Plugins.css';
 import { Inter, Nunito } from 'next/font/google';
+
 import '../styles/index.css';
 
 // Font configurations
@@ -23,10 +24,11 @@ const inter = Inter({
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body id={'root'} className={`${inter.variable} ${nunito.variable}`}>
-        <AppWrappers>{children}</AppWrappers>
+      <body id="root" className={`${inter.variable} ${nunito.variable}`}>
+       <AppWrappers>
+          {children}
+        </AppWrappers>
       </body>
     </html>
   );
 }
-  
