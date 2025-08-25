@@ -9,13 +9,14 @@ import { useRouter } from 'next/navigation';
 import toast, { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
-
+// Initialize Supabase client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 );
 
 export default function Login() {
+  // Use state hooks for form data and loading/error states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,23 +28,87 @@ export default function Login() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
+    try {
+      // try login
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+      // cek
+      if (authError) {
+        setError(authError.message);
+        toast.error('Login gagal: ' + authError.message);
+        setLoading(false);
+        return;
+      }
 
-    if (error) {
-      setError(error.message);
+      const userId = authData.user.id;
+      const accessToken = authData.session.access_token;
+      const refreshToken = authData.session.refresh_token;
+
+      // Store tokens in localStorage
+      localStorage.setItem('supabase_access_token', accessToken);
+      localStorage.setItem('supabase_refresh_token', refreshToken);
+      localStorage.setItem('user_id', userId);
+
+      // get tabel
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role', 'active_token')
+        .eq('id', userId)
+        .single();
+      
+        // if not found
+      if (profileError) {
+        if (profileError.code === 'PGRST116') {
+          setError('Profil pengguna tidak ditemukan. Silakan hubungi admin untuk aktivasi akun.');
+          toast.error('Profil tidak ditemukan. Hubungi admin.');
+        } else {
+          setError('Terjadi kesalahan saat mengambil data profil.');
+          toast.error('Terjadi kesalahan saat mengambil data profil.');
+        }
+        setLoading(false);
+        return;
+      }
+      
+      const userRole = profileData.role;
+      const activeToken = profileData.active_token;
+
+      // Store additional user data in localStorage
+      localStorage.setItem('user_role', userRole);
+      localStorage.setItem('user_email', email);
+      if (activeToken) {
+        localStorage.setItem('active_token', activeToken);
+      }
+
       setLoading(false);
-      toast.error('Login gagal: ' + error.message);
-      return;
+      
+      if (userRole === 'admin') {
+        toast.success('Login berhasil! Selamat datang, Admin!');
+        setTimeout(() => {
+          router.push('/admin/default');
+        }, 2000);
+      } else if (userRole === 'user') {
+        toast.success('Login berhasil! Selamat datang!');
+        setTimeout(() => {
+          router.push('/user/homepage');
+        }, 2000);
+      } else {
+        // Fallback for an unknown role
+        console.warn('Unknown role:', userRole, 'defaulting to user homepage');
+        toast.error('Pengguna tidak dikenali.');
+      }
+
+    } catch (error) {
+      console.error('Unexpected error during login:', error);
+      setError('Terjadi kesalahan yang tidak terduga. Silakan coba lagi.');
+      toast.error('Terjadi kesalahan yang tidak terduga.');
+      setLoading(false);
     }
-
-    router.push('/dashboard'); 
-
   };
 
-  const LupaPassword = () => {
+  // Helper function for navigation, simplified for clarity
+  const navigateToLupaPassword = () => {
     router.push('/lupa-password');
   }
 
@@ -53,7 +118,7 @@ export default function Login() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="flex h-screen justify-center bg-gray-100"
+        className="flex h-screen justify-center bg-gray-100 font-inter"
       >
         <Toaster position="top-center" reverseOrder={false} />
         <motion.div 
@@ -250,9 +315,9 @@ export default function Login() {
                       animate={{ opacity: 1, height: "auto", y: 0 }}
                       exit={{ opacity: 0, height: 0, y: -10 }}
                       transition={{ duration: 0.3 }}
-                      className="mb-4 text-center text-sm text-red-500 bg-red-50 p-3 rounded-lg border border-red-200"
+                      className="mb-4 text-center text-sm text-red-500 bg-red-50 p-3 rounded-lg border border-red-200 font-nunito"
                     >
-                      <p className="font-nunito">{error}</p>
+                      <p>{error}</p>
                     </motion.div>
                   )}
                 </AnimatePresence>

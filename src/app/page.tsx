@@ -1,4 +1,21 @@
-import { redirect } from 'next/navigation';
-export default function Home({}) {
-  redirect('/harita ');
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const user_role = localStorage.getItem('user_role');
+    if (user_role === 'admin') {
+      router.push('/admin/default');
+    } else if (user_role === 'user') {
+      router.push('/user/homepage');
+    } else {
+      router.push('/harita');
+    }
+  }, []);
+
+  return null;
 }
