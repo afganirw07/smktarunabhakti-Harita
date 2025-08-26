@@ -32,7 +32,7 @@ export default function Admin({ children }: { children: React.ReactNode }) {
           {/* Routes */}
           <div>
             <Navbar
-              onOpenSidenav={() => setOpen(!open)}  
+              onOpenSidenav={() => setOpen(!open)}
               brandText={getActiveRoute(routes, pathname)}
               secondary={getActiveNavbar(routes, pathname)}
             />

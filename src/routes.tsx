@@ -1,16 +1,15 @@
+// routes/adminRoutes.js
 import React from 'react';
-
-// Icon Imports
 import {
   MdHome,
   MdOutlineArticle,
   MdBarChart,
   MdPerson,
   MdLogout,
-  MdAddChart 
+  MdAddChart,
 } from 'react-icons/md';
 
-const routes = [
+const allRoutes = [
   {
     name: 'Main Dashboard',
     layout: '/admin',
@@ -22,15 +21,13 @@ const routes = [
     layout: '/admin',
     path: 'manajemen-aset',
     icon: <MdOutlineArticle className="h-6 w-6" />,
-
     secondary: true,
   },
   {
     name: 'Tambah Aset',
     layout: '/admin',
     path: 'tambah-aset',
-    icon: <MdAddChart  className="h-6 w-6" />,
-
+    icon: <MdAddChart className="h-6 w-6" />,
     secondary: true,
   },
   {
@@ -44,12 +41,16 @@ const routes = [
     layout: '/admin',
     path: 'profile',
     icon: <MdPerson className="h-6 w-6" />,
-  },  
+  },
   {
     name: 'Log Out',
     layout: '/admin',
-    path: 'logout', 
-    icon: <MdLogout   className="h-6 w-6" />,
-  }
+    path: 'logout',
+    icon: <MdLogout className="h-6 w-6" />,
+  },
 ];
+
+const role = localStorage.getItem('user_role');
+const routes = role === 'admin' ? allRoutes : [];
+
 export default routes;
