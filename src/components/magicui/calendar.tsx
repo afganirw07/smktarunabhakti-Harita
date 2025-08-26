@@ -97,7 +97,7 @@ export function SketchCalendarPicker({
         default:
           return cn(
             baseStyles,
-            "bg-primary font-semibold text-primary-foreground",
+            "bg-green-700 font-semibold text-primary-foreground",
           );
       }
     }
@@ -246,7 +246,7 @@ export function SketchCalendarPicker({
               {isHovered && variant === "artistic" && (
                 <motion.div
                   layoutId="hover-effect"
-                  className="absolute inset-0 rounded-lg border-2 border-dashed border-primary"
+                  className="absolute inset-0 rounded-lg border-2 border-dashed border-green-600"
                   transition={{ duration: 0.2 }}
                 />
               )}
