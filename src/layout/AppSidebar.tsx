@@ -299,19 +299,6 @@ const AppSidebar: React.FC = () => {
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
             <div>
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-green-800 font-semibold ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Menu"
-                ) : (
-                  <ShoppingBag className="text-green-800" />
-                )}
-              </h2>
               {renderMenuItems(navItems, "main")}
             </div>
           </div>
