@@ -91,7 +91,7 @@ export default function Login() {
       } else if (userRole === 'user') {
         toast.success('Login berhasil! Selamat datang!');
         setTimeout(() => {
-          router.push('/user/homepage');
+          router.push('/user/home');
         }, 1000);
       } else {
         // Fallback for an unknown role

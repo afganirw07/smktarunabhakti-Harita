@@ -1,60 +1,140 @@
-"use client";
-import React from "react";
-import { useModal } from "../../hooks/useModal";
-import { Modal } from "../ui/modal";
-import Button from "../ui/button/Button";
-import Input from "../form/input/InputField";
-import Label from "../form/Label";
+'use client';
+import React, { useState, useEffect } from 'react';
+import { useModal } from '../../hooks/useModal';
+import { Modal } from '../ui/modal';
+import Button from '../ui/button/Button';
+import Input from '../form/input/InputField';
+import Label from '../form/Label';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function UserInfoCard() {
   const { isOpen, openModal, closeModal } = useModal();
-  const handleSave = () => {
-    // Handle save logic here
-    console.log("Saving changes...");
-    closeModal();
+  const [firstName, setFirstName] = useState('Loading...');
+  const [lastName, setLastName] = useState('Loading...');
+  const [userEmail, setUserEmail] = useState('Loading...');
+  const [userPhone, setUserPhone] = useState('Loading...');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function getUserData() {
+      setLoading(true);
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        console.error('User not authenticated or error fetching user:', authError?.message);
+        setFirstName('Guest');
+        setLastName('');
+        setUserEmail('N/A');
+        setUserPhone('N/A');
+        setLoading(false);
+        return;
+      }
+
+      const { data, error: profileError } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, email, phone')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching user profile:', profileError.message);
+        setFirstName('Guest');
+        setLastName('');
+        setUserEmail('N/A');
+        setUserPhone('N/A');
+      } else if (data) {
+        setFirstName(data.first_name || 'N/A');
+        setLastName(data.last_name || 'N/A');
+        setUserEmail(data.email || 'N/A');
+        setUserPhone(data.phone || 'N/A');
+      }
+      setLoading(false);
+    }
+    getUserData();
+  }, []);
+
+  const handleSave = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: firstName,
+          last_name: lastName,
+          email: userEmail,
+          phone: userPhone,
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error updating user profile:', error.message);
+      } else {
+        console.log('Profile updated successfully!');
+        closeModal();
+      }
+    }
   };
+
+  const handleInputChange = (e, setter) => {
+    setter(e.target.value);
+  };
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-gray-200 p-5 dark:border-gray-800 lg:p-6">
+        <p className="text-gray-500">Loading user data...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
+    <div className="rounded-2xl border border-gray-200 p-5 dark:border-gray-800 lg:p-6">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h4 className="text-lg font-bold font-inter lg:mb-6 text-green-700">
+          <h4 className="font-inter text-lg font-bold text-green-700 lg:mb-6">
             Informasi Pribadi
           </h4>
-
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
             <div>
               <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                 Nama awal
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                Musharof
+                {firstName}
               </p>
             </div>
-
             <div>
               <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                 Nama akhir
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                Chowdhury
+                {lastName}
               </p>
             </div>
-
             <div>
               <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                 Alamat email
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                randomuser@pimjo.com
+                {userEmail}
               </p>
             </div>
-
             <div>
               <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                 Nomor Handphone
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                +09 363 398 46
+                {userPhone}
               </p>
             </div>
           </div>
@@ -62,7 +142,8 @@ export default function UserInfoCard() {
 
         <button
           onClick={openModal}
-          className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-green-800 px-4 py-3 text-sm font-medium text-white  hover:text-green-200 hover:bg-green-600 transition-colors duration-200 ease-out lg:inline-flex lg:w-auto">
+          className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-green-800 px-4 py-3 text-sm font-medium text-white  transition-colors duration-200 ease-out hover:bg-green-600 hover:text-green-200 lg:inline-flex lg:w-auto"
+        >
           <svg
             className="fill-current"
             width="18"
@@ -82,50 +163,68 @@ export default function UserInfoCard() {
         </button>
       </div>
 
-      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] m-4 z-50">
+      <Modal
+        isOpen={isOpen}
+        onClose={closeModal}
+        className="z-50 m-4 max-w-[700px]"
+      >
         <div className=" relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 lg:p-11">
           <div className="px-2 pr-14">
-            <h4 className="mb-2 text-2xl font-semibold text-green-700  font-inter">
+            <h4 className="mb-2 font-inter text-2xl font-semibold  text-green-700">
               Ubah profil anda
             </h4>
-            <p className=" text-sm text-black/60 font-nunito">
+            <p className=" font-nunito text-sm text-black/60">
               Perbarui profil anda
             </p>
           </div>
           <form className="flex flex-col">
             <div className=" h-[270px] overflow-y-auto px-2 pb-3">
-              <div>
-                
-              </div>
+              <div></div>
               <div className="mt-7">
-                <h5 className="mb-5 text-lg font-medium text-green-700 font-inter lg:mb-6">
+                <h5 className="mb-5 font-inter text-lg font-medium text-green-700 lg:mb-6">
                   Informasi pribadi
                 </h5>
 
-                <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2 font-nunito">
+                <div className="grid grid-cols-1 gap-x-6 gap-y-5 font-nunito lg:grid-cols-2">
                   <div className="col-span-2 lg:col-span-1">
                     <Label>First Name</Label>
-                    <Input type="text" defaultValue="Musharof" />
+                    <Input
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => handleInputChange(e, setFirstName)}
+                    />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Last Name</Label>
-                    <Input type="text" defaultValue="Chowdhury" />
+                    <Input
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => handleInputChange(e, setLastName)}
+                    />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Email Address</Label>
-                    <Input type="text" defaultValue="randomuser@pimjo.com" />
+                    <Input
+                      type="text"
+                      value={userEmail}
+                      onChange={(e) => handleInputChange(e, setUserEmail)}
+                    />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Phone</Label>
-                    <Input type="text" defaultValue="+09 363 398 46" />
+                    <Input
+                      type="text"
+                      value={userPhone}
+                      onChange={(e) => handleInputChange(e, setUserPhone)}
+                    />
                   </div>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
+            <div className="mt-6 flex items-center gap-3 px-2 lg:justify-end">
               <Button size="sm" variant="outline" onClick={closeModal}>
                 Tutup
               </Button>

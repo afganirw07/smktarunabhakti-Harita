@@ -1,26 +1,83 @@
-"use client";
-import React from "react";
-import { useModal } from "../../hooks/useModal";
-import { Modal } from "../ui/modal";
-import Button from "../ui/button/Button";
-import Input from "../form/input/InputField";
-import Label from "../form/Label";
-import Image from "next/image";
+'use client';
+import React, { useState, useEffect } from 'react';
+import { useModal } from '../../hooks/useModal';
+import { Modal } from '../ui/modal';
+import Button from '../ui/button/Button';
+import Input from '../form/input/InputField';
+import Label from '../form/Label';
+import Image from 'next/image';
+import { createClient } from '@supabase/supabase-js';
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables');
+}
+
+// Buat instance Supabase client
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function UserMetaCard() {
   const { isOpen, openModal, closeModal } = useModal();
+  const [userName, setUserName] = useState('Loading...');
+  const [userPlan, setUserPlan] = useState('Loading...');
+  const [userCity, setUserCity] = useState('Loading...');
+  const [userAddress, setUserAddress] = useState('Loading...');
+
+  useEffect(() => {
+    async function getUserData() {
+      // Ambil user_id dari local storage
+      const userId = localStorage.getItem('user_id');
+
+      if (!userId) {
+        console.error('User ID not found in local storage.');
+        setUserName('Guest');
+        setUserPlan('N/A');
+        setUserCity('N/A');
+        setUserAddress('N/A');
+        return;
+      }
+
+      // Query data dari tabel 'profiles'
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, plan, city, address')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user data:', error.message);
+        setUserName('Guest');
+        setUserPlan('N/A');
+        setUserCity('N/A');
+        setUserAddress('N/A');
+      } else if (data) {
+        const fullName = `${data.first_name || ''} ${
+          data.last_name || ''
+        }`.trim();
+        setUserName(fullName || 'Guest');
+        setUserPlan(data.plan || 'N/A');
+        setUserCity(data.city || 'N/A');
+        setUserAddress(data.address || 'N/A');
+      }
+    }
+
+    getUserData();
+  }, []);
+
   const handleSave = () => {
     // Handle save logic here
-    console.log("Saving changes...");
+    console.log('Saving changes...');
     closeModal();
   };
+
   return (
     <>
-      <div className="p-5 border border-gray-200 rounded-2xl  lg:p-6">
+      <div className="rounded-2xl border border-gray-200 p-5  lg:p-6">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
-            <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full ">
+          <div className="flex w-full flex-col items-center gap-6 xl:flex-row">
+            <div className="h-20 w-20 overflow-hidden rounded-full border border-gray-200 ">
               <Image
                 width={80}
                 height={80}
@@ -29,23 +86,25 @@ export default function UserMetaCard() {
               />
             </div>
             <div className="order-3 xl:order-2">
-              <h4 className="mb-2 text-lg font-bold text-center text-green-700 xl:text-left">
-                Musharof Chowdhury
+              <h4 className="mb-2 text-center text-lg font-bold text-green-700 xl:text-left">
+                {userName}
               </h4>
               <div className="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
-                <p className="text-sm text-green-500 ">
-                  Team Manager
+                <p className="text-sm text-green-500">
+                  {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)}
                 </p>
                 <div className="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block"></div>
                 <p className="text-sm text-green-500">
-                  Arizona, United States
+                  {userCity || ''}
+                  {userCity && userAddress ? ', ' : ''}
+                  {userAddress || ''}
                 </p>
               </div>
             </div>
           </div>
           <button
             onClick={openModal}
-            className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-green-800 px-4 py-3 text-sm font-medium text-white  hover:text-green-200 hover:bg-green-600 transition-colors duration-200 ease-out lg:inline-flex lg:w-auto"
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-green-800 px-4 py-3 text-sm font-medium text-white  transition-colors duration-200 ease-out hover:bg-green-600 hover:text-green-200 lg:inline-flex lg:w-auto"
           >
             <svg
               className="fill-current"
@@ -66,48 +125,56 @@ export default function UserMetaCard() {
           </button>
         </div>
       </div>
-      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] m-4">
+      <Modal isOpen={isOpen} onClose={closeModal} className="m-4 max-w-[700px]">
         <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 lg:p-11">
           <div className="px-2 pr-14">
-            <h4 className="mb-2 text-2xl font-semibold text-green-700 font-inter">
+            <h4 className="mb-2 font-inter text-2xl font-semibold text-green-700">
               Ubah informasi anda
             </h4>
-            <p className=" text-sm text-black/60  font-nunito">
-              Perbarui profil anda 
+            <p className=" font-nunito text-sm  text-black/60">
+              Perbarui profil anda
             </p>
           </div>
           <form className="flex flex-col">
             <div className=" h-[270px] overflow-y-auto px-2 pb-3">
               <div className="mt-7">
-                <h5 className="mb-5 text-lg font-medium text-green-700 lg:mb-6 font-inter">
+                <h5 className="mb-5 font-inter text-lg font-medium text-green-700 lg:mb-6">
                   Informasi Pribadi
                 </h5>
-
-                <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2 font-nunito">
+                <div className="grid grid-cols-1 gap-x-6 gap-y-5 font-nunito lg:grid-cols-2">
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Nama Awal</Label>
                     <Input type="text" defaultValue="Musharof" />
                   </div>
-
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Nama Akhir</Label>
                     <Input type="text" defaultValue="Chowdhury" />
                   </div>
-
                   <div className="col-span-2 lg:col-span-1">
-                    <Label>Alamat Emial</Label>
-                    <Input type="text" defaultValue="randomuser@pimjo.com" />
+                    <Label>Plan</Label>
+                    <Input type="text" defaultValue="Team Manager" />
                   </div>
-
                   <div className="col-span-2 lg:col-span-1">
-                    <Label>Nomor Handphone</Label>
-                    <Input type="text" defaultValue="+09 363 398 46" />
+                    <Label>Kota</Label>
+                    <Input type="text" defaultValue="Arizona" />
+                  </div>
+                  <div className="col-span-2">
+                    <Label>Alamat Lengkap</Label>
+                    <textarea
+                      className="h-24 w-full resize-none rounded-md border border-gray-300 p-3 focus:outline-none focus:ring-1 focus:ring-green-500"
+                      defaultValue="United States"
+                    ></textarea>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-              <Button className="" size="sm" variant="outline" onClick={closeModal}>
+            <div className="mt-6 flex items-center gap-3 px-2 lg:justify-end">
+              <Button
+                className=""
+                size="sm"
+                variant="outline"
+                onClick={closeModal}
+              >
                 Tutup
               </Button>
               <Button size="sm" onClick={handleSave}>
