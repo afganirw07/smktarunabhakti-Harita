@@ -43,12 +43,18 @@ const calculateEndDate = (startDate, plan) => {
 };
 
 export default function Home() {
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState(new Date());
   const [First_Name, setFirst_Name] = useState('Loading...');
   const [poin, setPoin] = useState(0);
   const [plan, setPlan] = useState('Loading...');
   const [isClaimed, setIsClaimed] = useState(false);
   const [subscriptionEndDate, setSubscriptionEndDate] = useState(null);
+
+  // State baru untuk produk
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [errorProducts, setErrorProducts] = useState(null);
+
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -56,38 +62,62 @@ export default function Home() {
     seconds: 0,
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const userId = localStorage.getItem('user_id');
+  // Fungsi untuk mengambil data pengguna
+  const fetchData = async () => {
+    const userId = localStorage.getItem('user_id');
 
-      if (userId) {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select(
-            'first_name, point, plan, subscription_start_date, is_claimed',
-          )
-          .eq('id', userId)
-          .single();
+    if (userId) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(
+          'first_name, point, plan, subscription_start_date, is_claimed',
+        )
+        .eq('id', userId)
+        .single();
 
-        if (error) {
-          console.error('Error fetching user data:', error);
-        } else {
-          setFirst_Name(data.first_name);
-          setPoin(data.point || 0);
-          setPlan(data.plan || 'Loading...');
-          setIsClaimed(data.is_claimed);
+      if (error) {
+        console.error('Error fetching user data:', error);
+      } else {
+        setFirst_Name(data.first_name);
+        setPoin(data.point || 0);
+        setPlan(data.plan || 'Loading...');
+        setIsClaimed(data.is_claimed);
 
-          const endDate = calculateEndDate(
-            data.subscription_start_date,
-            data.plan,
-          );
-          setSubscriptionEndDate(endDate);
-        }
+        const endDate = calculateEndDate(
+          data.subscription_start_date,
+          data.plan,
+        );
+        setSubscriptionEndDate(endDate);
       }
-    };
+    }
+  };
+
+  // Fungsi untuk mengambil data produk
+  const fetchProducts = async () => {
+    setLoadingProducts(true);
+    try {
+      const { data, error } = await supabase
+        .from('aset_barang')
+        .select('id, nama, img, desc, stock, status, poin');
+      if (error) {
+        throw error;
+      }
+      setProducts(data);
+    } catch (error) {
+      console.error('Error fetching products:', error.message);
+      setErrorProducts(error.message);
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+
+  // Menggabungkan kedua fungsi fetch di useEffect
+  useEffect(() => {
     fetchData();
+    fetchProducts();
   }, []);
 
+  // Timer useEffect
   useEffect(() => {
     if (!subscriptionEndDate || isNaN(subscriptionEndDate.getTime())) {
       setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -156,6 +186,7 @@ export default function Home() {
     <>
       <section className="h-auto w-full py-12 md:px-8 ">
         {/* Header */}
+        <Toaster position="top-center" reverseOrder={false} />
         <div className="flex w-full flex-col justify-between md:flex-row md:items-center ">
           <div className="flex flex-col ">
             <h1 className="font-inter text-3xl font-bold text-green-700">
@@ -207,7 +238,7 @@ export default function Home() {
           <div className="flex flex-col justify-center gap-4 rounded-xl bg-white p-6 shadow lg:col-span-3 lg:row-span-3">
             <div
               className="flex flex-col items-center justify-center
-             gap-4"
+              gap-4"
             >
               <h3 className="font-nunito font-bold text-green-700">
                 Masa Berlangganan
@@ -232,7 +263,7 @@ export default function Home() {
                 <p className="font-semibold text-green-500">Sisa Durasi</p>
                 <p className="font-bold text-black">
                   {timeLeft.days}h {timeLeft.hours}j {timeLeft.minutes}m{' '}
-                  {timeLeft.seconds}d
+                  {timeLeft.seconds}s
                 </p>
               </div>
               <div>
@@ -288,13 +319,13 @@ export default function Home() {
               {/* Badge Klaim Coins */}
               <button
                 onClick={handleClaimCoins}
-                disabled={isClaimed} // <-- Menggunakan state untuk menonaktifkan tombol
+                disabled={isClaimed}
                 className={`flex cursor-pointer items-center gap-1 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ease-out 
-        ${
-          isClaimed
-            ? 'cursor-not-allowed bg-gray-400 text-gray-700'
-            : 'bg-green-700 text-white hover:bg-green-500'
-        }`}
+              ${
+                isClaimed
+                  ? 'cursor-not-allowed bg-gray-400 text-gray-700'
+                  : 'bg-green-700 text-white hover:bg-green-500'
+              }`}
               >
                 <Coins className="h-6 w-6" />
                 {isClaimed ? 'Koin Sudah Diklaim' : 'Klaim 500 Coins'}
@@ -315,22 +346,23 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
-            <ProductCard
-              title="Produk C"
-              imageUrl="https://picsum.photos/400/301"
-            />
-            <ProductCard
-              title="Produk C"
-              imageUrl="https://picsum.photos/400/301"
-            />
-            <ProductCard
-              title="Produk C"
-              imageUrl="https://picsum.photos/400/301"
-            />
-            <ProductCard
-              title="Produk C"
-              imageUrl="https://picsum.photos/400/301"
-            />
+            {loadingProducts ? (
+              <p>Memuat produk...</p>
+            ) : errorProducts ? (
+              <p className="text-red-500">Error: Gagal memuat produk. Silakan coba lagi.</p>
+            ) : products.length > 0 ? (
+              products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  title={product.nama}
+                  imageUrl={product.img}
+                  description={product.desc}
+                  price={product.poin}
+                />
+              ))
+            ) : (
+              <p>Tidak ada produk yang tersedia saat ini.</p>
+            )}
           </div>
           <div className="flex w-full items-center justify-center">
             <Link href={'/user/toko'}>

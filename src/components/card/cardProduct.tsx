@@ -4,18 +4,32 @@ import { CoinsIcon, Minus, Plus, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
+/**
+ * @interface ProductCardProps
+ * @description Interface for the properties of the ProductCard component.
+ * @property {string} title - The name of the product.
+ * @property {string} description - The description of the product.
+ * @property {string} price - The price of the product in coins.
+ * @property {string} imageUrl - The URL of the product's image.
+ */
 interface ProductCardProps {
-  title?: string;
-  description?: string;
-  price?: string;
-  imageUrl?: string;
+  title: string;
+  description: string;
+  price: string;
+  imageUrl: string;
 }
 
+/**
+ * @function ProductCard
+ * @description A reusable card component to display product information.
+ * @param {ProductCardProps} props - The properties for the component.
+ * @returns {JSX.Element} The rendered product card.
+ */
 export default function ProductCard({
-  title = "Default Product",
-  description = "This is a dummy product description for testing layout with sidebar.",
-  price = "2500",
-  imageUrl = "https://picsum.photos/400/300",
+  title,
+  description,
+  price,
+  imageUrl,
 }: ProductCardProps) {
   const [quantity, setQuantity] = useState(1);
 
@@ -25,7 +39,7 @@ export default function ProductCard({
 
   return (
     <div className="w-full bg-white border border-green-700 rounded-xl shadow-md overflow-hidden">
-      {/* Gambar */}
+      {/* Gambar Produk */}
       <div className="relative w-full h-48">
         <Image
           src={imageUrl}
@@ -42,7 +56,7 @@ export default function ProductCard({
         <h3 className="text-green-700 font-semibold text-lg">{title}</h3>
         <p className="text-gray-500 text-sm line-clamp-3">{description}</p>
 
-        {/* Quantity */}
+        {/* Quantity control */}
         <div className="flex items-center gap-3">
           <button
             onClick={decrement}
@@ -59,7 +73,7 @@ export default function ProductCard({
           </button>
         </div>
 
-        {/* Harga + Tombol Beli */}
+        {/* Harga dan tombol beli */}
         <div className="flex items-center justify-between mt-2">
           <span className="flex items-center gap-1 text-black font-bold text-base">
             <CoinsIcon className="w-5 h-auto text-green-700" />
