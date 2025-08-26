@@ -59,7 +59,7 @@ export function SketchCalendarPicker({
       case "minimal":
         return "bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800";
       case "artistic":
-        return "bg-[url('/paper-texture.png')] bg-cover border-2 border-zinc-800 dark:border-zinc-300 [filter:contrast(1.1)] [box-shadow:4px_4px_0_0_rgba(0,0,0,0.2)]";
+        return "bg-[url('/paper-texture.png')] bg-cover border-2 border-zinc-800  [filter:contrast(1.1)] [box-shadow:4px_4px_0_0_rgba(0,0,0,0.2)]";
       case "gradient":
         return "bg-linear-to-br from-violet-500 via-purple-500 to-indigo-500 border-none text-white [box-shadow:0_8px_32px_rgba(124,58,237,0.2)]";
       case "neon":

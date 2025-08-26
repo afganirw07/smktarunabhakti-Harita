@@ -42,7 +42,8 @@ function CheckTable() {
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, city, address, phone, plan, status');
+        .select('id, first_name, last_name, email, city, address, phone, plan, status, role')
+        .eq('role', 'user'); 
 
       if (error) throw error;
 

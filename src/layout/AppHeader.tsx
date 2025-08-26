@@ -127,9 +127,6 @@ const AppHeader: React.FC = () => {
         >
             <div className="bg-gradient-to-r from-lime-400 via-lime-600 to-green-700 px-4 py-1 text-base font-nunito text-white font-bold rounded-full  hover:scale-110 transition-all duration-300 ease-out ">
               Plus
-            
-
-            {/* <!-- Notification Menu Area --> */}
           </div>
           <div className="flex items-center gap-4 2xsm:gap-3">
            <NotificationDropdown /> 
