@@ -91,7 +91,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Lapor sampah - FIXED */}
           <div className="rounded-xl bg-green-100 p-6 shadow lg:col-span-4">
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-between">
               <h1 className="font-inter text-center text-lg font-semibold sm:text-left sm:text-xl">

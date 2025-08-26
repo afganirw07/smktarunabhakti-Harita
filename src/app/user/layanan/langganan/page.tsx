@@ -77,7 +77,10 @@ export default function Langganan() {
       </div>
       {/* Pricing Section */}
       <div className="py-10 bg-white">
-        <Pricing />
+        <Pricing 
+        showModal
+        // onClick={openModal}
+        />
       </div>
     </>
   );
