@@ -35,6 +35,7 @@ export default function TukarSampah() {
   });
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+const [selectedBarang, setSelectedBarang] = useState<string>(''); 
 
   const lokasiPosList: LokasiPos[] = [
     { id: '1', nama: 'Harita Pos Taruna Bhakti', jarak: '0.8 Km' },
@@ -67,16 +68,23 @@ export default function TukarSampah() {
     );
   };
 
-  const isFormValid =
+ const isFormValid =
     formData.namaLengkap &&
     formData.nomorHandphone &&
     formData.email &&
     formData.massaSampah &&
-    formData.haritaPos;
+    formData.haritaPos &&
+    selectedBarang;
 
   return (
     <>
       <section className="min-h-screen w-full py-8">
+
+        <div>
+            
+        </div>
+
+
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-5 ">
           <div className="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-lg lg:col-span-3 lg:row-span-1 ">
             <h1 className="flex items-center gap-2 font-inter text-2xl font-bold text-black">
@@ -161,21 +169,28 @@ export default function TukarSampah() {
             </div>
           </div>
           
-          <div className='rounded-2xl bg-white p-6 shadow-lg lg:col-span-3 lg:row-start-2 lg:row-span-3'>
-                <h1 className='text-lg font-bold font-inter text-center'>Pilih Barang yang di tukar</h1>
-                <div className='mt-4 gap-4 grid grid-cols-3 w-full'>
-
-                    <div className='col-span-1 h-[100px] bg-blueSecondary rounded-xl flex justify-center items-center'>
-                        <h1 className='text-white font-bold text-3xl'>Pupuk</h1>
-                    </div>
-                    <div className='col-span-1 h-[100px] bg-blueSecondary rounded-xl flex justify-center items-center'>
-                         <h1 className='text-white font-bold text-3xl'>Bricket</h1>
-                    </div>
-                    <div className='col-span-1 h-[100px] bg-blueSecondary rounded-xl flex justify-center items-center'>
-                         <h1 className='text-white font-bold text-3xl'>Batako</h1>
-                    </div>
-                </div>
+          {/* Barang yang ditukar */}
+        <div className="rounded-2xl bg-white p-6 shadow-lg lg:col-span-3 lg:row-start-2 lg:row-span-3">
+          <h1 className="text-lg font-bold font-inter text-center">
+            Pilih Barang yang ditukar
+          </h1>
+          <div className="mt-4 grid w-full grid-cols-3 gap-4">
+            {['Pupuk', 'Bricket', 'Batako'].map((barang) => (
+              <button
+                key={barang}
+                type="button"
+                onClick={() => setSelectedBarang(barang)}
+                className={`col-span-1 h-[100px] rounded-xl flex justify-center items-center font-bold text-2xl transition-all ${
+                  selectedBarang === barang
+                    ? 'bg-green-700 text-white shadow-lg scale-105'
+                    : 'bg-blueSecondary text-white hover:bg-green-600'
+                }`}
+              >
+                {barang}
+              </button>
+            ))}
           </div>
+        </div>
 
           {/* Form Penukaran */}
           <div className="rounded-2xl bg-white p-6 shadow-lg lg:col-span-2  lg:row-span-4">
