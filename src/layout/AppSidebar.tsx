@@ -27,6 +27,7 @@ const navItems: NavItem[] = [
     subItems: [{ name: "Trash House", path: "/user/layanan/house", plus: true },
                 {name: 'Asisten AI', path: '/user/layanan/ai', plus: true},
                 {name: 'Lapor sampah', path: '/user/layanan/lapor', plus: false},
+                {name: 'Tukar Sampah', path: '/user/layanan/tukar', plus: false},
                 {name: 'Berlangganan', path: '/user/layanan/langganan', plus: false},
     ],
   },
