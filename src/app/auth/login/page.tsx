@@ -322,6 +322,24 @@ export default function Login() {
                   )}
                 </AnimatePresence>
 
+                {/* Back button (mobile & tablet only) */}
+<div className="absolute left-4 top-4 z-50 lg:hidden">
+  <Link href="/harita">
+    <motion.div
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ duration: 0.2 }}
+      className="p-2 rounded-fullshadow-md"
+    >
+      <CircleChevronLeft
+        size={28}
+        className="text-green-700 transition-colors duration-300 ease-in-out hover:text-green-500"
+      />
+    </motion.div>
+  </Link>
+</div>
+
+
                 {/* Form with staggered animations */}
                 <motion.form 
                   initial={{ opacity: 0 }}

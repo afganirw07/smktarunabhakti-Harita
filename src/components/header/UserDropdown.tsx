@@ -132,7 +132,8 @@ export default function UserDropdown() {
       </Dropdown>
 
       {/* Modal konfirmasi keluar */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Modal 
+      isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
   <div className="fixed inset-0 z-50 flex items-center justify-center">
     {/* backdrop */}
     <div

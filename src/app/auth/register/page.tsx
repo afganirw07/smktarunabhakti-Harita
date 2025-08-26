@@ -3,7 +3,7 @@
   import React, { useState } from 'react';
   import Link from 'next/link';
   import Image from 'next/image';
-  import { Users, ArrowLeft } from 'lucide-react';
+  import { Users, ArrowLeft, CircleChevronLeft } from 'lucide-react';
   import toast, { Toaster } from 'react-hot-toast';
   import { motion, AnimatePresence } from 'framer-motion';
   import { useRouter } from 'next/navigation';
@@ -122,8 +122,26 @@
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="m-0 flex max-w-screen-xl flex-1 justify-center bg-white shadow sm:m-6 sm:rounded-lg overflow-hidden"
+          className="relative m-0 flex max-w-screen-xl flex-1 justify-center bg-white shadow sm:m-6 sm:rounded-lg overflow-hidden"
         >
+
+          {/* Back button (mobile & tablet only) */}
+<div className="absolute left-4 top-4 z-50 lg:hidden">
+  <Link href="/harita">
+    <motion.div
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ duration: 0.2 }}
+      className="p-2 rounded-full"
+    >
+      <CircleChevronLeft
+        size={28}
+        className="text-green-700 transition-colors duration-300 ease-in-out hover:text-green-500"
+      />
+    </motion.div>
+  </Link>
+</div>
+
           <motion.div 
             initial={{ x: 100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
