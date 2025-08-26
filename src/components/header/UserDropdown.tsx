@@ -57,6 +57,13 @@ export default function UserDropdown() {
     fetchUser();
   }, []);
 
+  const handleLogOut = () => {
+    supabase.auth.signOut().then(() => {
+      localStorage.clear()
+      window.location.href = '/harita';
+    });
+  }
+
   function closeDropdown() {
     setIsOpen(false);
   }
@@ -151,15 +158,14 @@ export default function UserDropdown() {
           Tidak
         </Button>
 
-        <Link href="/harita">
+        
           <Button
             variant="primary"
+            onClick={handleLogOut}
             className="px-6 py-2"
-            onClick={() => setIsModalOpen(false)}
-          >
+            >
             Iya
           </Button>
-        </Link>
       </div>
     </div>
   </div>
