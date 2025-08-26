@@ -20,64 +20,202 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function UserMetaCard() {
   const { isOpen, openModal, closeModal } = useModal();
+  
+  // State untuk data yang ditampilkan
   const [userName, setUserName] = useState('Loading...');
   const [userPlan, setUserPlan] = useState('Loading...');
   const [userCity, setUserCity] = useState('Loading...');
   const [userAddress, setUserAddress] = useState('Loading...');
+  const [email, setEmail] = useState('Loading...');
+  const [phone, setPhone] = useState('Loading...');
+
+  const [initialForm, setInitialForm] = useState({
+  firstName: '',
+  lastName: '',
+  plan: '',
+  city: '',
+  address: '',
+  email: '',
+  phone: ''
+});
+  
+  // State untuk form edit
+  const [editForm, setEditForm] = useState({
+    firstName: '',
+    lastName: '',
+    plan: '',
+    city: '',
+    address: '',
+    email: '',
+    phone: ''
+  });
+  
+  // State untuk loading dan error
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    async function getUserData() {
+    getUserData();
+  }, []);
+
+  async function getUserData() {
+    setIsLoading(true);
+    setError('');
+    
+    try {
       // Ambil user_id dari local storage
       const userId = localStorage.getItem('user_id');
 
       if (!userId) {
-        console.error('User ID not found in local storage.');
-        setUserName('Guest');
-        setUserPlan('N/A');
-        setUserCity('N/A');
-        setUserAddress('N/A');
-        return;
+        throw new Error('User ID tidak ditemukan. Silakan login kembali.');
       }
 
       // Query data dari tabel 'profiles'
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, last_name, plan, city, address')
+        .select('first_name, last_name, plan, city, address, email, phone')
         .eq('id', userId)
         .single();
 
       if (error) {
-        console.error('Error fetching user data:', error.message);
-        setUserName('Guest');
-        setUserPlan('N/A');
-        setUserCity('N/A');
-        setUserAddress('N/A');
-      } else if (data) {
-        const fullName = `${data.first_name || ''} ${
-          data.last_name || ''
-        }`.trim();
+        throw new Error(`Gagal mengambil data: ${error.message}`);
+      }
+
+      if (data) {
+        const fullName = `${data.first_name || ''} ${data.last_name || ''}`.trim();
+        
+        // Update state untuk tampilan
         setUserName(fullName || 'Guest');
         setUserPlan(data.plan || 'N/A');
         setUserCity(data.city || 'N/A');
         setUserAddress(data.address || 'N/A');
+        setEmail(data.email || 'N/A');
+        setPhone(data.phone || 'N/A');
+
+        // Update state untuk form edit
+        setEditForm({
+          firstName: data.first_name || '',
+          lastName: data.last_name || '',
+          plan: data.plan || '',
+          city: data.city || '',
+          address: data.address || '',
+          email: data.email || '',
+          phone: data.phone || ''
+        });
       }
+    } catch (err) {
+      console.error('Error fetching user data:', err.message);
+      setError(err.message);
+      setUserName('Guest');
+      setUserPlan('N/A');
+      setUserCity('N/A');
+      setUserAddress('N/A');
+      setEmail('N/A');
+      setPhone('N/A');
+    } finally {
+      setIsLoading(false);
     }
+  }
 
-    getUserData();
-  }, []);
+  const handleInputChange = (field, value) => {
+    setEditForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    // Clear messages when user starts typing
+    if (error) setError('');
+    if (success) setSuccess('');
+  };
 
-  const handleSave = () => {
-    // Handle save logic here
-    console.log('Saving changes...');
+  const handleSave = async () => {
+    if (!hasChanges()) {
+      setSuccess('Tidak ada perubahan yang disimpan.');
+      return;
+    }
+    setIsSaving(true);
+    setError('');
+    setSuccess('');
+    
+    try {
+      const userId = localStorage.getItem('user_id');
+      
+      if (!userId) {
+        throw new Error('User ID tidak ditemukan. Silakan login kembali.');
+      }
+
+      // Validasi input
+      if (!editForm.firstName.trim()) {
+        throw new Error('Nama awal tidak boleh kosong.');
+      }
+
+      // Update data ke Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: editForm.firstName.trim(),
+          last_name: editForm.lastName.trim(),
+          city: editForm.city.trim(),
+          address: editForm.address.trim(),
+          email: editForm.email.trim(),
+          phone: editForm.phone.trim()
+        })
+        .eq('id', userId);
+
+      if (error) {
+        throw new Error(`Gagal menyimpan perubahan: ${error.message}`);
+      }
+
+      // Update tampilan dengan data baru
+      const fullName = `${editForm.firstName.trim()} ${editForm.lastName.trim()}`.trim();
+      setUserName(fullName);
+      setUserCity(editForm.city.trim() || 'N/A');
+      setUserAddress(editForm.address.trim() || 'N/A');
+      setEmail(editForm.email.trim() || 'N/A');
+      setPhone(editForm.phone.trim() || 'N/A');
+
+      setSuccess('Profil berhasil diperbarui!');
+      
+      // Tutup modal setelah 1.5 detik
+      setTimeout(() => {
+        closeModal();
+        setSuccess('');
+      }, 1500);
+
+    } catch (err) {
+      console.error('Error saving user data:', err.message);
+      setError(err.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleModalOpen = () => {
+    // Reset messages ketika modal dibuka
+    setInitialForm({ ...editForm})
+    setError('');
+    setSuccess('');
+    openModal();
+  };
+
+  const hasChanges = () => {
+  return JSON.stringify(initialForm) !== JSON.stringify(editForm);
+};
+
+  const handleModalClose = () => {
+    // Reset messages ketika modal ditutup
+    setError('');
+    setSuccess('');
     closeModal();
   };
 
   return (
     <>
-      <div className="rounded-2xl border border-gray-200 p-5  lg:p-6">
+      <div className="rounded-2xl border border-gray-200 p-5 lg:p-6">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex w-full flex-col items-center gap-6 xl:flex-row">
-            <div className="h-20 w-20 overflow-hidden rounded-full border border-gray-200 ">
+            <div className="h-20 w-20 overflow-hidden rounded-full border border-gray-200">
               <Image
                 width={80}
                 height={80}
@@ -95,16 +233,17 @@ export default function UserMetaCard() {
                 </p>
                 <div className="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block"></div>
                 <p className="text-sm text-green-500">
-                  {userCity || ''}
-                  {userCity && userAddress ? ', ' : ''}
-                  {userAddress || ''}
+                  {userCity !== 'N/A' ? userCity : ''}
+                  {userCity !== 'N/A' && userAddress !== 'N/A' ? ', ' : ''}
+                  {userAddress !== 'N/A' ? userAddress : ''}
                 </p>
               </div>
             </div>
           </div>
           <button
-            onClick={openModal}
-            className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-green-800 px-4 py-3 text-sm font-medium text-white  transition-colors duration-200 ease-out hover:bg-green-600 hover:text-green-200 lg:inline-flex lg:w-auto"
+            onClick={handleModalOpen}
+            disabled={isLoading}
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-green-800 px-4 py-3 text-sm font-medium text-white transition-colors duration-200 ease-out hover:bg-green-600 hover:text-green-200 disabled:opacity-50 disabled:cursor-not-allowed lg:inline-flex lg:w-auto"
           >
             <svg
               className="fill-current"
@@ -121,64 +260,135 @@ export default function UserMetaCard() {
                 fill=""
               />
             </svg>
-            Edit
+            {isLoading ? 'Loading...' : 'Edit'}
           </button>
         </div>
+        
+        {/* Error message untuk fetch data */}
+        {error && !isOpen && (
+          <div className="mt-4 rounded-lg bg-red-50 border border-red-200 p-3">
+            <p className="text-sm text-red-600">{error}</p>
+            <button
+              onClick={getUserData}
+              className="mt-2 text-sm text-red-700 hover:text-red-800 underline"
+            >
+              Coba lagi
+            </button>
+          </div>
+        )}
       </div>
-      <Modal isOpen={isOpen} onClose={closeModal} className="m-4 max-w-[700px]">
+
+      <Modal isOpen={isOpen} onClose={handleModalClose} className="m-4 max-w-[700px]">
         <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 lg:p-11">
           <div className="px-2 pr-14">
             <h4 className="mb-2 font-inter text-2xl font-semibold text-green-700">
               Ubah informasi anda
             </h4>
-            <p className=" font-nunito text-sm  text-black/60">
+            <p className="font-nunito text-sm text-black/60">
               Perbarui profil anda
             </p>
           </div>
-          <form className="flex flex-col">
-            <div className=" h-[270px] overflow-y-auto px-2 pb-3">
+
+          {/* Messages */}
+          {error && (
+            <div className="mx-2 mt-4 rounded-lg bg-red-50 border border-red-200 p-3">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+          
+          {success && (
+            <div className="mx-2 mt-4 rounded-lg bg-gray-50 border border-gray-200 p-3">
+              <p className="text-sm text-gray-600">{success}</p>
+            </div>
+          )}
+
+          <form className="flex flex-col" onSubmit={(e) => e.preventDefault()}>
+            <div className="h-[270px] overflow-y-auto px-2 pb-3">
               <div className="mt-7">
                 <h5 className="mb-5 font-inter text-lg font-medium text-green-700 lg:mb-6">
                   Informasi Pribadi
                 </h5>
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 font-nunito lg:grid-cols-2">
                   <div className="col-span-2 lg:col-span-1">
-                    <Label>Nama Awal</Label>
-                    <Input type="text" defaultValue="Musharof" />
+                    <Label>Nama Awal *</Label>
+                    <Input
+                      type="text"
+                      value={editForm.firstName}
+                      onChange={(e) => handleInputChange('firstName', e.target.value)}
+                      placeholder="Masukkan nama awal"
+                      disabled={isSaving}
+                      required
+                    />
                   </div>
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Nama Akhir</Label>
-                    <Input type="text" defaultValue="Chowdhury" />
-                  </div>
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>Plan</Label>
-                    <Input type="text" defaultValue="Team Manager" />
+                    <Input
+                      type="text"
+                      value={editForm.lastName}
+                      onChange={(e) => handleInputChange('lastName', e.target.value)}
+                      placeholder="Masukkan nama akhir"
+                      disabled={isSaving}
+                    />
                   </div>
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Kota</Label>
-                    <Input type="text" defaultValue="Arizona" />
+                    <Input
+                      type="text"
+                      value={editForm.city}
+                      onChange={(e) => handleInputChange('city', e.target.value)}
+                      placeholder="Masukkan kota"
+                      disabled={isSaving}
+                    />
+                  </div>
+                  <div className="col-span-2 lg:col-span-1">
+                    <Label>Email</Label>
+                    <Input
+                      type="text"
+                      value={editForm.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      placeholder="Masukkan email"
+                      disabled={isSaving}
+                    />
+                  </div>
+                  <div className="col-span-2 lg:col-span-1">
+                    <Label>Nomer</Label>
+                    <Input
+                      type="text"
+                      value={editForm.phone}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      placeholder="Masukkan nomer telepon"
+                      disabled={isSaving}
+                    />
                   </div>
                   <div className="col-span-2">
                     <Label>Alamat Lengkap</Label>
                     <textarea
-                      className="h-24 w-full resize-none rounded-md border border-gray-300 p-3 focus:outline-none focus:ring-1 focus:ring-green-500"
-                      defaultValue="United States"
-                    ></textarea>
+                      className="h-24 w-full resize-none rounded-md border border-gray-300 p-3 focus:outline-none focus:ring-1 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      value={editForm.address}
+                      onChange={(e) => handleInputChange('address', e.target.value)}
+                      placeholder="Masukkan alamat lengkap"
+                      disabled={isSaving}
+                    />
                   </div>
                 </div>
               </div>
             </div>
             <div className="mt-6 flex items-center gap-3 px-2 lg:justify-end">
               <Button
-                className=""
                 size="sm"
                 variant="outline"
-                onClick={closeModal}
+                onClick={handleModalClose}
+                disabled={isSaving}
               >
                 Tutup
               </Button>
-              <Button size="sm" onClick={handleSave}>
-                Simpan Perubahan
+              <Button
+                size="sm"
+                onClick={handleSave}
+                disabled={isSaving}
+                className={(!hasChanges() || isSaving) ? 'opacity-50 cursor-not-allowed' : ''}
+              >
+                {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
               </Button>
             </div>
           </form>
