@@ -11,7 +11,7 @@ export default function Home() {
     if (user_role === 'admin') {
       router.push('/admin/default');
     } else if (user_role === 'user') {
-      router.push('/user/homepage');
+      router.push('/user/home');
     }else {
       router.push('/harita');
     }

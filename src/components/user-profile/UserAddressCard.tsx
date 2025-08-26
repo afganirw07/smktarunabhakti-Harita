@@ -1,24 +1,68 @@
-"use client";
-import React from "react";
-import { useModal } from "../../hooks/useModal";
-import { Modal } from "../ui/modal";
-import Button from "../ui/button/Button";
-import Input from "../form/input/InputField";
-import Label from "../form/Label";
+'use client';
+import React, { useEffect, useState } from 'react';
+import { useModal } from '../../hooks/useModal';
+import { Modal } from '../ui/modal';
+import Button from '../ui/button/Button';
+import Input from '../form/input/InputField';
+import Label from '../form/Label';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function UserAddressCard() {
   const { isOpen, openModal, closeModal } = useModal();
+  const [kota, SetKota] = useState('Loading...');
+  const [alamat, SetAlamat] = useState('Loading...');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const userId = localStorage.getItem('user_id');
+
+      if (!userId) {
+        console.error('User ID not found in local storage.');
+        SetKota('N/A');
+        SetAlamat('N/A');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('city, address')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user address:', error);
+        SetKota('N/A');
+        SetAlamat('N/A');
+        return;
+      }  else {
+        SetKota(data.city);
+        SetAlamat(data.address);
+      }
+    }
+
+    fetchData();
+  }, []);
+
   const handleSave = () => {
     // Handle save logic here
-    console.log("Saving changes...");
+    console.log('Saving changes...');
     closeModal();
   };
   return (
     <>
-      <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
+      <div className="rounded-2xl border border-gray-200 p-5 dark:border-gray-800 lg:p-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <h4 className="text-lg font-bold font-inter text-green-700 lg:mb-6">
+            <h4 className="font-inter text-lg font-bold text-green-700 lg:mb-6">
               Alamat
             </h4>
 
@@ -37,16 +81,7 @@ export default function UserAddressCard() {
                   Kota
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  Kota Depok
-                </p>
-              </div>
-
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                  Kode Pos
-                </p>
-                <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  16418
+                  {kota}
                 </p>
               </div>
 
@@ -55,7 +90,7 @@ export default function UserAddressCard() {
                   Alamat Rumah
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  AS4568384
+                  {alamat}
                 </p>
               </div>
             </div>
@@ -63,7 +98,7 @@ export default function UserAddressCard() {
 
           <button
             onClick={openModal}
-            className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-green-800 px-4 py-3 text-sm font-medium text-white  hover:text-green-200 hover:bg-green-600 transition-colors duration-200 ease-out lg:inline-flex lg:w-auto"
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-green-800 px-4 py-3 text-sm font-medium text-white  transition-colors duration-200 ease-out hover:bg-green-600 hover:text-green-200 lg:inline-flex lg:w-auto"
           >
             <svg
               className="fill-current"
@@ -84,18 +119,22 @@ export default function UserAddressCard() {
           </button>
         </div>
       </div>
-      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] m-4 ">
-        <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900 lg:p-11">
+      <Modal
+        isOpen={isOpen}
+        onClose={closeModal}
+        className="m-4 max-w-[700px] "
+      >
+        <div className="no-scrollbar relative w-full overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
           <div className="px-2 pr-14">
-            <h4 className="mb-2 text-2xl font-semibold text-green-700 font-inter">
+            <h4 className="mb-2 font-inter text-2xl font-semibold text-green-700">
               Ubah alamat
             </h4>
-            <p className="mb-6 text-sm text-black/60 font-nunito">
+            <p className="mb-6 font-nunito text-sm text-black/60">
               Perbarui profil anda
             </p>
           </div>
           <form className="flex flex-col font-nunito">
-            <div className="px-2 overflow-y-auto custom-scrollbar">
+            <div className="custom-scrollbar overflow-y-auto px-2">
               <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
                   <Label>Negara</Label>
@@ -118,7 +157,7 @@ export default function UserAddressCard() {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
+            <div className="mt-6 flex items-center gap-3 px-2 lg:justify-end">
               <Button size="sm" variant="outline" onClick={closeModal}>
                 Close
               </Button>
