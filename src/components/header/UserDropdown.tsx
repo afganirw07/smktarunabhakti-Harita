@@ -1,17 +1,60 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState('Loading.....')
+  const [FullName, SetFullName] = useState('Loading.....')
+  const [email, setEmail] = useState('Loading.....')
 
 function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
   e.stopPropagation();
   setIsOpen((prev) => !prev);
 }
+
+useEffect(() => {
+  const fetchUser = async () => { 
+  const userId = localStorage.getItem('user_id');
+
+  if (!userId) {
+    console.error('User ID not found in localStorage');
+    setUser('Guest');
+    SetFullName('N/A');
+    setEmail('N/A');
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, first_name, last_name, email')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching user data:', error);
+    return;
+  }
+  setUser(data.first_name)
+  SetFullName(`${data.first_name} ${data.last_name}`);
+  setEmail(data.email);
+};
+
+fetchUser();
+}, []);
 
   function closeDropdown() {
     setIsOpen(false);
@@ -31,7 +74,7 @@ function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
           />
         </span>
 
-        <span className="block mr-1 font-semibold text-green-700 ">Afgan</span>
+        <span className="block mr-1 font-semibold text-green-700 ">{user}</span>
 
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
@@ -60,10 +103,10 @@ function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
       >
         <div>
           <span className="block font-medium text-green-700 ">
-            Musharof Chowdhury
+            {FullName}
           </span>
           <span className="mt-0.5 block  text-green-500 ">
-            randomuser@pimjo.com
+            {email}
           </span>
         </div>
         <Link
