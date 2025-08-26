@@ -312,7 +312,7 @@ export default function landingPage() {
       </section>
 
       {/* benefit section */}
-      <section className="relative flex h-auto w-full flex-col items-center justify-center overflow-hidden bg-[#FBFFF9] px-6 py-16 sm:px-16 lg:px-20 z-10">
+      <section className="relative flex h-auto w-full flex-col items-center justify-center overflow-hidden bg-[#FBFFF9] px-6 py-16 sm:px-8 lg:px-20 z-10">
         {/* Lingkaran 1 */}
         <div className="absolute right-[-200px] top-[-200px] h-[300px] w-[300px] rounded-full bg-[#6DD130] opacity-100 blur-[300px] lg:h-[300px] lg:w-[300px]"></div>
 

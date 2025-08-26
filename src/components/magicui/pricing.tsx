@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { Check, Star, Truck, Home, Users2 } from 'lucide-react';
+import { Check, Truck, Home, Users2, Star } from 'lucide-react';
 
 interface PricingPlan {
   name: string;
@@ -50,8 +50,8 @@ export default function WasteManagementPricing(): JSX.Element {
     },
     {
       name: 'Standar',
-      subHead: 'Standar membership',
-      price: 125000,
+      subHead: '1 Bulan',
+      price: 150000,
       duration: '/bulan',
       icon: <Home className="w-6 h-6" />,
       features: [
@@ -69,35 +69,34 @@ export default function WasteManagementPricing(): JSX.Element {
       buttonText: 'Berlangganan Sekarang'
     },
     {
-      name: 'Premium ',
+      name: '3 Bulan',
       subHead: 'Disarankan untuk sampah elektronik',
-      price: 285000,
-      duration: '/bulan',
+      price: 450000,
+      duration: '/3 bulan',
       icon: <Users2 className="w-6 h-6" />,
       features: [
-        'Pengangkutan harian (6x seminggu)',
-        'Tidak ada batas volume',
+        'Pengangkutan 3x seminggu',
+        'Maksimal 25kg per pickup',
         'Notifikasi Jadwal',
-        'Customer support AI & Whatsapp ',
-        'Pemilahan 4 kategori sampah',
-        'Pickup sampah khusus (elektronik, B3)',
+        'Customer support AI & Whatsapp',
+        'Pemilahan sampah organik/anorganik',
         'Kompos gratis dari sampah organik',
         'Menyusun jadwal sendiri',
-        'Gratis 1000 HaCoins tiap bulan',
-        'Penggantian kantong sampah gratis'
+        'Gratis 500 HaCoins Tiap bulan',
+        'Penggantian kantong sampah gratis',
       ],
       popular: false,
-      buttonText: 'Upgrade Premium'
+      buttonText: 'Berlangganan sekarang'
     }
   ];
 
   const yearlyPlans: PricingPlan[] = [
     {
-      name: 'Standar',
+      name: '6 Bulan',
       subHead: 'Standar membership',
-      price: 1250000,
+      price: 900000,
       originalPrice: 1500000,
-      duration: '/tahun',
+      duration: '1/2 Tahun',
       icon: <Home className="w-6 h-6" />,
       features: [
         'Pengangkutan 3x seminggu',
@@ -115,26 +114,25 @@ export default function WasteManagementPricing(): JSX.Element {
       savings: 'Hemat 17%'
     },
     {
-      name: 'Premium ',
+      name: '1 Tahun',
       subHead: 'Disarankan untuk sampah elektronik',
-      price: 2850000,
+      price: 1500000,
       originalPrice: 3420000,
       duration: '/tahun',
       icon: <Users2 className="w-6 h-6" />,
       features: [
-        'Pengangkutan harian (6x seminggu)',
-        'Tidak ada batas volume',
+        'Pengangkutan 3x seminggu',
+        'Maksimal 25kg per pickup',
         'Notifikasi Jadwal',
-        'Customer support AI & Whatsapp ',
-        'Pemilahan 4 kategori sampah',
-        'Pickup sampah khusus (elektronik, B3)',
+        'Customer support AI & Whatsapp',
+        'Pemilahan sampah organik/anorganik',
         'Kompos gratis dari sampah organik',
         'Menyusun jadwal sendiri',
-        'Gratis 1000 HaCoins tiap bulan',
-        'Penggantian kantong sampah gratis'
+        'Gratis 500 HaCoins Tiap bulan',
+        'Penggantian kantong sampah gratis',
       ],
       popular: false,
-      buttonText: 'Upgrade Premium',
+      buttonText: 'Upgrade sekarang',
       savings: 'Hemat 17%'
     }
   ];
@@ -149,10 +147,6 @@ export default function WasteManagementPricing(): JSX.Element {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);
-  };
-
-  const isPremiumPlan = (planName: string): boolean => {
-    return planName.toLowerCase().includes('premium');
   };
 
   return (
@@ -203,31 +197,20 @@ export default function WasteManagementPricing(): JSX.Element {
 
         {/* Pricing Cards */}
         <div
-          className={`
-            grid grid-cols-1 md:grid-cols-2 
+          className={`grid grid-cols-1 md:grid-cols-2 
             ${currentPlans.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-2"} 
             gap-8 max-w-6xl mx-auto transition-all duration-500 
-            ${isAnimating ? "opacity-0 transform translate-y-4" : "opacity-100 transform translate-y-0"}
-          `}
+            ${isAnimating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}
         >
           {currentPlans.map((plan, index) => (
             <div
               key={`${plan.name}-${billingPeriod}`}
-              className="relative bg-white rounded-2xl shadow-lg p-6 flex flex-col transition-all duration-500 ease-in-out transform hover:shadow-xl hover:-translate-y-1 hover:border-green-800 border-2 border-transparent"
-              style={{ animationDelay: `${index * 100}ms` }}
+              className="relative bg-white rounded-2xl shadow-lg p-6 flex flex-col transition-all duration-500 ease-in-out hover:shadow-xl hover:-translate-y-1 border-2 border-transparent hover:border-green-800"
             >
               <div className="flex flex-col flex-grow">
                 {/* Header */}
                 <div className="text-center mb-6">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 ${
-                    plan.popular 
-                      ? 'bg-green-800 text-white' 
-                      : plan.isTrial
-                      ? 'bg-green-800 text-white'
-                      : isPremiumPlan(plan.name)
-                      ? 'bg-gradient-to-br from-green-800 to-green-500 text-white'
-                      : 'bg-gray-100 text-gray-600'
-                  }`}>
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 bg-green-800 text-white">
                     {plan.icon}
                   </div>
                   
@@ -240,20 +223,17 @@ export default function WasteManagementPricing(): JSX.Element {
 
                   {/* Price */}
                   <div className="mb-6">
-                    <div className="flex items-center justify-center transition-all duration-500">
-                      <span className={`font-inter text-4xl font-bold transition-all duration-500 ${
-                        plan.price === 0 ? 'text-green-800' : 'text-gray-900'
-                      }`}>
+                    <div className="flex items-center justify-center">
+                      <span className={`font-inter text-4xl font-bold ${plan.price === 0 ? 'text-green-800' : 'text-gray-900'}`}>
                         {formatPrice(plan.price)}
                       </span>
                     </div>
-                    <div className="font-nunito text-gray-500 text-lg transition-all duration-500">
+                    <div className="font-nunito text-gray-500 text-lg">
                       {plan.duration}
                     </div>
                     
-                    {/* Yearly savings */}
                     {billingPeriod === 'yearly' && plan.originalPrice && (
-                      <div className="mt-2 opacity-100 transition-opacity duration-500">
+                      <div className="mt-2">
                         <span className="font-nunito text-gray-400 line-through text-sm">
                           {formatPrice(plan.originalPrice)}
                         </span>
@@ -265,15 +245,7 @@ export default function WasteManagementPricing(): JSX.Element {
                   </div>
 
                   {/* CTA Button */}
-                  <button className={`w-full py-3 px-5 rounded-xl font-semibold font-nunito text-base transition-all duration-300 ${
-                    plan.popular
-                      ? 'bg-green-800 text-white hover:bg-green-500 shadow-md hover:shadow-lg'
-                      : plan.isTrial
-                      ? 'bg-green-800 text-white hover:bg-green-500 shadow-md hover:shadow-lg'
-                      : isPremiumPlan(plan.name)
-                      ? 'bg-gradient-to-r from-green-800 to-green-500 text-white hover:bg-green-500  shadow-md hover:shadow-lg'
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200 border border-gray-200'
-                  }`}>
+                  <button className="w-full py-3 px-5 rounded-xl font-semibold font-nunito text-base bg-green-800 text-white hover:bg-green-500 shadow-md hover:shadow-lg">
                     {plan.buttonText}
                   </button>
                 </div>

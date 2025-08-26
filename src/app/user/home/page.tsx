@@ -1,138 +1,152 @@
-import React from "react";
-import { CircleDollarSign, CoinsIcon, CalendarClock, CreditCard, Smartphone, Building2, Banknote } from "lucide-react";
-import Benefit from "components/landingpage/widgetBenefit/benefit";
-import Magnet from "components/magicui/magnet";
-import Pricing from "../../../components/magicui/pricing";
+"use client"
 
-export default function Homepage() {
-  const paymentMethods = [
-    {
-      icon: <CreditCard className="w-6 h-6" />,
-      name: "Kartu Kredit",
-      description: "Visa, Mastercard, American Express"
-    },
-    {
-      icon: <Smartphone className="w-6 h-6" />,
-      name: "E-Wallet",
-      description: "GoPay, OVO, DANA, ShopeePay"
-    },
-    {
-      icon: <Building2 className="w-6 h-6" />,
-      name: "Transfer Bank",
-      description: "BCA, Mandiri, BNI, BRI"
-    },
-    {
-      icon: <Banknote className="w-6 h-6" />,
-      name: "Virtual Account",
-      description: "Semua bank terkemuka"
-    }
-  ];
+import { useState } from 'react';
+import { SketchCalendarPicker } from 'components/magicui/calendar';
+
+import { Coins, Users, ShoppingBag, BarChart3, Package } from 'lucide-react';
+
+export default function Home() {
+
+  const [date, setDate] = useState<Date>(new Date());
 
   return (
     <>
-      {/* Hero Section */}
-      <div className="min-h-screen ">
-        <div className="container mx-auto px-4 py-20">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-5xl font-bold text-green-700 mb-6">
-              Hai Ahsan, Selamat datang di Harita
+      <section className="h-auto w-full px-8 py-12 ">
+        {/* Header */}
+        <div className="flex w-full flex-col justify-between md:flex-row md:items-center ">
+          <div className="flex flex-col">
+            <h1 className="font-inter text-3xl font-bold text-green-700">
+              Hi Ahsan
             </h1>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-              Platform inovatif yang menghadirkan solusi terdepan untuk kebutuhan bisnis modern Anda. 
-              Dengan teknologi canggih dan antarmuka yang intuitif, Harita membantu mengoptimalkan 
-              produktivitas dan efisiensi kerja tim Anda.
-            </p>
+            <h1 className="font-inter text-3xl font-bold text-black">
+              Selamat Datang Kembali
+            </h1>
           </div>
-
-          {/* Features Overview */}
-          <section className="relative flex h-auto w-full flex-col items-center justify-center overflow-hidden bg-[#FBFFF9] px-6 py-8 z-10">
-        {/* Lingkaran 1 */}
-        <div className="absolute right-[-200px] top-[-200px] h-[300px] w-[300px] rounded-full bg-[#6DD130] opacity-100 blur-[300px] lg:h-[300px] lg:w-[300px]"></div>
-
-        {/* Lingkaran 2 */}
-        <div className="absolute bottom-[-200px] left-[-200px] h-[300px] w-[300px] rounded-full bg-[#74C9A9] opacity-100 blur-[300px] lg:h-[300px] lg:w-[300px]"></div>
-
-        <h1 className="text-center font-inter text-[2rem] font-bold">
-          Benefit yang anda dapatkan
-        </h1>
-
-        <div className="z-30 mx-auto  flex max-w-[1000px] flex-wrap justify-center md:gap-20 gap-10 mt-12 lg:mt-16">
-          <Magnet padding={30} disabled={false} magnetStrength={10}>
-          <div className='lg:-rotate-3 rotate-0 lg:hover:rotate-0 hover:-rotate-3 transition-all duration-300 ease-out'>
-            <Benefit
-            Name='GRATIS Pengguna Baru'
-            Desc='Bonus 14 hari masa berlangganan untuk Alamat baru '
-            />
-          </div>
-          </Magnet>
-
-          <Magnet padding={30} disabled={false} magnetStrength={10}>
-          <div className='lg:rotate-3 rotate-0 lg:hover:rotate-0 hover:rotate-3 transition-all duration-300 ease-out'>
-            <Benefit 
-            Icon={CalendarClock}
-            Name='Atur jadwal sesuka anda'
-            Desc='Susun jadwal sesuka anda kapan sampah dapat di ambil'
-            />
-          </div>
-          </Magnet>
-
-          <Magnet padding={30} disabled={false} magnetStrength={10}>
-          <div className='lg:-rotate-3 rotate-0 lg:hover:rotate-0 hover:-rotate-3 transition-all duration-300 ease-out'>
-            <Benefit
-            Icon={CircleDollarSign} 
-            Name='Pembayaran yang Transparant'
-            Desc='Pembayaran yang tercatat dan dapat dilihat pengguna'
-            />
-          </div>
-          </Magnet>
-
-          <Magnet padding={30} disabled={false} magnetStrength={10}>
-          <div className='lg:rotate-3 rotate-0 lg:hover:rotate-0 hover:rotate-3 transition-all duration-300 ease-out'>
-            <Benefit
-            Icon={CoinsIcon}
-            Name='Bonus HACOINS Tiap Bulan'
-            Desc='Dapatkan HACOINS dengan menukar sampah rumah anda'
-            />
-          </div>
-          </Magnet>
         </div>
-      </section>
-        </div>
-      </div>
 
-      {/* Pricing Section */}
-      <div className="py-20 bg-white">
-        <Pricing />
-      </div>
-
-      {/* Payment Methods */}
-      <div className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-green-700 mb-4">Metode Pembayaran</h2>
-            <p className="text-gray-600">Pilih cara pembayaran yang paling nyaman untuk Anda</p>
+        {/* <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="flex items-center gap-4 rounded-xl bg-white p-6 shadow-md">
+            <div className="rounded-lg bg-green-100 p-3">
+              <Users className="h-6 w-6 text-green-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-black">1,200</h2>
+              <p className="text-sm text-gray-500">Pengguna</p>
+            </div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            {paymentMethods.map((method, index) => (
-              <div key={index} className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow text-center">
-                <div className="flex justify-center text-green-700 mb-4">
-                  {method.icon}
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">{method.name}</h3>
-                <p className="text-sm text-gray-600">{method.description}</p>
+          <div className="flex items-center gap-4 rounded-xl bg-white p-6 shadow-md">
+            <div className="rounded-lg bg-blue-100 p-3">
+              <ShoppingBag className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-black">350</h2>
+              <p className="text-sm text-gray-500">Transaksi</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 rounded-xl bg-white p-6 shadow-md">
+            <div className="rounded-lg bg-yellow-100 p-3">
+              <Coins className="h-6 w-6 text-yellow-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-black">500</h2>
+              <p className="text-sm text-gray-500">HaritaCoins</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 rounded-xl bg-white p-6 shadow-md">
+            <div className="rounded-lg bg-purple-100 p-3">
+              <BarChart3 className="h-6 w-6 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-black">2 Hari lalu</h2>
+              <p className="text-sm text-gray-500">Terakhir aktif</p>
+            </div>
+          </div>
+        </div> */}
+
+        <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Card Customers */}
+          <div className="flex flex-col gap-2 rounded-xl bg-white p-6 shadow">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Users className="h-6 w-6 text-gray-500" />
+                <span className="font-medium text-gray-500">Customers</span>
               </div>
-            ))}
+              <span className="rounded-full bg-green-100 px-2 py-0.5 text-sm text-green-600">
+                ↑ 11.01%
+              </span>
+            </div>
+            <h2 className="text-2xl font-bold text-black">3,782</h2>
           </div>
 
-          <div className="text-center mt-12">
-            <p className="text-gray-600">
-              Semua transaksi dilindungi dengan enkripsi SSL 256-bit untuk keamanan maksimal
+          {/* Card Orders */}
+          <div className="flex flex-col gap-2 rounded-xl bg-white p-6 shadow">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Package className="h-6 w-6 text-gray-500" />
+                <span className="font-medium text-gray-500">Orders</span>
+              </div>
+              <span className="rounded-full bg-red-100 px-2 py-0.5 text-sm text-red-600">
+                ↓ 9.05%
+              </span>
+            </div>
+            <h2 className="text-2xl font-bold text-black">5,359</h2>
+          </div>
+
+          {/* Card Monthly Target (tinggi 2 baris) */}
+          <div className="row-span-2 flex flex-col gap-4 rounded-xl bg-white p-6 shadow">
+            <div>
+              <h3 className="font-medium text-green-700">Waktu Berlangganan</h3>
+              <p className="text-sm text-green-400">
+                Target you’ve set for each month
+              </p>
+            </div>
+            <div>
+             <SketchCalendarPicker value={date} onChange={setDate} variant="artistic" />
+            </div>
+            <div className="mt-2 flex justify-between border-t pt-4 text-sm">
+              <div>
+                <p className="text-gray-500">Target</p>
+                <p className="font-bold text-black">
+                  $20K <span className="text-red-500">↓</span>
+                </p>
+              </div>
+              <div>
+                <p className="text-gray-500">Revenue</p>
+                <p className="font-bold text-black">
+                  $20K <span className="text-green-500">↑</span>
+                </p>
+              </div>
+              <div>
+                <p className="text-gray-500">Today</p>
+                <p className="font-bold text-black">
+                  $20K <span className="text-green-500">↑</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Card Monthly Sales (melebar 2 kolom) */}
+          <div className="flex flex-col gap-4 rounded-xl bg-white p-6 shadow lg:col-span-2">
+            <h3 className="font-semibold text-gray-700">Monthly Sales</h3>
+            <p className="text-sm leading-relaxed text-gray-500">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
+              eget dui sit amet turpis dictum sollicitudin. Nulla facilisi.
+              Aenean tincidunt sapien nec purus viverra, nec elementum turpis
+              ultrices.
+            </p>
+            <p className="text-sm leading-relaxed text-gray-500">
+              Integer blandit, orci eu suscipit consequat, turpis est tempor
+              eros, vel vulputate risus sem sed sapien. Morbi nec turpis et
+              nulla feugiat accumsan non ut dui.
             </p>
           </div>
         </div>
-      </div>
+
+        
+      </section>
     </>
   );
 }

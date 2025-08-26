@@ -125,7 +125,7 @@ export default function Login() {
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="m-0 flex max-w-screen-xl flex-1 justify-center bg-white shadow sm:m-6 sm:rounded-lg overflow-hidden"
+          className="relative m-0 flex max-w-screen-xl flex-1 justify-center bg-white shadow sm:m-6 sm:rounded-lg overflow-hidden"
         >
           {/* Left side content - Welcome back section */}
           <div className="flex-1 hidden lg:flex lg:w-2/5 xl:w-5/12 relative overflow-hidden">
@@ -165,7 +165,7 @@ export default function Login() {
                       <CircleChevronLeft
                         width={30}
                         height={30}
-                        className='stroke-white hover:stroke-green-400 transition-all duration-300 ease-out '
+                        className='stroke-white hover:stroke-green-400 transition-all duration-300 ease-out z-50 '
                       />
                     </motion.div>
                   </div>
