@@ -165,8 +165,8 @@ const AppSidebar: React.FC = () => {
                           <span
                             className={`text-xs px-2 py-0.5 rounded-full font-bold ${
                               isActive(subItem.path)
-                                ? "menu-dropdown-badge-active bg-gradient-to-r from-green-700 via-green-800 to-green-900 text-white shadow-sm"
-                                : "menu-dropdown-badge-inactive bg-gradient-to-r from-green-700 via-green-800 to-green-900 text-white font-semibold shadow-sm"
+                                ? "menu-dropdown-badge-active bg-gradient-to-r from-lime-500 via-lime-600 to-green-700 text-white shadow-sm"
+                                : "menu-dropdown-badge-inactive bg-gradient-to-r from-lime-500 via-lime-600 to-green-700 text-white font-semibold shadow-sm"
                             }`}
                           >
                             Plus
