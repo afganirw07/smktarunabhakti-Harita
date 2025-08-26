@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { SketchCalendarPicker } from 'components/magicui/calendar';
-
-import { Coins, Users, ShoppingBag, BarChart3, Package } from 'lucide-react';
+import Button from 'components/ui/button/Button';
+import { Coins, Wallet} from 'lucide-react';
 
 export default function Home() {
 
@@ -66,83 +66,88 @@ export default function Home() {
           </div>
         </div> */}
 
-        <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-7">
           {/* Card Customers */}
-          <div className="flex flex-col gap-2 rounded-xl bg-white p-6 shadow">
+          <div className="flex flex-col gap-2 col-span-2 rounded-xl bg-white p-6 shadow">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Users className="h-6 w-6 text-gray-500" />
-                <span className="font-medium text-gray-500">Customers</span>
+                <Coins className="h-6 w-6 text-green-700" />
+                <span className="font-medium text-black">Coins</span>
               </div>
               <span className="rounded-full bg-green-100 px-2 py-0.5 text-sm text-green-600">
-                ↑ 11.01%
+                + 500
               </span>
             </div>
-            <h2 className="text-2xl font-bold text-black">3,782</h2>
+            <h2 className="text-2xl font-bold text-black">500</h2>
           </div>
 
           {/* Card Orders */}
-          <div className="flex flex-col gap-2 rounded-xl bg-white p-6 shadow">
+          <div className="flex flex-col col-span-2 gap-2 rounded-xl bg-white p-6 shadow">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Package className="h-6 w-6 text-gray-500" />
-                <span className="font-medium text-gray-500">Orders</span>
+                <Wallet className="h-6 w-6 text-green-700" />
+                <span className="font-medium text-black">Transaksi</span>
               </div>
-              <span className="rounded-full bg-red-100 px-2 py-0.5 text-sm text-red-600">
-                ↓ 9.05%
+              <span className="rounded-full bg-green-100 px-2 py-0.5 text-sm text-green-500">
+                + 2
               </span>
             </div>
-            <h2 className="text-2xl font-bold text-black">5,359</h2>
+            <div className='flex items-center gap-4'>
+            <h2 className="text-2xl font-bold text-black">13x</h2>
+            <button className='px-2 py-1 bg-green-700 text-white font-nunito font-bold text-xs rounded-full hover:bg-green-600 transition-colors duration-200 ease-out '>Lihat riwayat</button>
+            </div>
           </div>
 
           {/* Card Monthly Target (tinggi 2 baris) */}
-          <div className="row-span-2 flex flex-col gap-4 rounded-xl bg-white p-6 shadow">
-            <div>
-              <h3 className="font-medium text-green-700">Waktu Berlangganan</h3>
-              <p className="text-sm text-green-400">
-                Target you’ve set for each month
-              </p>
+          <div className=" row-span-3 col-span-3 flex flex-col justify-center gap-4 rounded-xl bg-white p-6 shadow">
+            <div className='flex flex-col gap-4 justify-center
+             items-center'>
+              <h3 className="font-bold text-green-700 font-nunito">Waktu Berlangganan</h3>
             </div>
-            <div>
+            <div className='flex justify-center items-center'>
              <SketchCalendarPicker value={date} onChange={setDate} variant="artistic" />
             </div>
-            <div className="mt-2 flex justify-between border-t pt-4 text-sm">
+            <div className="mt-2 flex justify-between border-t pt-4 text-sm font-nunito">
               <div>
-                <p className="text-gray-500">Target</p>
+                <p className="text-green-500 font-semibold">Total Durasi</p>
                 <p className="font-bold text-black">
-                  $20K <span className="text-red-500">↓</span>
+                  60 Hari
                 </p>
               </div>
               <div>
-                <p className="text-gray-500">Revenue</p>
+                <p className="text-green-500 font-semibold">Sisa Durasi</p>
                 <p className="font-bold text-black">
-                  $20K <span className="text-green-500">↑</span>
+                  59h 23j 59d
                 </p>
               </div>
               <div>
-                <p className="text-gray-500">Today</p>
+                <p className="text-green-500 font-semibold">Berakhir pada</p>
                 <p className="font-bold text-black">
-                  $20K <span className="text-green-500">↑</span>
+                  23 Oktober 2025
                 </p>
               </div>
             </div>
           </div>
 
+           <div className='lg:col-span-4 bg-white p-6 shadow'>
+              <h1 className='font-inter font-bold text-sm'>Merasa Puas Dengan layanan kami?</h1>
+          </div>
           {/* Card Monthly Sales (melebar 2 kolom) */}
-          <div className="flex flex-col gap-4 rounded-xl bg-white p-6 shadow lg:col-span-2">
-            <h3 className="font-semibold text-gray-700">Monthly Sales</h3>
-            <p className="text-sm leading-relaxed text-gray-500">
+          <div className="flex flex-col gap-4 rounded-xl bg-white p-6 shadow lg:col-span-4">
+            <h3 className="font-semibold text-green-700 ">Monthly Sales</h3>
+            <p className="text-sm leading-relaxed text-black font-nunito font-semibold">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
               eget dui sit amet turpis dictum sollicitudin. Nulla facilisi.
               Aenean tincidunt sapien nec purus viverra, nec elementum turpis
               ultrices.
             </p>
-            <p className="text-sm leading-relaxed text-gray-500">
+            <p className="text-sm leading-relaxed text-black font-nunito font-semibold">
               Integer blandit, orci eu suscipit consequat, turpis est tempor
               eros, vel vulputate risus sem sed sapien. Morbi nec turpis et
               nulla feugiat accumsan non ut dui.
             </p>
           </div>
+         
         </div>
 
         

@@ -7,6 +7,7 @@ import { Users, ArrowLeft } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { log } from 'console';
 
 // Inisialisasi Supabase
 const supabase = createClient(
@@ -100,6 +101,7 @@ export default function Register() {
       // Error lainnya
       else {
         errorMessage = err.message;
+        console.error('Error during sign up:', err);
       }
 
       setError(errorMessage);
