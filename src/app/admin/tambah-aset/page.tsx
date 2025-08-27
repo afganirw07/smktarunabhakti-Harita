@@ -211,7 +211,7 @@ const TambahAset = () => {
               </label>
               <textarea
                 id="desc"
-                rows="6"
+                rows={6 }
                 className="block w-full resize-none rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-green-900 focus:ring-green-800"
                 placeholder="Tuliskan deskripsi produk di sini"
                 value={desc}
