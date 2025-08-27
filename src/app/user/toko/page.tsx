@@ -80,14 +80,15 @@ export default function Toko() {
         </div>
 
       {/* benerin */}
-        <div className='w-full flex flex-wrap gap-10'>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {loadingProducts ? (
               <p>Memuat produk...</p>
             ) : errorProducts ? (
               <p className="text-red-500">Error: Gagal memuat produk. Silakan coba lagi.</p>
             ) : products.length > 0 ? (
               products.map((product) => (
+                <div className='col-span-1' key={product}>
                 <ProductCard
                   key={product.id}
                   title={product.nama}
@@ -95,12 +96,12 @@ export default function Toko() {
                   price={product.poin.toString()} 
                   imageUrl={product.img}
                 />
+                </div>
               ))
             ) : (
               <p>Tidak ada produk yang tersedia saat ini.</p>
             )}
           </div>
-        </div>
       </section>
     </>
   );
