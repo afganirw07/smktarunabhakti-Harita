@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import CardMenu from 'components/card/CardMenu';
 import Card from 'components/card';
@@ -19,29 +17,16 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  SortingState,
   useReactTable,
 } from '@tanstack/react-table';
 
-// Mendefinisikan interface untuk data aset
-interface AssetTableData {
-  id: string;
-  nama: string | null;
-  stock: number | null;
-  poin: number | null;
-  status: 'Tersedia' | 'Tidak Tersedia' | 'active' | 'inactive' | string | null;
-  created_at: string;
-}
-
-// Menggunakan tipe data yang sudah didefinisikan untuk column helper
-const columnHelper = createColumnHelper<AssetTableData>();
+const columnHelper = createColumnHelper();
 
 function AssetTable() {
-  // Menentukan tipe data untuk state
-  const [data, setData] = useState<AssetTableData[]>([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [sorting, setSorting] = useState([]);
+  const [expandedIds, setExpandedIds] = useState(new Set());
 
   useEffect(() => {
     // Fetch asset data when the component mounts
@@ -58,12 +43,11 @@ function AssetTable() {
       // Fetch asset data
       const { data, error } = await supabase
         .from('aset_barang')
-        .select<string, AssetTableData>('id, nama, stock, status, poin, created_at');
+        .select('id, nama, stock, status, poin, created_at');
 
       if (error) throw error;
 
-      // Memastikan data memiliki tipe yang benar
-      setData(data as AssetTableData[] || []);
+      setData(data || []);
     } catch (error) {
       console.error('Error fetching asset data:', error);
     } finally {
@@ -71,7 +55,7 @@ function AssetTable() {
     }
   };
 
-  const toggleIdExpansion = (id: string) => {
+  const toggleIdExpansion = (id) => {
     const newExpandedIds = new Set(expandedIds);
     if (newExpandedIds.has(id)) {
       newExpandedIds.delete(id);
@@ -81,17 +65,17 @@ function AssetTable() {
     setExpandedIds(newExpandedIds);
   };
 
-  const truncateId = (id: string | null) => {
+  const truncateId = (id) => {
     if (typeof id !== 'string') return id;
     return id.length > 5 ? `${id.substring(0, 5)}...` : id;
   };
 
-  const formatDate = (dateString: string | null) => {
+  const formatDate = (dateString) => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('id-ID', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric',
+      day: 'numeric'
     });
   };
 
@@ -147,8 +131,8 @@ function AssetTable() {
       cell: (info) => (
         <div className="flex items-center">
           <span className={`inline-flex items-center justify-center w-8 h-6 rounded-full text-xs font-medium ${
-            (info.getValue() || 0) > 0
-              ? 'bg-green-100 p-4 text-green-800'
+            info.getValue() > 0 
+              ? 'bg-green-100 p-4 text-green-800 '
               : 'bg-red-100 text-red-800 p-4'
           }`}>
             {info.getValue() || 0}
@@ -253,7 +237,7 @@ function AssetTable() {
     <Card extra={'w-full h-full sm:overflow-auto px-6'}>
       <header className="relative flex items-center justify-between pt-4">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-          Data Aset ({data.length} item)
+          Data Aset ({data.length} aset)
         </div>
         <CardMenu />
       </header>
@@ -267,7 +251,6 @@ function AssetTable() {
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="!border-px !border-gray-400">
                 {headerGroup.headers.map((header) => {
-                  const sorted = header.column.getIsSorted();
                   return (
                     <th
                       key={header.id}
@@ -280,7 +263,10 @@ function AssetTable() {
                           header.column.columnDef.header,
                           header.getContext(),
                         )}
-                        {sorted === 'asc' ? ' ↑' : sorted === 'desc' ? ' ↓' : null}
+                        {{
+                          asc: ' ↑',
+                          desc: ' ↓',
+                        }[header.column.getIsSorted()] ?? null}
                       </div>
                     </th>
                   );

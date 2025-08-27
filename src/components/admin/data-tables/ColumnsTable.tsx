@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import CardMenu from 'components/card/CardMenu';
 import Card from 'components/card';
@@ -19,74 +17,45 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  SortingState,
   useReactTable,
 } from '@tanstack/react-table';
 
-// Mendefinisikan interface untuk data dari Supabase
-interface Profile {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  email: string | null;
-  city: string | null;
-  address: string | null;
-  phone: string | null;
-  status: 'yes' | 'no' | string | null;
-  role: string | null;
-}
-
-// Mendefinisikan interface untuk data yang akan ditampilkan di tabel (dengan tambahan field 'username')
-interface UserTableData extends Profile {
-  username: string;
-}
-
-// Menggunakan tipe data yang sudah didefinisikan untuk column helper
-const columnHelper = createColumnHelper<UserTableData>();
+const columnHelper = createColumnHelper();
 
 function CheckTable() {
-  // Menentukan tipe data untuk state
-  const [data, setData] = useState<UserTableData[]>([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [sorting, setSorting] = useState([]);
+  const [expandedIds, setExpandedIds] = useState(new Set());
 
   useEffect(() => {
-    fetchUsers();
+    // Fetch employee data when the component mounts
+    fetchKaryawan();
   }, []);
 
-  const fetchUsers = async () => {
+  const fetchKaryawan = async () => {
     try {
       if (!supabase) {
         console.error('Supabase client not initialized');
         return;
       }
 
-      // Supabase Query dengan tipe data yang diharapkan
+      // Fetch specific columns for employee data
       const { data, error } = await supabase
-        .from('profiles')
-        .select<string, Profile>('id, first_name, last_name, email, city, address, phone, status, role')
-        .eq('role', 'admin');
+        .from('data_karyawan')
+        .select('id, nama, role, divisi, tugas, status');
 
       if (error) throw error;
 
-      // Gabungkan first_name dan last_name menjadi username, dengan memastikan tipe datanya sesuai
-      const processedData: UserTableData[] = (data || []).map(user => ({
-        ...user,
-        username: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
-        // Memastikan status bertipe string
-        status: user.status || 'no',
-      }));
-
-      setData(processedData);
+      setData(data || []);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching employee data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleIdExpansion = (id: string) => {
+  const toggleIdExpansion = (id) => {
     const newExpandedIds = new Set(expandedIds);
     if (newExpandedIds.has(id)) {
       newExpandedIds.delete(id);
@@ -96,12 +65,12 @@ function CheckTable() {
     setExpandedIds(newExpandedIds);
   };
 
-  const truncateId = (id: string | null) => {
-    if (typeof id !== 'string') return '-';
+  const truncateId = (id) => {
+    if (typeof id !== 'string') return id;
     return id.length > 5 ? `${id.substring(0, 5)}...` : id;
   };
 
-  // Kolom tabel dengan tipe data yang benar
+  // Define table columns
   const columns = [
     columnHelper.accessor('id', {
       id: 'id',
@@ -111,7 +80,7 @@ function CheckTable() {
       cell: (info) => {
         const id = info.getValue();
         const isExpanded = expandedIds.has(id);
-        
+
         return (
           <div className="flex items-center gap-2">
             <p className="text-sm font-bold text-navy-700 dark:text-white">
@@ -120,8 +89,10 @@ function CheckTable() {
             {id && id.length > 5 && (
               <button
                 onClick={() => toggleIdExpansion(id)}
-                className="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-                title={isExpanded ? "Hide full ID" : "Show full ID"}
+                className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                title={
+                  isExpanded ? 'Sembunyikan ID lengkap' : 'Tampilkan ID lengkap'
+                }
               >
                 <span className="text-xs font-bold">
                   {isExpanded ? '−' : '⋯'}
@@ -132,12 +103,10 @@ function CheckTable() {
         );
       },
     }),
-    columnHelper.accessor('username', {
-      id: 'username',
+    columnHelper.accessor('nama', {
+      id: 'nama',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">
-          Nama
-        </p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Nama</p>
       ),
       cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
@@ -145,10 +114,10 @@ function CheckTable() {
         </p>
       ),
     }),
-    columnHelper.accessor('email', {
-      id: 'email',
+    columnHelper.accessor('role', {
+      id: 'role',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">Email</p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Role</p>
       ),
       cell: (info) => (
         <p className="text-sm font-medium text-navy-700 dark:text-white">
@@ -156,22 +125,11 @@ function CheckTable() {
         </p>
       ),
     }),
-    columnHelper.accessor('city', {
-      id: 'city',
-      header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">Kota</p>
-      ),
-      cell: (info) => (
-        <p className="text-sm font-medium text-navy-700 dark:text-white">
-          {info.getValue() || '-'}
-        </p>
-      ),
-    }),
-    columnHelper.accessor('address', {
-      id: 'address',
+    columnHelper.accessor('divisi', {
+      id: 'divisi',
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">
-          Alamat
+          Divisi
         </p>
       ),
       cell: (info) => (
@@ -180,10 +138,10 @@ function CheckTable() {
         </p>
       ),
     }),
-    columnHelper.accessor('phone', {
-      id: 'phone',
+    columnHelper.accessor('tugas', {
+      id: 'tugas',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">Nomor</p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Tugas</p>
       ),
       cell: (info) => (
         <p className="text-sm font-medium text-navy-700 dark:text-white">
@@ -191,7 +149,6 @@ function CheckTable() {
         </p>
       ),
     }),
-
     columnHelper.accessor('status', {
       id: 'status',
       header: () => (
@@ -234,8 +191,8 @@ function CheckTable() {
   if (loading) {
     return (
       <Card extra={'w-full h-full sm:overflow-auto px-6'}>
-        <div className="text-center p-8">
-          <div className="text-lg text-gray-600 dark:text-white">Loading...</div>
+        <div className="p-8 text-center">
+          <div className="text-lg text-gray-600 dark:text-white">Memuat...</div>
         </div>
       </Card>
     );
@@ -246,12 +203,14 @@ function CheckTable() {
       <Card extra={'w-full h-full sm:overflow-auto px-6'}>
         <header className="relative flex items-center justify-between pt-4">
           <div className="text-xl font-bold text-navy-700 dark:text-white">
-            Data Pengguna
+            Data Karyawan
           </div>
           <CardMenu />
         </header>
-        <div className="text-center p-8">
-          <div className="text-lg text-gray-600 dark:text-white">Tidak ada data pengguna</div>
+        <div className="p-8 text-center">
+          <div className="text-lg text-gray-600 dark:text-white">
+            Tidak ada data karyawan
+          </div>
         </div>
       </Card>
     );
@@ -261,17 +220,20 @@ function CheckTable() {
     <Card extra={'w-full h-full sm:overflow-auto px-6'}>
       <header className="relative flex items-center justify-between pt-4">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-          Data Admin ({data.length} admin)
+          Data Karyawan ({data.length} karyawan)
         </div>
         <CardMenu />
       </header>
-      <div className="scrollbar-thin w-full overflow-x-auto mt-4">
+      {/* The wrapper div for the table is now scrollable */}
+      <div
+        className="scrollbar-thin mt-4 w-full"
+        style={{ maxHeight: '300px', overflowY: 'scroll' }}
+      >
         <table className="w-full min-w-[700px] table-auto">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="!border-px !border-gray-400">
                 {headerGroup.headers.map((header) => {
-                  const sorted = header.column.getIsSorted();
                   return (
                     <th
                       key={header.id}
@@ -284,7 +246,10 @@ function CheckTable() {
                           header.column.columnDef.header,
                           header.getContext(),
                         )}
-                        {sorted === 'asc' ? ' ↑' : sorted === 'desc' ? ' ↓' : null}
+                        {{
+                          asc: ' ↑',
+                          desc: ' ↓',
+                        }[header.column.getIsSorted()] ?? null}
                       </div>
                     </th>
                   );
@@ -295,7 +260,10 @@ function CheckTable() {
           <tbody>
             {table.getRowModel().rows.map((row) => {
               return (
-                <tr key={row.id} className="border-b border-gray-100 dark:border-gray-700">
+                <tr
+                  key={row.id}
+                  className="border-b border-gray-100 dark:border-gray-700"
+                >
                   {row.getVisibleCells().map((cell) => {
                     return (
                       <td

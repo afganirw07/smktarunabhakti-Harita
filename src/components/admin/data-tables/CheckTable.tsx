@@ -246,7 +246,7 @@ function CheckTable() {
       <Card extra={'w-full h-full sm:overflow-auto px-6'}>
         <header className="relative flex items-center justify-between pt-4">
           <div className="text-xl font-bold text-navy-700 dark:text-white">
-            Data Pengguna
+            Data Admin
           </div>
           <CardMenu />
         </header>
@@ -265,13 +265,16 @@ function CheckTable() {
         </div>
         <CardMenu />
       </header>
-      <div className="scrollbar-thin w-full overflow-x-auto mt-4">
+      {/* The wrapper div for the table is now scrollable */}
+      <div
+        className="scrollbar-thin mt-4 w-full"
+        style={{ maxHeight: '300px', overflowY: 'scroll' }}
+      >
         <table className="w-full min-w-[700px] table-auto">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="!border-px !border-gray-400">
                 {headerGroup.headers.map((header) => {
-                  const sorted = header.column.getIsSorted();
                   return (
                     <th
                       key={header.id}
@@ -284,7 +287,10 @@ function CheckTable() {
                           header.column.columnDef.header,
                           header.getContext(),
                         )}
-                        {sorted === 'asc' ? ' ↑' : sorted === 'desc' ? ' ↓' : null}
+                        {{
+                          asc: ' ↑',
+                          desc: ' ↓',
+                        }[header.column.getIsSorted()] ?? null}
                       </div>
                     </th>
                   );
@@ -295,7 +301,10 @@ function CheckTable() {
           <tbody>
             {table.getRowModel().rows.map((row) => {
               return (
-                <tr key={row.id} className="border-b border-gray-100 dark:border-gray-700">
+                <tr
+                  key={row.id}
+                  className="border-b border-gray-100 dark:border-gray-700"
+                >
                   {row.getVisibleCells().map((cell) => {
                     return (
                       <td

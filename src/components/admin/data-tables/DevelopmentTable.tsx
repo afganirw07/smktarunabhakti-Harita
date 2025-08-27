@@ -267,7 +267,11 @@ function CheckTable() {
         </div>
         <CardMenu />
       </header>
-      <div className="scrollbar-thin w-full overflow-x-auto mt-4">
+      {/* The wrapper div for the table is now scrollable */}
+      <div
+        className="scrollbar-thin mt-4 w-full"
+        style={{ maxHeight: '300px', overflowY: 'scroll' }}
+      >
         <table className="w-full min-w-[700px] table-auto">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -288,7 +292,7 @@ function CheckTable() {
                         {{
                           asc: ' ↑',
                           desc: ' ↓',
-                        }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
+                        }[header.column.getIsSorted()] ?? null}
                       </div>
                     </th>
                   );
@@ -299,7 +303,10 @@ function CheckTable() {
           <tbody>
             {table.getRowModel().rows.map((row) => {
               return (
-                <tr key={row.id} className="border-b border-gray-100 dark:border-gray-700">
+                <tr
+                  key={row.id}
+                  className="border-b border-gray-100 dark:border-gray-700"
+                >
                   {row.getVisibleCells().map((cell) => {
                     return (
                       <td

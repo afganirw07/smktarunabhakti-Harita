@@ -101,20 +101,14 @@ const General = () => {
           </p>
         </div>
 
-        <div className="flex flex-col items-start justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-          <p className="text-sm text-gray-600">Tanggal Bergabung</p>
-          <p className="text-base font-medium text-navy-700 dark:text-white">
-            20 Mei 2023
-          </p>
-        </div>
+      </div>
 
-        <div className="flex flex-col justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
+        <div className="flex flex-col justify-center rounded-2xl bg-white bg-clip-border mt-6 px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
           <p className="text-sm text-gray-600">Email</p>
           <p className="text-base font-medium text-navy-700 dark:text-white">
             {profileData.email}
           </p>
         </div>
-      </div>
     </Card>
   );
 };
