@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/public/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/public/lib/utils';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   format,
   addMonths,
@@ -14,20 +14,22 @@ import {
   isSameMonth,
   isSameDay,
   isToday,
-} from "date-fns";
+} from 'date-fns';
 
 interface SketchCalendarPickerProps {
   value?: Date;
   onChange?: (date: Date) => void;
   className?: string;
-  variant?: "default" | "minimal" | "artistic" | "gradient" | "neon" | "candy";
+  variant?: 'default' | 'minimal' | 'artistic' | 'gradient' | 'neon' | 'candy';
+  endDate?: Date | null;
 }
 
 export function SketchCalendarPicker({
   value,
   onChange,
   className,
-  variant = "default",
+  variant = 'default',
+  endDate = null,
 }: SketchCalendarPickerProps) {
   const [currentMonth, setCurrentMonth] = useState(value || new Date());
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
@@ -37,7 +39,7 @@ export function SketchCalendarPicker({
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
   // Get day names with Sunday as first day
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Calculate padding days for the first week
   const firstDayOfMonth = monthStart.getDay();
@@ -56,18 +58,18 @@ export function SketchCalendarPicker({
 
   const getVariantStyles = () => {
     switch (variant) {
-      case "minimal":
-        return "bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800";
-      case "artistic":
-        return "bg-[url('/paper-texture.png')] bg-cover border-2 border-zinc-800  [filter:contrast(1.1)] [box-shadow:4px_4px_0_0_rgba(0,0,0,0.2)]";
-      case "gradient":
-        return "bg-linear-to-br from-violet-500 via-purple-500 to-indigo-500 border-none text-white [box-shadow:0_8px_32px_rgba(124,58,237,0.2)]";
-      case "neon":
-        return "bg-zinc-950 border-2 border-emerald-500 text-emerald-500 [text-shadow:0_0_10px_rgba(16,185,129,0.5)] [box-shadow:0_0_20px_rgba(16,185,129,0.3),inset_0_0_20px_rgba(16,185,129,0.2)]";
-      case "candy":
-        return "bg-linear-to-br from-pink-300 via-rose-300 to-pink-400 border-white/20 border-2 backdrop-blur-xl text-white [box-shadow:0_8px_32px_rgba(244,114,182,0.2)]";
+      case 'minimal':
+        return 'bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800';
+      case 'artistic':
+        return "bg-[url('/paper-texture.png')] bg-cover border-2 border-zinc-800 [filter:contrast(1.1)] [box-shadow:4px_4px_0_0_rgba(0,0,0,0.2)]";
+      case 'gradient':
+        return 'bg-linear-to-br from-violet-500 via-purple-500 to-indigo-500 border-none text-white [box-shadow:0_8px_32px_rgba(124,58,237,0.2)]';
+      case 'neon':
+        return 'bg-zinc-950 border-2 border-emerald-500 text-emerald-500 [text-shadow:0_0_10px_rgba(16,185,129,0.5)] [box-shadow:0_0_20px_rgba(16,185,129,0.3),inset_0_0_20px_rgba(16,185,129,0.2)]';
+      case 'candy':
+        return 'bg-linear-to-br from-pink-300 via-rose-300 to-pink-400 border-white/20 border-2 backdrop-blur-xl text-white [box-shadow:0_8px_32px_rgba(244,114,182,0.2)]';
       default:
-        return "bg-linear-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 border border-zinc-200 dark:border-zinc-800";
+        return 'bg-linear-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 border border-zinc-200 dark:border-zinc-800';
     }
   };
 
@@ -75,79 +77,85 @@ export function SketchCalendarPicker({
     isSelected: boolean | undefined,
     isCurrentDate: boolean,
     isCurrentMonth: boolean,
+    isEndDate: boolean,
   ) => {
     const baseStyles =
-      "relative flex h-8 w-8 items-center justify-center rounded-lg text-sm transition-colors";
+      'relative flex h-8 w-8 items-center justify-center rounded-lg text-sm transition-colors';
+
+    // Prioritize red color for the end date
+    if (isEndDate) {
+      return cn(baseStyles, 'bg-red-500 font-semibold text-white');
+    }
 
     if (!isCurrentMonth) {
-      return cn(baseStyles, "text-zinc-300 dark:text-zinc-700");
+      return cn(baseStyles, 'text-zinc-300 dark:text-zinc-700');
     }
 
     if (isSelected) {
       switch (variant) {
-        case "gradient":
-          return cn(baseStyles, "bg-white/20 font-semibold text-white");
-        case "neon":
+        case 'gradient':
+          return cn(baseStyles, 'bg-white/20 font-semibold text-white');
+        case 'neon':
           return cn(
             baseStyles,
-            "bg-emerald-500/20 font-semibold text-emerald-400 [text-shadow:0_0_10px_rgba(16,185,129,0.8)]",
+            'bg-emerald-500/20 font-semibold text-emerald-400 [text-shadow:0_0_10px_rgba(16,185,129,0.8)]',
           );
-        case "candy":
-          return cn(baseStyles, "bg-white/30 font-semibold text-white");
+        case 'candy':
+          return cn(baseStyles, 'bg-white/30 font-semibold text-white');
         default:
           return cn(
             baseStyles,
-            "bg-green-700 font-semibold text-primary-foreground",
+            'bg-green-700 font-semibold text-primary-foreground',
           );
       }
     }
 
     if (isCurrentDate) {
       switch (variant) {
-        case "gradient":
-          return cn(baseStyles, "font-medium text-white");
-        case "neon":
-          return cn(baseStyles, "font-medium text-emerald-400");
-        case "candy":
-          return cn(baseStyles, "font-medium text-white");
+        case 'gradient':
+          return cn(baseStyles, 'font-medium text-white');
+        case 'neon':
+          return cn(baseStyles, 'font-medium text-emerald-400');
+        case 'candy':
+          return cn(baseStyles, 'font-medium text-white');
         default:
-          return cn(baseStyles, "font-medium text-primary");
+          return cn(baseStyles, 'font-medium text-primary');
       }
     }
 
     switch (variant) {
-      case "gradient":
-        return cn(baseStyles, "text-white/90 hover:bg-white/10");
-      case "neon":
-        return cn(baseStyles, "text-emerald-500/90 hover:bg-emerald-500/10");
-      case "candy":
-        return cn(baseStyles, "text-white/90 hover:bg-white/10");
+      case 'gradient':
+        return cn(baseStyles, 'text-white/90 hover:bg-white/10');
+      case 'neon':
+        return cn(baseStyles, 'text-emerald-500/90 hover:bg-emerald-500/10');
+      case 'candy':
+        return cn(baseStyles, 'text-white/90 hover:bg-white/10');
       default:
-        return cn(baseStyles, "hover:bg-zinc-100 dark:hover:bg-zinc-800");
+        return cn(baseStyles, 'hover:bg-zinc-100 dark:hover:bg-zinc-800');
     }
   };
 
   const getHeaderStyles = () => {
     switch (variant) {
-      case "gradient":
-      case "candy":
-        return "text-white/70";
-      case "neon":
-        return "text-emerald-500/70";
+      case 'gradient':
+      case 'candy':
+        return 'text-white/70';
+      case 'neon':
+        return 'text-emerald-500/70';
       default:
-        return "text-zinc-500 dark:text-zinc-400";
+        return 'text-zinc-500 dark:text-zinc-400';
     }
   };
 
   const getButtonStyles = () => {
     switch (variant) {
-      case "gradient":
-      case "candy":
-        return "text-white/90 hover:bg-white/10";
-      case "neon":
-        return "text-emerald-500 hover:bg-emerald-500/10";
+      case 'gradient':
+      case 'candy':
+        return 'text-white/90 hover:bg-white/10';
+      case 'neon':
+        return 'text-emerald-500 hover:bg-emerald-500/10';
       default:
-        return "hover:bg-zinc-100 dark:hover:bg-zinc-800";
+        return 'hover:bg-zinc-100 dark:hover:bg-zinc-800';
     }
   };
 
@@ -156,7 +164,7 @@ export function SketchCalendarPicker({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        "w-[320px] rounded-xl p-4 shadow-lg backdrop-blur-xs",
+        'backdrop-blur-xs w-[320px] rounded-xl p-4 shadow-lg',
         getVariantStyles(),
         className,
       )}
@@ -167,27 +175,27 @@ export function SketchCalendarPicker({
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={handlePrevMonth}
-          className={cn("rounded-lg p-1", getButtonStyles())}
+          className={cn('rounded-lg p-1', getButtonStyles())}
         >
           <ChevronLeft className="h-5 w-5" />
         </motion.button>
         <h2
           className={cn(
-            "text-lg font-semibold",
-            variant === "gradient" || variant === "candy"
-              ? "text-white"
-              : variant === "neon"
-                ? "text-emerald-500"
-                : undefined,
+            'text-lg font-semibold',
+            variant === 'gradient' || variant === 'candy'
+              ? 'text-white'
+              : variant === 'neon'
+              ? 'text-emerald-500'
+              : undefined,
           )}
         >
-          {format(currentMonth, "MMMM yyyy")}
+          {format(currentMonth, 'MMMM yyyy')}
         </h2>
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={handleNextMonth}
-          className={cn("rounded-lg p-1", getButtonStyles())}
+          className={cn('rounded-lg p-1', getButtonStyles())}
         >
           <ChevronRight className="h-5 w-5" />
         </motion.button>
@@ -199,7 +207,7 @@ export function SketchCalendarPicker({
         {dayNames.map((day) => (
           <div
             key={day}
-            className={cn("text-center text-sm font-medium", getHeaderStyles())}
+            className={cn('text-center text-sm font-medium', getHeaderStyles())}
           >
             {day}
           </div>
@@ -210,12 +218,12 @@ export function SketchCalendarPicker({
           <div
             key={`padding-${i}`}
             className={cn(
-              "text-center text-sm",
-              variant === "gradient" || variant === "candy"
-                ? "text-white/30"
-                : variant === "neon"
-                  ? "text-emerald-500/30"
-                  : "text-zinc-300 dark:text-zinc-700",
+              'text-center text-sm',
+              variant === 'gradient' || variant === 'candy'
+                ? 'text-white/30'
+                : variant === 'neon'
+                ? 'text-emerald-500/30'
+                : 'text-zinc-300 dark:text-zinc-700',
             )}
           >
             {date.getDate()}
@@ -228,6 +236,7 @@ export function SketchCalendarPicker({
           const isCurrentMonth = isSameMonth(date, currentMonth);
           const isCurrentDate = isToday(date);
           const isHovered = hoveredDate && isSameDay(date, hoveredDate);
+          const isEndDate = endDate && isSameDay(date, endDate);
 
           return (
             <motion.button
@@ -237,12 +246,16 @@ export function SketchCalendarPicker({
               onHoverEnd={() => setHoveredDate(null)}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className={getDayStyles(
-                isSelected,
-                isCurrentDate,
-                isCurrentMonth,
+              // Correctly combine styles using `cn`
+              className={cn(
+                getDayStyles(isSelected, isCurrentDate, isCurrentMonth, isEndDate),
+                isEndDate && 'bg-red-500 font-semibold text-white',
               )}
             >
+              {/* Display the date number inside the button */}
+              <span>{date.getDate()}</span>
+              
+              {/* Other visual indicators */}
               {isHovered && variant === "artistic" && (
                 <motion.div
                   layoutId="hover-effect"
@@ -250,7 +263,6 @@ export function SketchCalendarPicker({
                   transition={{ duration: 0.2 }}
                 />
               )}
-              <span>{date.getDate()}</span>
               {isCurrentDate && !isSelected && (
                 <div
                   className={cn(
