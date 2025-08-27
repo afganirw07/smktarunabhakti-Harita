@@ -54,7 +54,7 @@ export default function Login() {
       // get tabel
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('role', 'active_token')
+        .select('role, active_token')
         .eq('id', userId)
         .single();
       
