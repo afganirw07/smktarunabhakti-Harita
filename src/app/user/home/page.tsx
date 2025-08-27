@@ -300,7 +300,7 @@ export default function Home() {
               Dapatkan Coins dengan{' '}
               <span className="font-bold">Memilah kategori sampah rumah</span>{' '}
               anda pada{' '}
-              <Link href={'/user/layanan/trashHouse'}>
+              <Link href={'/user/layanan/trash-house'}>
                 <span className="font-black text-green-700 underline underline-offset-2 transition-colors duration-200 ease-out hover:text-green-500">
                   Trash House
                 </span>
@@ -345,7 +345,7 @@ export default function Home() {
               </button>
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 ">
             {loadingProducts ? (
               <p>Memuat produk...</p>
             ) : errorProducts ? (

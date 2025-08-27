@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/public/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
@@ -16,12 +16,21 @@ import {
   isToday,
 } from 'date-fns';
 
+interface HighlightDate {
+  month: number; // 0 = Jan, 11 = Dec
+  date: number;
+}
+
 interface SketchCalendarPickerProps {
   value?: Date;
   onChange?: (date: Date) => void;
   className?: string;
   variant?: 'default' | 'minimal' | 'artistic' | 'gradient' | 'neon' | 'candy';
   endDate?: Date | null;
+  highlightDates?: HighlightDate[];
+  highlightClassName?: string;
+  highlightDates2?: HighlightDate[];
+  highlightClassName2?: string;
 }
 
 export function SketchCalendarPicker({
@@ -30,6 +39,10 @@ export function SketchCalendarPicker({
   className,
   variant = 'default',
   endDate = null,
+  highlightDates = [],
+  highlightClassName = 'bg-amber-500 text-white',
+  highlightDates2 = [],
+  highlightClassName2 = 'bg-green-500 text-white',
 }: SketchCalendarPickerProps) {
   const [currentMonth, setCurrentMonth] = useState(value || new Date());
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
@@ -38,10 +51,10 @@ export function SketchCalendarPicker({
   const monthEnd = endOfMonth(currentMonth);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
-  // Get day names with Sunday as first day
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  // Nama hari
+  const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 
-  // Calculate padding days for the first week
+  // Padding hari
   const firstDayOfMonth = monthStart.getDay();
   const paddingDays = Array.from(
     { length: firstDayOfMonth },
@@ -82,7 +95,6 @@ export function SketchCalendarPicker({
     const baseStyles =
       'relative flex h-8 w-8 items-center justify-center rounded-lg text-sm transition-colors';
 
-    // Prioritize red color for the end date
     if (isEndDate) {
       return cn(baseStyles, 'bg-red-500 font-semibold text-white');
     }
@@ -238,25 +250,33 @@ export function SketchCalendarPicker({
           const isHovered = hoveredDate && isSameDay(date, hoveredDate);
           const isEndDate = endDate && isSameDay(date, endDate);
 
+          const isHighlighted1 =
+            highlightDates?.some(
+              (d) => d.month === date.getMonth() && d.date === date.getDate(),
+            ) ?? false;
+
+          const isHighlighted2 =
+            highlightDates2?.some(
+              (d) => d.month === date.getMonth() && d.date === date.getDate(),
+            ) ?? false;
+
           return (
-            <motion.button
+            <motion.div
               key={date.toISOString()}
-              onClick={() => onChange?.(date)}
               onHoverStart={() => setHoveredDate(date)}
               onHoverEnd={() => setHoveredDate(null)}
               whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              // Correctly combine styles using `cn`
               className={cn(
                 getDayStyles(isSelected, isCurrentDate, isCurrentMonth, isEndDate),
                 isEndDate && 'bg-red-500 font-semibold text-white',
+                isHighlighted1 && highlightClassName,
+                isHighlighted2 && highlightClassName2,
+                'cursor-default',
               )}
             >
-              {/* Display the date number inside the button */}
               <span>{date.getDate()}</span>
-              
-              {/* Other visual indicators */}
-              {isHovered && variant === "artistic" && (
+
+              {isHovered && variant === 'artistic' && (
                 <motion.div
                   layoutId="hover-effect"
                   className="absolute inset-0 rounded-lg border-2 border-dashed border-green-600"
@@ -266,16 +286,16 @@ export function SketchCalendarPicker({
               {isCurrentDate && !isSelected && (
                 <div
                   className={cn(
-                    "absolute bottom-1 h-1 w-1 rounded-full",
-                    variant === "gradient" || variant === "candy"
-                      ? "bg-white"
-                      : variant === "neon"
-                        ? "bg-emerald-500"
-                        : "bg-primary",
+                    'absolute bottom-1 h-1 w-1 rounded-full',
+                    variant === 'gradient' || variant === 'candy'
+                      ? 'bg-white'
+                      : variant === 'neon'
+                      ? 'bg-emerald-500'
+                      : 'bg-primary',
                   )}
                 />
               )}
-            </motion.button>
+            </motion.div>
           );
         })}
       </div>
