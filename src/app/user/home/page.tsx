@@ -27,15 +27,15 @@ const calculateEndDate = (startDate, plan) => {
   const start = new Date(startDate);
 
   switch (plan) {
-    case 'trial':
+    case 'Trial':
       return addDays(start, 14);
-    case '1_month':
+    case '1 Bulan':
       return addMonths(start, 1);
-    case '3_months':
+    case '3 Bulan':
       return addMonths(start, 3);
-    case '6_months':
+    case '6 Bulan':
       return addMonths(start, 6);
-    case '1_year':
+    case '1 Tahun':
       return addYears(start, 1);
     default:
       return null;

@@ -18,10 +18,10 @@ const snap = new Midtrans.Snap({
 });
 // Mapping plan agar cocok enum Supabase
 const planMapping: Record<string, string> = {
-    'Standar': '1_month',
-    '3 Bulan': '3_months',
-    '6 Bulan': '6_months',
-    '1 Tahun': '1_year',
+    'Standar': '1 Bulan',
+    '3 Bulan': '3 Bulan',
+    '6 Bulan': '6 Bulan',
+    '1 Tahun': '1 Tahun',
 };
 
 export async function POST(request: Request) {
