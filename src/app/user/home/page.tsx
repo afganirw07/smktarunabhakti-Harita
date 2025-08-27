@@ -262,9 +262,8 @@ export default function Home() {
               <div>
                 <p className="font-semibold text-green-500">Sisa Durasi</p>
                 <p className="font-bold text-black">
-                  {timeLeft.days}h {timeLeft.hours}j {timeLeft.minutes}m{' '}
-                  {timeLeft.seconds}s
-                </p>
+  {timeLeft.days}h {timeLeft.hours}j {timeLeft.minutes}m {timeLeft.seconds}s
+</p>
               </div>
               <div>
                 <p className="font-semibold text-green-500">Berakhir pada</p>
