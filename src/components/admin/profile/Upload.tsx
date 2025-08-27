@@ -5,18 +5,18 @@ import { MdLock } from "react-icons/md";
 
 const CompleteProfile = () => {
   // State to manage the visibility of the modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   // Function to toggle the modal's visibility
-  const toggleModal = (e) => {
-    e?.preventDefault();
-    e?.stopPropagation();
+  const toggleModal = (e: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     setIsModalOpen(!isModalOpen);
   };
 
   // Handle escape key to close modal
   useEffect(() => {
-    const handleEscape = (event) => {
+    const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isModalOpen) {
         setIsModalOpen(false);
       }
@@ -37,7 +37,7 @@ const CompleteProfile = () => {
   }, [isModalOpen]);
 
   // Handle backdrop click
-  const handleBackdropClick = (e) => {
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.target === e.currentTarget) {
@@ -47,9 +47,9 @@ const CompleteProfile = () => {
 
   // Modal Component
   const Modal = () => (
-    <div 
+    <div
       className="fixed inset-0 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900 bg-opacity-50 dark:bg-opacity-80"
-      style={{ 
+      style={{
         zIndex: 999999,
         isolation: 'isolate',
         contain: 'layout style paint'
@@ -60,19 +60,17 @@ const CompleteProfile = () => {
       aria-modal="true"
       aria-labelledby="modal-title"
     >
-      <div 
+      <div
         className="relative w-full max-w-md max-h-full"
-        onClick={(e) => {
+        onClick={(e: React.MouseEvent<HTMLDivElement>) => {
           e.preventDefault();
           e.stopPropagation();
-          e.stopImmediatePropagation();
         }}
-        onMouseDown={(e) => {
+        onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => {
           e.preventDefault();
           e.stopPropagation();
-          e.stopImmediatePropagation();
         }}
-        style={{ 
+        style={{
           isolation: 'isolate',
           contain: 'layout style paint'
         }}
@@ -80,14 +78,23 @@ const CompleteProfile = () => {
         <div className="rounded-lg bg-white shadow-sm dark:bg-gray-700 mx-auto">
           {/* Modal Header */}
           <div className="flex items-center justify-between rounded-t border-b border-gray-200 p-4 md:p-5 dark:border-gray-600">
-            <h3 
+            <h3
               id="modal-title"
               className="text-lg font-semibold text-gray-900 dark:text-white"
             >
               Riwayat Login
             </h3>
             {/* Close button with onClick handler */}
-        
+            <button
+              type="button"
+              className="end-2.5 rounded-lg bg-transparent p-1.5 text-sm text-gray-400 ms-auto inline-flex h-8 w-8 items-center hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
+              onClick={toggleModal}
+            >
+              <svg className="h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+              </svg>
+              <span className="sr-only">Close modal</span>
+            </button>
           </div>
 
           {/* Modal Body */}

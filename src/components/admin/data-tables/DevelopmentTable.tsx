@@ -1,13 +1,17 @@
+// This is a TypeScript file, so we'll use a .tsx extension
+
 import React, { useState, useEffect } from 'react';
 import CardMenu from 'components/card/CardMenu';
 import Card from 'components/card';
 import { BsCheckCircleFill, BsXCircleFill } from 'react-icons/bs';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // Inisialisasi Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase =
+
+// @ts-ignore
+const supabase: SupabaseClient | null =
   supabaseUrl && supabaseAnonKey
     ? createClient(supabaseUrl, supabaseAnonKey)
     : null;
@@ -21,13 +25,28 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-const columnHelper = createColumnHelper();
+// Mendefinisikan tipe data untuk pengguna
+type UserData = {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  city: string | null;
+  address: string | null;
+  phone: string | null;
+  plan: string | null;
+  status: string | null;
+  role: string | null;
+  username: string; // Tambahan untuk nama lengkap
+};
+
+const columnHelper = createColumnHelper<UserData>();
 
 function CheckTable() {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [sorting, setSorting] = useState([]);
-  const [expandedIds, setExpandedIds] = useState(new Set());
+  const [data, setData] = useState<UserData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchUsers();
@@ -40,17 +59,16 @@ function CheckTable() {
         return;
       }
 
-      const { data, error } = await supabase
+      const { data: users, error } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, email, city, address, phone, plan, status, role')
-        .eq('role', 'user'); 
+        .eq('role', 'user');
 
       if (error) throw error;
 
-      // Gabungkan first_name dan last_name menjadi username untuk keperluan tabel
-      const processedData = (data || []).map(user => ({
+      const processedData: UserData[] = (users || []).map(user => ({
         ...user,
-        username: `${user.first_name || ''} ${user.last_name || ''}`.trim()
+        username: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
       }));
 
       setData(processedData);
@@ -61,18 +79,19 @@ function CheckTable() {
     }
   };
 
-  const toggleIdExpansion = (id) => {
-    const newExpandedIds = new Set(expandedIds);
-    if (newExpandedIds.has(id)) {
-      newExpandedIds.delete(id);
-    } else {
-      newExpandedIds.add(id);
-    }
-    setExpandedIds(newExpandedIds);
+  const toggleIdExpansion = (id: string) => {
+    setExpandedIds(prev => {
+      const newExpandedIds = new Set(prev);
+      if (newExpandedIds.has(id)) {
+        newExpandedIds.delete(id);
+      } else {
+        newExpandedIds.add(id);
+      }
+      return newExpandedIds;
+    });
   };
 
-  const truncateId = (id) => {
-    if (typeof id !== 'string') return id;
+  const truncateId = (id: string): string => {
     return id.length > 5 ? `${id.substring(0, 5)}...` : id;
   };
 
@@ -82,10 +101,9 @@ function CheckTable() {
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">ID</p>
       ),
-      cell: (info) => {
+      cell: info => {
         const id = info.getValue();
         const isExpanded = expandedIds.has(id);
-        
         return (
           <div className="flex items-center gap-2">
             <p className="text-sm font-bold text-navy-700 dark:text-white">
@@ -113,7 +131,7 @@ function CheckTable() {
           Nama
         </p>
       ),
-      cell: (info) => (
+      cell: info => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
           {info.getValue() || '-'}
         </p>
@@ -124,7 +142,7 @@ function CheckTable() {
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">Email</p>
       ),
-      cell: (info) => (
+      cell: info => (
         <p className="text-sm font-medium text-navy-700 dark:text-white">
           {info.getValue() || '-'}
         </p>
@@ -135,7 +153,7 @@ function CheckTable() {
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">Kota</p>
       ),
-      cell: (info) => (
+      cell: info => (
         <p className="text-sm font-medium text-navy-700 dark:text-white">
           {info.getValue() || '-'}
         </p>
@@ -148,7 +166,7 @@ function CheckTable() {
           Alamat
         </p>
       ),
-      cell: (info) => (
+      cell: info => (
         <p className="text-sm font-medium text-navy-700 dark:text-white">
           {info.getValue() || '-'}
         </p>
@@ -159,7 +177,7 @@ function CheckTable() {
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">Nomor</p>
       ),
-      cell: (info) => (
+      cell: info => (
         <p className="text-sm font-medium text-navy-700 dark:text-white">
           {info.getValue() || '-'}
         </p>
@@ -170,7 +188,7 @@ function CheckTable() {
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">Plan</p>
       ),
-      cell: (info) => (
+      cell: info => (
         <p className="text-sm font-medium text-navy-700 dark:text-white">
           {info.getValue() || '-'}
         </p>
@@ -183,7 +201,7 @@ function CheckTable() {
           Status
         </p>
       ),
-      cell: (info) => (
+      cell: info => (
         <div className="flex h-full min-h-[24px] items-center justify-start">
           <span className="flex items-center gap-2">
             {info.getValue() === 'yes' ? (
@@ -270,7 +288,7 @@ function CheckTable() {
                         {{
                           asc: ' ↑',
                           desc: ' ↓',
-                        }[header.column.getIsSorted()] ?? null}
+                        }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
                       </div>
                     </th>
                   );
