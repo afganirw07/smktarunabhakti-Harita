@@ -43,7 +43,7 @@ export default function Toko() {
     try {
       const { data, error } = await supabase
         .from('aset_barang')
-        .select('id, nama, desc, img, poin')
+        .select('id, nama, desc, img, poin, stock')
       if (error) {
         throw error;
       }
@@ -90,10 +90,12 @@ export default function Toko() {
                 <div className='col-span-1' key={product}>
                 <ProductCard
                   key={product.id}
+                  id={product.id}
                   title={product.nama}
                   description={product.desc}
                   price={product.poin.toString()} 
                   imageUrl={product.img}
+                  stock={product.stock}
                 />
                 </div>
               ))

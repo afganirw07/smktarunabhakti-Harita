@@ -74,7 +74,6 @@ export default function Home() {
         )
         .eq('id', userId)
         .single();
-
       if (error) {
         console.error('Error fetching user data:', error);
       } else {
@@ -353,7 +352,9 @@ export default function Home() {
               products.map((product) => (
                 <ProductCard
                   key={product.id}
+                  id={product.id} 
                   title={product.nama}
+                  stock={product.stock}
                   imageUrl={product.img}
                   description={product.desc}
                   price={product.poin}
