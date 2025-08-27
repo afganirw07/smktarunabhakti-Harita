@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Coins, CoinsIcon } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import ProductCard from 'components/card/cardProduct';
-import Link from 'next/link';
 
 // Configure Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

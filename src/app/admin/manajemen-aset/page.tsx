@@ -46,7 +46,7 @@ const Marketplace = () => {
       {/* right side section */}
 
       <div className="col-span-1 h-full w-full rounded-xl 2xl:col-span-1">
-        <TopCreatorTable tableData={tableDataTopCreators} />
+        <TopCreatorTable  />
         <div className="mb-5" />
         <HistoryItem />
       </div>

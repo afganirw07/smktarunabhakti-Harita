@@ -23,13 +23,33 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-const columnHelper = createColumnHelper();
+// Mendefinisikan interface untuk data dari Supabase
+interface Profile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  city: string | null;
+  address: string | null;
+  phone: string | null;
+  status: 'yes' | 'no' | string | null;
+  role: string | null;
+}
+
+// Mendefinisikan interface untuk data yang akan ditampilkan di tabel (dengan tambahan field 'username')
+interface UserTableData extends Profile {
+  username: string;
+}
+
+// Menggunakan tipe data yang sudah didefinisikan untuk column helper
+const columnHelper = createColumnHelper<UserTableData>();
 
 function CheckTable() {
-  const [data, setData] = useState([]);
+  // Menentukan tipe data untuk state
+  const [data, setData] = useState<UserTableData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sorting, setSorting] = useState([]);
-  const [expandedIds, setExpandedIds] = useState(new Set());
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchUsers();
@@ -42,18 +62,20 @@ function CheckTable() {
         return;
       }
 
-      // Filter data untuk hanya mengambil user dengan role 'admin'
+      // Supabase Query dengan tipe data yang diharapkan
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, city, address, phone, status, role')
-        .eq('role', 'admin'); // Hanya ambil data yang role-nya 'admin'
+        .select<string, Profile>('id, first_name, last_name, email, city, address, phone, status, role')
+        .eq('role', 'admin');
 
       if (error) throw error;
 
-      // Gabungkan first_name dan last_name menjadi username untuk keperluan tabel
-      const processedData = (data || []).map(user => ({
+      // Gabungkan first_name dan last_name menjadi username, dengan memastikan tipe datanya sesuai
+      const processedData: UserTableData[] = (data || []).map(user => ({
         ...user,
-        username: `${user.first_name || ''} ${user.last_name || ''}`.trim()
+        username: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+        // Memastikan status bertipe string
+        status: user.status || 'no',
       }));
 
       setData(processedData);
@@ -64,7 +86,7 @@ function CheckTable() {
     }
   };
 
-  const toggleIdExpansion = (id) => {
+  const toggleIdExpansion = (id: string) => {
     const newExpandedIds = new Set(expandedIds);
     if (newExpandedIds.has(id)) {
       newExpandedIds.delete(id);
@@ -74,11 +96,12 @@ function CheckTable() {
     setExpandedIds(newExpandedIds);
   };
 
-  const truncateId = (id) => {
-    if (typeof id !== 'string') return id;
+  const truncateId = (id: string | null) => {
+    if (typeof id !== 'string') return '-';
     return id.length > 5 ? `${id.substring(0, 5)}...` : id;
   };
 
+  // Kolom tabel dengan tipe data yang benar
   const columns = [
     columnHelper.accessor('id', {
       id: 'id',
@@ -248,6 +271,7 @@ function CheckTable() {
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="!border-px !border-gray-400">
                 {headerGroup.headers.map((header) => {
+                  const sorted = header.column.getIsSorted();
                   return (
                     <th
                       key={header.id}
@@ -260,10 +284,7 @@ function CheckTable() {
                           header.column.columnDef.header,
                           header.getContext(),
                         )}
-                        {{
-                          asc: ' ↑',
-                          desc: ' ↓',
-                        }[header.column.getIsSorted()] ?? null}
+                        {sorted === 'asc' ? ' ↑' : sorted === 'desc' ? ' ↓' : null}
                       </div>
                     </th>
                   );
