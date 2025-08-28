@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
@@ -288,10 +290,10 @@ const AppSidebar: React.FC = () => {
             </>
           ) : (
             <Image
-              src="/images/logo/logo-icon.svg"
+              src="/images/logo/Logo.png"
               alt="Logo"
-              width={32}
-              height={32}
+              width={42}
+              height={42}
             />
           )}
         </Link>
@@ -310,3 +312,5 @@ const AppSidebar: React.FC = () => {
 };
 
 export default AppSidebar;
+
+

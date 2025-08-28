@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Leaf } from "lucide-react";
+import Image from "next/image";
 
 export default function PageLoader({ children }) {
   const [isVisible, setIsVisible] = useState(true);
@@ -44,7 +44,14 @@ export default function PageLoader({ children }) {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
               >
-                <Leaf size={60} />
+                <Image
+                src={"/images/logo/Logo.png"}
+                alt="Logo"
+                width={90}
+                height={90}
+                >
+
+                </Image>
               </motion.div>
 
               {/* Text */}
