@@ -29,7 +29,6 @@ function CheckTable() {
     const [expandedIds, setExpandedIds] = useState(new Set());
 
     useEffect(() => {
-        // Fetch employee data when the component mounts
         fetchKaryawan();
     }, []);
 
@@ -40,12 +39,9 @@ function CheckTable() {
                 return;
             }
 
-            // Fetch specific columns for employee data
             const { data, error } = await supabase
                 .from('transactions')
-                .select(
-                    'id, user_id, order_id, plan_name, amount, status, created_at',
-                );
+                .select('id, user_id, order_id, plan_name, amount, status, created_at');
 
             if (error) throw error;
 
@@ -72,16 +68,15 @@ function CheckTable() {
         return id.length > 5 ? `${id.substring(0, 5)}...` : id;
     };
 
-     const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+    const formatDate = (dateString) => {
+        if (!dateString) return '-';
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+    };
 
-    // Define table columns
     const columns = [
         columnHelper.accessor('id', {
             id: 'id',
@@ -91,7 +86,6 @@ function CheckTable() {
             cell: (info) => {
                 const id = info.getValue();
                 const isExpanded = expandedIds.has(id);
-
                 return (
                     <div className="flex items-center gap-2">
                         <p className="text-sm font-bold text-navy-700 dark:text-white">
@@ -117,12 +111,13 @@ function CheckTable() {
         columnHelper.accessor('user_id', {
             id: 'user_id',
             header: () => (
-                <p className="text-sm font-bold text-gray-600 dark:text-white">User Id</p>
+                <p className="text-sm font-bold text-gray-600 dark:text-white">
+                    User Id
+                </p>
             ),
             cell: (info) => {
                 const id = info.getValue();
                 const isExpanded = expandedIds.has(id);
-
                 return (
                     <div className="flex items-center gap-2">
                         <p className="text-sm font-bold text-navy-700 dark:text-white">
@@ -148,7 +143,9 @@ function CheckTable() {
         columnHelper.accessor('order_id', {
             id: 'order_id',
             header: () => (
-                <p className="text-sm font-bold text-gray-600 dark:text-white">Order Id</p>
+                <p className="text-sm font-bold text-gray-600 dark:text-white">
+                    Order Id
+                </p>
             ),
             cell: (info) => (
                 <p className="text-sm font-bold text-navy-700 dark:text-white">
@@ -172,9 +169,7 @@ function CheckTable() {
         columnHelper.accessor('amount', {
             id: 'amount',
             header: () => (
-                <p className="text-sm font-bold text-gray-600 dark:text-white">
-                    Harga
-                </p>
+                <p className="text-sm font-bold text-gray-600 dark:text-white">Harga</p>
             ),
             cell: (info) => (
                 <p className="text-sm font-medium text-navy-700 dark:text-white">
@@ -198,7 +193,9 @@ function CheckTable() {
         columnHelper.accessor('created_at', {
             id: 'created_at',
             header: () => (
-                <p className="text-sm font-bold text-gray-600 dark:text-white">Tanggal</p>
+                <p className="text-sm font-bold text-gray-600 dark:text-white">
+                    Tanggal
+                </p>
             ),
             cell: (info) => (
                 <p className="text-sm font-medium text-navy-700 dark:text-white">
@@ -255,11 +252,9 @@ function CheckTable() {
                     Data Riwayat Transaksi
                 </div>
             </header>
-            {/* The wrapper div for the table is now scrollable */}
-            <div
-                className="scrollbar-thin mt-4 w-full"
-                style={{ maxHeight: '500px', overflowY: 'scroll' }}
-            >
+            
+            {/* Tampilkan tabel utama yang dapat digulir untuk UI */}
+            <div className="scrollbar-thin mt-4 w-full" style={{ maxHeight: '500px', overflowY: 'scroll' }}>
                 <table className="w-full min-w-[700px] table-auto">
                     <thead>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -314,6 +309,39 @@ function CheckTable() {
                     </tbody>
                 </table>
             </div>
+
+            {/* Tambahkan tabel tersembunyi yang akan digunakan untuk PDF */}
+            <div id="pdf-content" style={{ display: 'none' }}>
+                <h1 style={{ fontSize: '24px', fontWeight: 'bold' }}>Data Riwayat Transaksi</h1>
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+                    <thead>
+                        <tr style={{ backgroundColor: '#f2f2f2' }}>
+                            {columns.map(col => (
+                                <th key={col.id} style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>
+                                    {typeof col.header === 'function' ? col.header({ column: col }) : col.header}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {data.map(row => (
+                            <tr key={row.id}>
+                                {columns.map(col => (
+                                    <td key={col.id} style={{ border: '1px solid #ddd', padding: '8px' }}>
+                                        {/* Tampilkan data lengkap di sini, bukan versi terpotong */}
+                                        {col.id === 'id' ? row.id :
+                                         col.id === 'user_id' ? row.user_id :
+                                         col.id === 'created_at' ? formatDate(row.created_at) :
+                                         row[col.id]
+                                        }
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
         </Card>
     );
 }
