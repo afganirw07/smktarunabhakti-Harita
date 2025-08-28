@@ -25,6 +25,7 @@
     "@types/react-dom": "^18.0.6",
     "apexcharts": "^3.35.2",
     "axios": "^1.11.0",
+    "cally": "^0.8.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^7.10.3",
