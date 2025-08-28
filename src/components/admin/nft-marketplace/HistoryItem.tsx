@@ -48,7 +48,7 @@ const HistoryCard = () => {
   ];
 
   return (
-    <Card extra={'mt-3 !z-5 overflow-hidden'}>
+    <Card extra={'mt-3 !z-5 overflow-hidden  -mb-89'}>
       {/* Riwayat Aktivitas Aset Header */}
       <div className="flex items-center justify-between rounded-t-3xl p-3">
         <div className="text-lg font-bold text-navy-700 dark:text-white">

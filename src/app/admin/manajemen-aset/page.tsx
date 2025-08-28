@@ -1,13 +1,7 @@
 'use client';
 
-import truk from '/public/img/aset/truk.png';
-import alat from '/public/img/aset/alat.png';
-import gudang from '/public/img/aset/gudang.png';
 
-
-import tableDataTopCreators from 'variables/nfts/marketplace/tableDataTopCreators';
 import HistoryItem from 'components/admin/nft-marketplace/HistoryItem';
-import TopCreatorTable from 'components/admin/nft-marketplace/TableTopCreators';
 import NftCard from 'components/card/NftCard';
 import StatusAset from 'components/card/statusAset';
 
@@ -46,9 +40,8 @@ const Marketplace = () => {
       {/* right side section */}
 
       <div className="col-span-1 h-full w-full rounded-xl 2xl:col-span-1">
-        <TopCreatorTable  />
-        <div className="mb-5" />
         <HistoryItem />
+        <div />
       </div>
     </div>
   );
