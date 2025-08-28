@@ -7,6 +7,7 @@ import {
   MdPerson,
   MdLogout,
   MdAddChart,
+  MdHistory
 } from 'react-icons/md';
 
 const allRoutes = [
@@ -35,6 +36,12 @@ const allRoutes = [
     layout: '/admin',
     icon: <MdBarChart className="h-6 w-6" />,
     path: 'data-tables',
+  },
+  {
+    name: 'Riwayat Transaksi',
+    layout: '/admin',
+    icon: <MdHistory className="h-6 w-6" />,
+    path: 'riwayat-transaksi',
   },
   {
     name: 'Profile',
