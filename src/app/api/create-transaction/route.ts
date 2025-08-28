@@ -18,11 +18,19 @@ const snap = new Midtrans.Snap({
 });
 
 const planMapping: Record<string, string> = {
-    'Standar': '1 Bulan',
+    '1 Bulan': '1 Bulan',
     '3 Bulan': '3 Bulan',
     '6 Bulan': '6 Bulan',
     '1 Tahun': '1 Tahun',
 };
+
+const planDuration: Record<string, number> = {
+    '1 Bulan': 30,       // 1 bulan
+    '3 Bulan': 90,       // 3 bulan
+    '6 Bulan': 180,      // 6 bulan
+    '1 Tahun': 365,      // 1 tahun
+};
+
 
 export async function POST(request: Request) {
     try {
@@ -72,14 +80,19 @@ export async function POST(request: Request) {
 
         const transaction = await snap.createTransaction(parameter);
         const transactionToken = transaction.token;
+        const durationDays = planDuration[planName] || 30; // default 30 hari
+        const endDate = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+
 
         const { error: dbError } = await supabase.from('transactions').insert([
             {
                 user_id: userId,
+                nama: customer_details.first_name + ' ' + customer_details.last_name || '',
                 order_id,
                 plan_name: planName,
                 amount: gross_amount,
-                status: 'created',
+                status: 'Sukses',
+                end_date: endDate,
             },
         ]);
 

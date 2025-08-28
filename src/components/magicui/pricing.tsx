@@ -322,7 +322,7 @@ export default function WasteManagementPricing({
       isTrial: true,
     },
     {
-      name: 'Standar',
+      name: '1 Bulan',
       subHead: '1 Bulan',
       price: 150000,
       duration: '1 bulan',
