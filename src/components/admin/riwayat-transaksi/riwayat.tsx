@@ -79,60 +79,66 @@ function CheckTable() {
     };
 
     const handleDownload = async () => {
-        const content = document.getElementById('pdf-content');
-        if (content) {
-            // Tampilkan konten sementara untuk render
-            content.style.display = 'block';
-            
-            const options = {
-                margin: [10, 10, 10, 10],
-                filename: 'riwayat-transaksi.pdf',
-                image: { 
-                    type: 'jpeg', 
-                    quality: 0.98 
-                },
-                html2canvas: { 
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: '#ffffff',
-                    logging: true,
-                    width: content.scrollWidth,
-                    height: content.scrollHeight
-                },
-                jsPDF: { 
-                    unit: 'mm', 
-                    format: 'a4', 
-                    orientation: 'portrait' 
-                },
-                pagebreak: { 
-                    mode: ['avoid-all', 'css', 'legacy'] 
-                }
-            };
-            
-            try {
-                await html2pdf()
-                    .set(options)
-                    .from(content)
-                    .toPdf()
-                    .get('pdf')
-                    .then(function (pdf) {
-                        // Optional: tambahkan metadata
-                        pdf.setProperties({
-                            title: 'Data Riwayat Transaksi',
-                            creator: 'Your App Name',
-                            author: 'Your App'
-                        });
-                    })
-                    .save();
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-            } finally {
-                // Sembunyikan kembali konten
-                content.style.display = 'none';
-            }
-        }
-    };
+    const content = document.getElementById('pdf-content');
+    if (content) {
+      // Tampilkan konten sementara untuk render
+      content.style.display = 'block';
+
+      // Create a wrapper to center the content
+      const wrapper = document.createElement('div');
+      wrapper.style.display = 'flex';
+      wrapper.style.justifyContent = 'center';
+      wrapper.style.alignItems = 'center';
+      wrapper.style.width = '100%';
+      wrapper.style.height = '100%';
+      wrapper.appendChild(content.cloneNode(true));
+      
+      const options = {
+        margin: [10, 10, 10, 10], // Margin (top, left, bottom, right)
+        filename: 'riwayat-transaksi.pdf',
+        image: {
+          type: 'jpeg',
+          quality: 0.98,
+        },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          logging: true,
+        },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait',
+        },
+        pagebreak: {
+          mode: ['avoid-all', 'css', 'legacy'],
+        },
+      };
+
+      try {
+        await html2pdf()
+          .set(options)
+          .from(wrapper) // Render from the wrapper
+          .toPdf()
+          .get('pdf')
+          .then(function (pdf) {
+            pdf.setProperties({
+              title: 'Data Riwayat Transaksi',
+              creator: 'Admin',
+              author: 'Harita',
+            });
+          })
+          .save();
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+      } finally {
+        // Sembunyikan kembali konten
+        content.style.display = 'none';
+      }
+    }
+  };
 
     // Definisikan header kolom untuk tabel PDF
     const pdfHeaders = [
@@ -411,7 +417,7 @@ function CheckTable() {
                         color: '#666666',
                         margin: '5px 0 0 0'
                     }}>
-                        Generated on {new Date().toLocaleDateString('id-ID')}
+                        Dibuat pada {new Date().toLocaleDateString('id-ID')}
                     </p>
                 </div>
                 
