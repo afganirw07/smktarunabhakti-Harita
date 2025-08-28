@@ -63,33 +63,34 @@ export default function Home() {
   });
 
   // Fungsi untuk mengambil data pengguna
-  const fetchData = async () => {
-    const userId = localStorage.getItem('user_id');
+const fetchData = async () => {
+  const userId = localStorage.getItem('user_id');
 
-    if (userId) {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select(
-          'first_name, point, plan, subscription_start_date, is_claimed',
-        )
-        .eq('id', userId)
-        .single();
-      if (error) {
-        console.error('Error fetching user data:', error);
+  if (userId) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('first_name, point, plan, subscription_start_date, end_date, is_claimed')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching user data:', error);
+    } else {
+      setFirst_Name(data.first_name);
+      setPoin(data.point || 0);
+      setPlan(data.plan || 'Loading...');
+      setIsClaimed(data.is_claimed);
+
+      if (data.end_date) {
+        setSubscriptionEndDate(new Date(data.end_date));
       } else {
-        setFirst_Name(data.first_name);
-        setPoin(data.point || 0);
-        setPlan(data.plan || 'Loading...');
-        setIsClaimed(data.is_claimed);
-
-        const endDate = calculateEndDate(
-          data.subscription_start_date,
-          data.plan,
-        );
+        const endDate = calculateEndDate(data.subscription_start_date, data.plan);
         setSubscriptionEndDate(endDate);
       }
     }
-  };
+  }
+};
+
 
   // Fungsi untuk mengambil data produk
   const fetchProducts = async () => {
