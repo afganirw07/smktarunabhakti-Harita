@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Coins, CoinsIcon } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import ProductCard from 'components/card/cardProduct';
+import Link from 'next/link';
 
 // Configure Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -71,10 +72,19 @@ export default function Toko() {
           </div>
 
           <div>
-            <h1 className='bg-green-700 px-6 py-2 text-white font-semibold font-inter flex gap-1 rounded-full '>
+           <div className="flex items-center gap-2">
+            <h1 className="flex gap-1 rounded-xl bg-green-700 px-6 py-2 font-inter font-semibold text-white ">
               <Coins />
               <span>{poin}</span>
             </h1>
+
+            <Link href={'/user/toko/riwayat'}>           
+            <button className="rounded-xl bg-green-100 px-4 py-2 font-nunito font-bold text-green-700 transition-all duration-200 ease-out hover:bg-green-700 hover:text-white">
+              Riwayat Transaksi
+            </button>
+            </Link>
+ 
+          </div>
           </div>
         </div>
 

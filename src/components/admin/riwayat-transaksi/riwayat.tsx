@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CardMenu from 'components/card/CardMenu';
 import Card from 'components/card';
+import html2pdf from 'html2pdf.js';
 import { BsCheckCircleFill, BsXCircleFill } from 'react-icons/bs';
 import { createClient } from '@supabase/supabase-js';
 
@@ -77,6 +78,74 @@ function CheckTable() {
         });
     };
 
+    const handleDownload = async () => {
+        const content = document.getElementById('pdf-content');
+        if (content) {
+            // Tampilkan konten sementara untuk render
+            content.style.display = 'block';
+            
+            const options = {
+                margin: [10, 10, 10, 10],
+                filename: 'riwayat-transaksi.pdf',
+                image: { 
+                    type: 'jpeg', 
+                    quality: 0.98 
+                },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    logging: true,
+                    width: content.scrollWidth,
+                    height: content.scrollHeight
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                },
+                pagebreak: { 
+                    mode: ['avoid-all', 'css', 'legacy'] 
+                }
+            };
+            
+            try {
+                await html2pdf()
+                    .set(options)
+                    .from(content)
+                    .toPdf()
+                    .get('pdf')
+                    .then(function (pdf) {
+                        // Optional: tambahkan metadata
+                        pdf.setProperties({
+                            title: 'Data Riwayat Transaksi',
+                            creator: 'Your App Name',
+                            author: 'Your App'
+                        });
+                    })
+                    .save();
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+            } finally {
+                // Sembunyikan kembali konten
+                content.style.display = 'none';
+            }
+        }
+    };
+
+    // Definisikan header kolom untuk tabel PDF
+    const pdfHeaders = [
+        { key: 'id', title: 'ID' },
+        { key: 'user_id', title: 'User ID' },
+        { key: 'order_id', title: 'Order ID' },
+        { key: 'plan_name', title: 'Langganan' },
+        { key: 'amount', title: 'Harga' },
+        { key: 'status', title: 'Status' },
+        { key: 'created_at', title: 'Tanggal' },
+    ];
+    
+    // Pastikan `columns` yang ini tidak digunakan untuk tabel HTML di bawah, tetapi untuk rendering `useReactTable`
     const columns = [
         columnHelper.accessor('id', {
             id: 'id',
@@ -251,9 +320,14 @@ function CheckTable() {
                 <div className="text-xl font-bold text-navy-700 dark:text-white">
                     Data Riwayat Transaksi
                 </div>
+                <button
+                    onClick={handleDownload}
+                    className='bg-[#294B29] hover:bg-green-800 active:bg-[#294B29] text-white font-bold py-2 px-4 rounded'
+                >
+                    Download Data
+                </button>
             </header>
             
-            {/* Tampilkan tabel utama yang dapat digulir untuk UI */}
             <div className="scrollbar-thin mt-4 w-full" style={{ maxHeight: '500px', overflowY: 'scroll' }}>
                 <table className="w-full min-w-[700px] table-auto">
                     <thead>
@@ -309,30 +383,78 @@ function CheckTable() {
                     </tbody>
                 </table>
             </div>
-
-            {/* Tambahkan tabel tersembunyi yang akan digunakan untuk PDF */}
-            <div id="pdf-content" style={{ display: 'none' }}>
-                <h1 style={{ fontSize: '24px', fontWeight: 'bold' }}>Data Riwayat Transaksi</h1>
-                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+            
+            <div id="pdf-content" style={{ 
+                display: 'none',
+                backgroundColor: '#ffffff',
+                padding: '20px',
+                fontFamily: 'Arial, sans-serif',
+                color: '#000000',
+                minHeight: '100px'
+            }}>
+                <div style={{ 
+                    textAlign: 'center', 
+                    marginBottom: '30px',
+                    borderBottom: '2px solid #333',
+                    paddingBottom: '15px'
+                }}>
+                    <h1 style={{ 
+                        fontSize: '28px', 
+                        fontWeight: 'bold',
+                        margin: '0',
+                        color: '#333333'
+                    }}>
+                        Data Riwayat Transaksi
+                    </h1>
+                    <p style={{ 
+                        fontSize: '14px', 
+                        color: '#666666',
+                        margin: '5px 0 0 0'
+                    }}>
+                        Generated on {new Date().toLocaleDateString('id-ID')}
+                    </p>
+                </div>
+                
+                <table style={{ 
+                    width: '100%', 
+                    borderCollapse: 'collapse', 
+                    marginTop: '20px',
+                    backgroundColor: '#ffffff'
+                }}>
                     <thead>
-                        <tr style={{ backgroundColor: '#f2f2f2' }}>
-                            {columns.map(col => (
-                                <th key={col.id} style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>
-                                    {typeof col.header === 'function' ? col.header({ column: col }) : col.header}
+                        <tr style={{ backgroundColor: '#f8f9fa' }}>
+                            {pdfHeaders.map(header => (
+                                <th key={header.key} style={{ 
+                                    border: '2px solid #333333', 
+                                    padding: '12px 8px', 
+                                    textAlign: 'left',
+                                    fontSize: '12px',
+                                    fontWeight: 'bold',
+                                    color: '#333333',
+                                    backgroundColor: '#e9ecef'
+                                }}>
+                                    {header.title}
                                 </th>
                             ))}
                         </tr>
                     </thead>
                     <tbody>
-                        {data.map(row => (
-                            <tr key={row.id}>
-                                {columns.map(col => (
-                                    <td key={col.id} style={{ border: '1px solid #ddd', padding: '8px' }}>
-                                        {/* Tampilkan data lengkap di sini, bukan versi terpotong */}
-                                        {col.id === 'id' ? row.id :
-                                         col.id === 'user_id' ? row.user_id :
-                                         col.id === 'created_at' ? formatDate(row.created_at) :
-                                         row[col.id]
+                        {data.map((row, index) => (
+                            <tr key={row.id} style={{ 
+                                backgroundColor: index % 2 === 0 ? '#ffffff' : '#f8f9fa'
+                            }}>
+                                {pdfHeaders.map(header => (
+                                    <td key={header.key} style={{ 
+                                        border: '1px solid #333333', 
+                                        padding: '10px 8px',
+                                        fontSize: '11px',
+                                        color: '#333333',
+                                        wordWrap: 'break-word',
+                                        maxWidth: '150px'
+                                    }}>
+                                        {header.key === 'created_at' 
+                                            ? formatDate(row[header.key]) 
+                                            : (row[header.key] || '-')
                                         }
                                     </td>
                                 ))}
@@ -340,8 +462,18 @@ function CheckTable() {
                         ))}
                     </tbody>
                 </table>
+                
+                {data.length === 0 && (
+                    <div style={{
+                        textAlign: 'center',
+                        padding: '40px',
+                        fontSize: '16px',
+                        color: '#666666'
+                    }}>
+                        Tidak ada data transaksi
+                    </div>
+                )}
             </div>
-
         </Card>
     );
 }
