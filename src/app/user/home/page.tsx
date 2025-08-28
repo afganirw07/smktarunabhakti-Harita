@@ -227,9 +227,11 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-4">
               <h2 className="text-2xl font-bold text-black">13x</h2>
+              <Link href={"/user/profile/riwayat"}>
               <button className="rounded-full bg-green-700 px-2 py-1 font-nunito text-xs font-bold text-white transition-colors duration-200 ease-out hover:bg-green-600 ">
                 Lihat riwayat
               </button>
+              </Link>
             </div>
           </div>
 

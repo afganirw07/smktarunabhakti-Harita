@@ -78,7 +78,7 @@ export default function Toko() {
               <span>{poin}</span>
             </h1>
 
-            <Link href={'/user/toko/riwayat'}>           
+            <Link href={'/user/profile/riwayat'}>           
             <button className="rounded-xl bg-green-100 px-4 py-2 font-nunito font-bold text-green-700 transition-all duration-200 ease-out hover:bg-green-700 hover:text-white">
               Riwayat Transaksi
             </button>

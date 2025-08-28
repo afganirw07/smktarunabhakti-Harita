@@ -7,6 +7,7 @@ import Input from '../form/input/InputField';
 import Label from '../form/Label';
 import Image from 'next/image';
 import { createClient } from '@supabase/supabase-js';
+import Link from 'next/link';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -212,71 +213,84 @@ export default function UserMetaCard() {
 
   return (
     <>
-      <div className="rounded-2xl border border-gray-200 p-5 lg:p-6">
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex w-full flex-col items-center gap-6 xl:flex-row">
-            <div className="h-20 w-20 overflow-hidden rounded-full border border-gray-200">
-              <Image
-                width={80}
-                height={80}
-                src="/images/user/owner.jpg"
-                alt="user"
-              />
-            </div>
-            <div className="order-3 xl:order-2">
-              <h4 className="mb-2 text-center text-lg font-bold text-green-700 xl:text-left">
-                {userName}
-              </h4>
-              <div className="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
-                <p className="text-sm text-green-500">
-                  {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)}
-                </p>
-                <div className="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block"></div>
-                <p className="text-sm text-green-500">
-                  {userCity !== 'N/A' ? userCity : ''}
-                  {userCity !== 'N/A' && userAddress !== 'N/A' ? ', ' : ''}
-                  {userAddress !== 'N/A' ? userAddress : ''}
-                </p>
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={handleModalOpen}
-            disabled={isLoading}
-            className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-green-800 px-4 py-3 text-sm font-medium text-white transition-colors duration-200 ease-out hover:bg-green-600 hover:text-green-200 disabled:opacity-50 disabled:cursor-not-allowed lg:inline-flex lg:w-auto"
-          >
-            <svg
-              className="fill-current"
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="white"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z"
-                fill=""
-              />
-            </svg>
-            {isLoading ? 'Loading...' : 'Edit'}
-          </button>
-        </div>
-        
-        {/* Error message untuk fetch data */}
-        {error && !isOpen && (
-          <div className="mt-4 rounded-lg bg-red-50 border border-red-200 p-3">
-            <p className="text-sm text-red-600">{error}</p>
-            <button
-              onClick={getUserData}
-              className="mt-2 text-sm text-red-700 hover:text-red-800 underline"
-            >
-              Coba lagi
-            </button>
-          </div>
-        )}
+      import Link from "next/link";
+import Image from "next/image";
+
+<div className="rounded-2xl border border-gray-200 p-5 lg:p-6">
+  <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+    <div className="flex w-full flex-col items-center gap-6 xl:flex-row">
+      <div className="h-20 w-20 overflow-hidden rounded-full border border-gray-200">
+        <Image
+          width={80}
+          height={80}
+          src="/images/user/owner.jpg"
+          alt="user"
+        />
       </div>
+      <div className="order-3 xl:order-2">
+        <h4 className="mb-2 text-center text-lg font-bold text-green-700 xl:text-left">
+          {userName}
+        </h4>
+        <div className="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
+          <p className="text-sm text-green-500">
+            {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)}
+          </p>
+          <div className="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block"></div>
+          <p className="text-sm text-green-500">
+            {userCity !== "N/A" ? userCity : ""}
+            {userCity !== "N/A" && userAddress !== "N/A" ? ", " : ""}
+            {userAddress !== "N/A" ? userAddress : ""}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {/* Action Buttons */}
+    <div className="flex lg:w-[400px] lg:justify-end flex-col gap-3 lg:flex-row">
+         <Link
+        href="/user/profile/riwayat"
+        className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-green-800 transition-colors duration-200 ease-out hover:bg-green-100 lg:w-auto"
+      >
+         Riwayat transaksi
+      </Link>
+      <button
+        onClick={handleModalOpen}
+        disabled={isLoading}
+        className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-green-800 px-4 py-3 text-sm font-medium text-white transition-colors duration-200 ease-out hover:bg-green-600 hover:text-green-200 disabled:opacity-50 disabled:cursor-not-allowed lg:w-auto"
+      >
+        <svg
+          className="fill-current"
+          width="18"
+          height="18"
+          viewBox="0 0 18 18"
+          fill="white"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z"
+          />
+        </svg>
+        {isLoading ? "Loading..." : "Edit"}
+      </button>
+    </div>
+  </div>
+
+  {/* Error message untuk fetch data */}
+  {error && !isOpen && (
+    <div className="mt-4 rounded-lg bg-red-50 border border-red-200 p-3">
+      <p className="text-sm text-red-600">{error}</p>
+      <button
+        onClick={getUserData}
+        className="mt-2 text-sm text-red-700 hover:text-red-800 underline"
+      >
+        Coba lagi
+      </button>
+    </div>
+  )}
+</div>
+
 
       <Modal isOpen={isOpen} onClose={handleModalClose} className="m-4 max-w-[700px]">
         <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 lg:p-11">
