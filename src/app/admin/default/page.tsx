@@ -28,6 +28,7 @@ const supabase =
 const Dashboard = () => {
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalKaryawan, setTotalkaryawan] = useState(0);
+  const [Layanan, SetLayanan] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const fetchTotalUsers = async () => {
@@ -77,10 +78,52 @@ const Dashboard = () => {
     }
   };
 
+  const fetchTotalLayanan = async () => {
+    try {
+      if (!supabase) {
+        console.error('Supabase client not initialized');
+        return;
+      }
+
+      const { count: countAset, error: errorAset } = await supabase
+        .from('riwayat_aset')
+        .select('id', { count: 'exact', head: true });
+      if (errorAset) throw errorAset;
+
+      const { count: countTrx, error: errorTrx } = await supabase
+        .from('transactions')
+        .select('id', { count: 'exact', head: true });
+      if (errorTrx) throw errorTrx;
+
+      const { count: countTukar, error: errorTukar } = await supabase
+        .from('tukar_sampah')
+        .select('id', { count: 'exact', head: true });
+      if (errorTukar) throw errorTukar;
+
+      const { count: countReports, error: errorReports } = await supabase
+        .from('reports')
+        .select('id', { count: 'exact', head: true });
+      if (errorReports) throw errorReports;
+
+      const total =
+        (countAset || 0) +
+        (countTrx || 0) +
+        (countTukar || 0) +
+        (countReports || 0);
+
+      SetLayanan(total);
+    } catch (error) {
+      console.error('Error fetching total layanan:', error);
+    }
+  };
 
   useEffect(() => {
     fetchTotalKaryawan();
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    fetchTotalLayanan();
+  }, []);
 
   return (
     <div>
@@ -109,7 +152,7 @@ const Dashboard = () => {
         <Widget
           icon={<MdBarChart className="h-7 w-7" />}
           title={'Layanan'}
-          subtitle={'942'}
+          subtitle={loading ? 'Memuat...' : String(Layanan)}
         />
         <Widget
           icon={<MdBarChart className="h-6 w-6" />}
