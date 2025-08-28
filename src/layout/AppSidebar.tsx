@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
@@ -128,13 +130,13 @@ const AppSidebar: React.FC = () => {
           {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
             <div
               ref={(el) => {
-                subMenuRefs.current[${menuType}-${index}] = el;
+                subMenuRefs.current[`${menuType}-${index}`] = el;
               }}
               className="overflow-hidden transition-all duration-300"
               style={{
                 height:
                   openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? ${subMenuHeight[${menuType}-${index}]}px
+                    ? `${subMenuHeight[`${menuType}-${index}`]}px`
                     : "0px",
               }}
             >
@@ -225,7 +227,7 @@ const AppSidebar: React.FC = () => {
   useEffect(() => {
     // Set the height of the submenu items when the submenu is opened
     if (openSubmenu !== null) {
-      const key = ${openSubmenu.type}-${openSubmenu.index};
+      const key = `${openSubmenu.type}-${openSubmenu.index}`;
       if (subMenuRefs.current[key]) {
         setSubMenuHeight((prevHeights) => ({
           ...prevHeights,
@@ -281,10 +283,10 @@ const AppSidebar: React.FC = () => {
             </>
           ) : (
             <Image
-              src="/images/logo/logo.png"
+              src="/images/logo/Logo.png"
               alt="Logo"
-              width={32}
-              height={32}
+              width={42}
+              height={42}
             />
           )}
         </Link>
@@ -295,7 +297,7 @@ const AppSidebar: React.FC = () => {
             <div>
               {renderMenuItems(navItems, "main")}
             </div>
-          </div>
+          </div>  
         </nav>
       </div>
     </aside>
@@ -303,3 +305,5 @@ const AppSidebar: React.FC = () => {
 };
 
 export default AppSidebar;
+
+

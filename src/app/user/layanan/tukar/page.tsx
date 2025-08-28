@@ -2,12 +2,13 @@
 
 import {
   MapPin,
-  MapPinCheck,
   User,
   Phone,
   Mail,
   Scale,
   ChevronDown,
+  Check,
+  Star,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -22,7 +23,8 @@ interface FormData {
 interface LokasiPos {
   id: string;
   nama: string;
-  jarak: string;
+  rating: string;
+  alamat: string;
 }
 
 export default function TukarSampah() {
@@ -35,12 +37,13 @@ export default function TukarSampah() {
   });
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-const [selectedBarang, setSelectedBarang] = useState<string>(''); 
+  const [selectedBarang, setSelectedBarang] = useState<string>(''); 
 
   const lokasiPosList: LokasiPos[] = [
-    { id: '1', nama: 'Harita Pos Taruna Bhakti', jarak: '0.8 Km' },
-    { id: '2', nama: 'Harita Pos Pekapuran', jarak: '1.6 Km' },
-    { id: '3', nama: 'Harita Pos Merdeka', jarak: '3.4 Km' },
+    { id: '1', nama: 'Harita Pos Taruna Bhakti', rating: '5.0', alamat: 'Jl. Taruna Bhakti No. 15, Bekasi Selatan' },
+    { id: '2', nama: 'Harita Pos Pekapuran', rating: '5.0', alamat: 'Jl. Pekapuran Raya No. 89, Bekasi Utara' },
+    { id: '3', nama: 'Harita Pos Merdeka', rating: '5.0', alamat: 'Jl. Merdeka No. 123, Bekasi Barat' },
+    { id: '4', nama: 'Harita Pos Posan', rating: '5.0', alamat: 'Jl. Posan Raya No. 456, Bekasi Timur' },
   ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,16 +62,15 @@ const [selectedBarang, setSelectedBarang] = useState<string>('');
     setIsDropdownOpen(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     console.log('Form Data:', formData);
     // Handle submit logic here
     alert(
-      `Form submitted!\nNama: ${formData.namaLengkap}\nHP: ${formData.nomorHandphone}\nEmail: ${formData.email}\nMassa: ${formData.massaSampah} Kg\nPos: ${formData.haritaPos}`,
+      `Form submitted!\nNama: ${formData.namaLengkap}\nHP: ${formData.nomorHandphone}\nEmail: ${formData.email}\nMassa: ${formData.massaSampah} Kg\nPos: ${formData.haritaPos}`
     );
   };
 
- const isFormValid =
+  const isFormValid =
     formData.namaLengkap &&
     formData.nomorHandphone &&
     formData.email &&
@@ -79,14 +81,9 @@ const [selectedBarang, setSelectedBarang] = useState<string>('');
   return (
     <>
       <section className="min-h-screen w-full py-8">
-
-        <div>
-            
-        </div>
-
-
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5 ">
-          <div className="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-lg lg:col-span-3 lg:row-span-1 ">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
+          {/* Lokasi pos terdekat */}
+          <div className="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-lg lg:col-span-3 lg:row-span-1">
             <h1 className="flex items-center gap-2 font-inter text-2xl font-bold text-black">
               <span className="text-green-700">
                 <MapPin className="h-auto w-8" />
@@ -94,106 +91,56 @@ const [selectedBarang, setSelectedBarang] = useState<string>('');
               Lokasi pos terdekat
             </h1>
 
-            <div className="flex h-[300px] w-full items-center justify-center rounded-2xl bg-green-100">
-              <h1 className="flex gap-2 font-inter text-xl font-bold text-black">
-                <span>
-                  <MapPin className="h-auto w-8 text-green-700" />
-                </span>
-                Map Dummy
-              </h1>
-            </div>
-
-            
-
-            <div className="flex flex-col gap-4 ">
-              {/* Lokasi 1 */}
-              <div className="h-auto w-full">
-                <div>
-                  <div className="flex justify-between border-b-2 border-black/10 p-2">
-                    <h1 className="font-inter text-lg font-semibold text-green-800">
-                      Harita Pos Taruna Bhakti
-                    </h1>
-                    <p className="flex gap-1 font-nunito text-base font-bold text-red-600">
-                      0.8 Km
-                      <span>
-                        <MapPinCheck
-                          className="h-auto w-5 text-green-800"
-                          strokeWidth={2}
-                        />
-                      </span>
+            <div className="flex flex-col gap-4">
+              {lokasiPosList.map((lokasi) => (
+                <div key={lokasi.id} className="flex items-center gap-4 rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow duration-200">
+                  <div className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-8 h-8 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-inter text-lg font-semibold text-green-800 mb-1">
+                      {lokasi.nama}
+                    </h3>
+                    <p className="font-nunito text-sm text-gray-600">
+                      {lokasi.alamat}
                     </p>
                   </div>
-                </div>
-              </div>
-
-              {/* Lokasi 2 */}
-              <div className="h-auto w-full">
-                <div>
-                  <div className="flex justify-between border-b-2 border-black/10 p-2">
-                    <h1 className="font-inter text-lg font-semibold text-green-800">
-                      Harita Pos Pekapuran
-                    </h1>
-                    <p className="flex gap-1 font-nunito text-base font-bold text-red-600">
-                      1.6 Km
-                      <span>
-                        <MapPinCheck
-                          className="h-auto w-5 text-green-800"
-                          strokeWidth={2}
-                        />
-                      </span>
-                    </p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                      <p className="font-nunito text-base font-bold text-gray-800">{lokasi.rating}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-
-              {/* Lokasi 3 */}
-              <div className="h-auto w-full">
-                <div>
-                  <div className="flex justify-between border-b-2 border-black/10 p-2">
-                    <h1 className="font-inter text-lg font-semibold text-green-800">
-                      Harita Pos Merdeka
-                    </h1>
-                    <p className="flex gap-1 font-nunito text-base font-bold text-red-600">
-                      3.4 Km
-                      <span>
-                        <MapPinCheck
-                          className="h-auto w-5 text-green-800"
-                          strokeWidth={2}
-                        />
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
           
           {/* Barang yang ditukar */}
-        <div className="rounded-2xl bg-white p-6 shadow-lg lg:col-span-3 lg:row-start-2 lg:row-span-3">
-          <h1 className="text-lg font-bold font-inter text-center">
-            Pilih Barang yang ditukar
-          </h1>
-          <div className="mt-4 grid w-full grid-cols-3 gap-4">
-            {['Pupuk', 'Bricket', 'Batako'].map((barang) => (
-              <button
-                key={barang}
-                type="button"
-                onClick={() => setSelectedBarang(barang)}
-                className={`col-span-1 h-[100px] rounded-xl flex justify-center items-center font-bold text-2xl transition-all ${
-                  selectedBarang === barang
-                    ? 'bg-green-700 text-white shadow-lg scale-105'
-                    : 'bg-blueSecondary text-white hover:bg-green-600'
-                }`}
-              >
-                {barang}
-              </button>
-            ))}
+          <div className="rounded-2xl bg-white p-6 shadow-lg lg:col-span-3 lg:row-start-2 lg:row-span-3">
+            <h1 className="text-lg font-bold font-inter text-center">
+              Pilih Barang yang ditukar
+            </h1>
+            <div className="mt-4 grid w-full grid-cols-3 gap-4">
+              {['Pupuk', 'Bricket', 'Batako'].map((barang) => (
+                <button
+                  key={barang}
+                  type="button"
+                  onClick={() => setSelectedBarang(barang)}
+                  className={`col-span-1 h-[100px] rounded-xl flex justify-center items-center font-bold text-2xl transition-all ${
+                    selectedBarang === barang
+                      ? 'bg-green-700 text-white shadow-lg scale-105'
+                      : 'bg-blue-500 text-white hover:bg-green-600'
+                  }`}
+                >
+                  {barang}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
           {/* Form Penukaran */}
-          <div className="rounded-2xl bg-white p-6 shadow-lg lg:col-span-2  lg:row-span-4">
+          <div className="rounded-2xl bg-white p-6 shadow-lg lg:col-span-2 lg:row-span-4">
             <div className="mb-6 text-center">
               <h2 className="mb-2 font-inter text-2xl font-bold text-black">
                 Form Penukaran Sampah
@@ -203,7 +150,7 @@ const [selectedBarang, setSelectedBarang] = useState<string>('');
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-6">
               {/* Nama Lengkap */}
               <div>
                 <label className="mb-2 block font-nunito font-semibold text-green-700">
@@ -219,7 +166,6 @@ const [selectedBarang, setSelectedBarang] = useState<string>('');
                   className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 
                    font-nunito text-black placeholder-gray-400 
                    transition-all focus:border-green-500 focus:ring-2 focus:ring-green-500"
-                  required
                 />
               </div>
 
@@ -238,7 +184,6 @@ const [selectedBarang, setSelectedBarang] = useState<string>('');
                   className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 
                    font-nunito text-black placeholder-gray-400 
                    transition-all focus:border-green-500 focus:ring-2 focus:ring-green-500"
-                  required
                 />
               </div>
 
@@ -257,7 +202,6 @@ const [selectedBarang, setSelectedBarang] = useState<string>('');
                   className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 
                    font-nunito text-black placeholder-gray-400 
                    transition-all focus:border-green-500 focus:ring-2 focus:ring-green-500"
-                  required
                 />
               </div>
 
@@ -278,7 +222,6 @@ const [selectedBarang, setSelectedBarang] = useState<string>('');
                   className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 
                    font-nunito text-black placeholder-gray-400 
                    transition-all focus:border-green-500 focus:ring-2 focus:ring-green-500"
-                  required
                 />
               </div>
 
@@ -323,9 +266,12 @@ const [selectedBarang, setSelectedBarang] = useState<string>('');
                           <span className="font-nunito font-medium text-gray-800">
                             {lokasi.nama}
                           </span>
-                          <span className="font-nunito text-sm font-semibold text-red-600">
-                            {lokasi.jarak}
-                          </span>
+                          <div className="flex items-center gap-1">
+                            <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                            <span className="font-nunito text-sm font-semibold text-gray-800">
+                              {lokasi.rating}
+                            </span>
+                          </div>
                         </button>
                       ))}
                     </div>
@@ -335,9 +281,10 @@ const [selectedBarang, setSelectedBarang] = useState<string>('');
 
               {/* Submit Button */}
               <button
-                type="submit"
+                type="button"
+                onClick={handleSubmit}
                 disabled={!isFormValid}
-                className={`w-full transform rounded-xl py-4 font-nunito text-lg font-bold transition-all    ${
+                className={`w-full transform rounded-xl py-4 font-nunito text-lg font-bold transition-all ${
                   isFormValid
                     ? 'bg-green-700 text-white shadow-lg hover:bg-green-600 hover:shadow-xl'
                     : 'cursor-not-allowed bg-gray-200 text-gray-400'
@@ -353,7 +300,7 @@ const [selectedBarang, setSelectedBarang] = useState<string>('');
                   yang lebih bersih
                 </p>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </section>

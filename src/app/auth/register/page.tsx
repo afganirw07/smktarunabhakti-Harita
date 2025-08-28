@@ -346,7 +346,7 @@
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.5, delay: 2 }}
-                      className="block pt-2 text-sm lg:hidden"
+                      className=" pt-2 text-sm "
                     >
                       <span className="font-nunito">Sudah punya akun? </span>
                       <motion.span whileHover={{ scale: 1.05 }} className="inline-block">
