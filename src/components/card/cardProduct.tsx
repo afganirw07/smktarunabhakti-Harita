@@ -125,6 +125,7 @@ export default function ProductCard({
 
       // 6. Tambahkan entri ke tabel riwayat_aset
       const { error: riwayatError } = await supabase.from('riwayat_aset').insert({
+        user_id : userId,
         nama_penukar: userData.first_name,
         barang_ditukar: title,
         stok: quantity,

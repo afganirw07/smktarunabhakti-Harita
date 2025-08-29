@@ -120,7 +120,7 @@ export default function Riwayat() {
                   timeStyle: "short",
                 })}
               </span>
-              <span className="text-xs text-gray-400">Stok: {aset.stok}</span>
+              <span className="text-xs text-gray-400">Jumlah: {aset.stok}</span>
             </div>
           </div>
         ))
