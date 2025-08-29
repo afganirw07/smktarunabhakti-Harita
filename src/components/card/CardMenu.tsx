@@ -34,12 +34,7 @@ function CardMenu(props: { transparent?: boolean; vertical?: boolean }) {
       animation={'origin-top-right transition-all duration-300 ease-in-out'}
       classNames={`${transparent ? 'top-8' : 'top-11'} right-0 w-max`}
     >
-      {/* Tambahkan children di sini untuk mengatasi error */}
-      <div className={`${open ? 'block' : 'hidden'} text-navy-700 dark:text-white`}>
-        {/* Anda bisa mengganti ini dengan konten menu yang Anda inginkan */}
-        <p className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">Option 1</p>
-        <p className="p-2 hover:bg-gray-100 rounded-lg cursor-pointer">Option 2</p>
-      </div>
+      
     </Dropdown>
   );
 }

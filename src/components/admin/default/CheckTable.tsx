@@ -13,31 +13,29 @@ import {
 } from '@tanstack/react-table';
 
 type RowObj = {
-  name: [string, boolean];
-  progress: string;
-  quantity: number;
-  date: string;
+  name: string;      // ID layanan (B, S, A, dst)
+  progress: string;  // Nama pengguna (Plastik, Kertas, dll)
+  layanan: string; 
+  date: string;      // Tanggal
 };
 
-function CheckTable(props: { tableData: any }) {
+const columnHelper = createColumnHelper<RowObj>();
+
+function CheckTable(props: { tableData: RowObj[] }) {
   const { tableData } = props;
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  let defaultData = tableData;
+  const [data] = React.useState(() => [...tableData]);
+
   const columns = [
     columnHelper.accessor('name', {
       id: 'name',
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">ID layanan</p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">Nama</p>
       ),
       cell: (info: any) => (
         <div className="flex items-center">
-          <Checkbox
-            defaultChecked={info.getValue()[1]}
-            color="indigo"
-            me="10px"
-          />
           <p className="ml-3 text-sm font-bold text-navy-700 dark:text-white">
-            {info.getValue()[0]}
+            {info.getValue()}
           </p>
         </div>
       ),
@@ -46,7 +44,7 @@ function CheckTable(props: { tableData: any }) {
       id: 'progress',
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">
-          Nama pengguna
+         Jenis
         </p>
       ),
       cell: (info) => (
@@ -55,8 +53,8 @@ function CheckTable(props: { tableData: any }) {
         </p>
       ),
     }),
-    columnHelper.accessor('quantity', {
-      id: 'quantity',
+    columnHelper.accessor('layanan', {
+      id: 'layananStatus Layanan',
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">
           Tipe layanan
@@ -79,26 +77,24 @@ function CheckTable(props: { tableData: any }) {
         </p>
       ),
     }),
-  ]; // eslint-disable-next-line
-  const [data, setData] = React.useState(() => [...defaultData]);
+  ];
+
   const table = useReactTable({
     data,
     columns,
-    state: {
-      sorting,
-    },
+    state: { sorting },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     debugTable: true,
   });
+
   return (
     <Card extra={'w-full h-full sm:overflow-auto px-6'}>
       <header className="relative flex items-center justify-between pt-4">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-         Tabel Permintaan Layanan
+          Tabel Permintaan Layanan
         </div>
-
         <CardMenu />
       </header>
 
@@ -107,27 +103,25 @@ function CheckTable(props: { tableData: any }) {
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="!border-px !border-gray-400">
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <th
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      onClick={header.column.getToggleSortingHandler()}
-                      className="cursor-pointer border-b-[1px] border-gray-200 pt-4 pb-2 pr-4 text-start"
-                    >
-                      <div className="items-center justify-between text-xs text-gray-200">
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                        {{
-                          asc: '',
-                          desc: '',
-                        }[header.column.getIsSorted() as string] ?? null}
-                      </div>
-                    </th>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    onClick={header.column.getToggleSortingHandler()}
+                    className="cursor-pointer border-b-[1px] border-gray-200 pt-4 pb-2 pr-4 text-start"
+                  >
+                    <div className="items-center justify-between text-xs text-gray-200">
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                      {{
+                        asc: '',
+                        desc: '',
+                      }[header.column.getIsSorted() as string] ?? null}
+                    </div>
+                  </th>
+                ))}
               </tr>
             ))}
           </thead>
@@ -135,25 +129,21 @@ function CheckTable(props: { tableData: any }) {
             {table
               .getRowModel()
               .rows.slice(0, 5)
-              .map((row) => {
-                return (
-                  <tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <td
-                          key={cell.id}
-                          className="min-w-[150px] border-white/0 py-3  pr-4"
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
+              .map((row) => (
+                <tr key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <td
+                      key={cell.id}
+                      className="min-w-[150px] border-white/0 py-3 pr-4"
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
@@ -162,4 +152,3 @@ function CheckTable(props: { tableData: any }) {
 }
 
 export default CheckTable;
-const columnHelper = createColumnHelper<RowObj>();
