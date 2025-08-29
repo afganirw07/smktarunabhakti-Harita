@@ -13,7 +13,7 @@ const Navbar = () => {
 
     return(
         <>
-        <nav className="lg:w-auto w-[95%] md:w-[95%]  bg-white/85 backdrop-blur-sm text-black md:px-12 px-8 py-2 flex items-center lg:justify-center justify-between  lg:gap-16 gap-4 drop-shadow-md rounded-full fixed top-6 z-50">
+        <nav className="scroll-smooth lg:w-auto w-[95%] md:w-[95%]  bg-white/85 backdrop-blur-sm text-black md:px-12 px-8 py-2 flex items-center lg:justify-center justify-between  lg:gap-16 gap-4 drop-shadow-md rounded-full fixed top-6 z-50">
             <div className="font-black text-2xl text-green-800 font-family-inter flex ">
                 HARITA
             </div>
@@ -21,21 +21,29 @@ const Navbar = () => {
             {/* Desktop Navigation */}
             <div className="nav items-center justify-center md:flex hidden">
                 <ul className="flex gap-10">
-                    <li className="relative group cursor-pointer text-lg font-family-nunito">
+                    <li className="relative group cursor-pointer text-lg font-family-nunito" >
+                        <a href="#beranda">
                         Beranda
                         <div className="bg-green-600 h-[3px] w-0 group-hover:w-full transition-all duration-300 absolute left-0"></div>
+                        </a>
                     </li>
                     <li className="relative group cursor-pointer text-lg font-family-nunito">
+                        <a href="#tentang">
                         Tentang
                         <div className="bg-green-600 h-[3px] w-0 group-hover:w-full transition-all duration-300 absolute left-0"></div>
+                        </a>
                     </li>
                     <li className="relative group cursor-pointer text-lg font-family-nunito">
+                        <a href="#layanan">
                         Layanan
                         <div className="bg-green-600 h-[3px] w-0 group-hover:w-full transition-all duration-300 absolute left-0"></div>
+                        </a>
                     </li>
                     <li className="relative group cursor-pointer text-lg font-family-nunito">
+                        <a href="#testimoni">
                         Testimoni
                         <div className="bg-green-600 h-[3px] w-0 group-hover:w-full transition-all duration-300 absolute left-0"></div>
+                        </a>
                     </li>
                 </ul>
             </div>

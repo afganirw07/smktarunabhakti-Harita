@@ -213,9 +213,6 @@ export default function UserMetaCard() {
 
   return (
     <>
-      import Link from "next/link";
-import Image from "next/image";
-
 <div className="rounded-2xl border border-gray-200 p-5 lg:p-6">
   <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
     <div className="flex w-full flex-col items-center gap-6 xl:flex-row">
