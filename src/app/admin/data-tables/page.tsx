@@ -4,6 +4,7 @@ import DevelopmentTable from 'components/admin/data-tables/DevelopmentTable';
 import ColumnsTable from 'components/admin/data-tables/ColumnsTable';
 import ComplexTable from 'components/admin/data-tables/ComplexTable';
 import HistoryCard from 'components/admin/data-tables/historyPenukaran'
+import DataLayanan from 'components/admin/data-tables/DataLayanan'
 
 const Tables = () => {
   return (
@@ -21,6 +22,7 @@ const Tables = () => {
 
       <div className="mt-5 grid h-full grid-cols-1 gap-5 md:grid-cols-2">
         <HistoryCard />
+        <DataLayanan />
       </div>
     </div>
   );
