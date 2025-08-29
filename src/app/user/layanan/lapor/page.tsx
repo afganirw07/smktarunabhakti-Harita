@@ -232,7 +232,7 @@ export default function LaporSampah() {
                                     name="deskripsi"
                                     value={formData.deskripsi}
                                     onChange={handleInputChange}
-                                    rows="4"
+                                    rows={4}
                                     className="w-full px-4 py-2 font-nunito border border-green-300 rounded-lg focus:outline-none focus:border-green-500"
                                     placeholder="Deskripsi keluhan sampahnya (contoh: Tumpukan sampah plastik dan organik di dekat selokan yang menyebabkan bau tidak sedap)"
                                 ></textarea>

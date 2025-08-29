@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           strategy="beforeInteractive"
         />
       </head>
-      <body id="root" className={`${inter.variable} ${nunito.variable}`}>
+      <body id="root" className={`${inter.variable} ${nunito.variable} scroll-smooth `}>
         <AppWrappers>{children}</AppWrappers>
       </body>
     </html>

@@ -16,6 +16,7 @@ import Magnet from 'components/magicui/magnet';
 import Pricing from 'components/magicui/pricing';
 import { AnimatedTesti } from 'components/landingpage/testimonial/testi';
 import Footer from '../../components/landingpage/footer/footer';
+import Link from 'next/link';
 
 export default function landingPage() {
 
@@ -39,7 +40,7 @@ export default function landingPage() {
         <Navbar />
 
         <FadeAnimation direction='in'>
-        <div className="heading mt-10 flex flex-col items-center justify-center gap-2">
+        <div id='beranda' className="scroll-smooth heading mt-10 flex flex-col items-center justify-center gap-2">
           <h1 className="text-Black max-w-[600px]  text-wrap  text-center font-inter text-[2rem]/tight font-black md:text-[2.5rem]/tight ">
             Solusi permasalahan{' '}
             <span className="text-green-800">sampah lingkungan </span> anda
@@ -49,14 +50,18 @@ export default function landingPage() {
           </p>
 
           <div className="mt-4 flex gap-6">
+            <Link href={"/auth/login"}>
             <button className="hover:bg-green-950 rounded-full bg-green-800 px-6 py-1.5 text-center font-inter text-sm font-bold text-white transition-colors duration-300 ease-out md:text-base">
               {' '}
               Berlangganan
             </button>
+            </Link>
+            <Link href={'/auth/login'}>
             <button className="rounded-full border-[1px] border-gray-400 bg-white px-6 py-1.5 text-center  font-inter text-sm font-bold text-green-800 transition-colors duration-200 ease-out hover:bg-green-200 md:text-base">
               {' '}
               Coba Trial
             </button>
+            </Link>
           </div>
         </div>
           </FadeAnimation>
@@ -225,7 +230,7 @@ export default function landingPage() {
 
       {/* about section */}
 
-      <section className="relative flex h-auto w-full items-center justify-center overflow-hidden bg-white px-6 py-10 lg:justify-start lg:px-24">
+      <section id='tentang' className="scroll-smooth relative flex h-auto w-full items-center justify-center overflow-hidden bg-white px-6 py-10 lg:justify-start lg:px-24">
         {/* Lingkaran 1 */}
         <div className="absolute left-[-200px] top-[-200px] h-[600px] w-[600px] rounded-full bg-[#F6F193] opacity-100 blur-[400px]"></div>
 
@@ -261,9 +266,12 @@ export default function landingPage() {
               Kami Menyediakan fitur yang dapat di jadikan solusi permasalahan
               sampah pada masyarakat Indonesia
             </p>
+
+            <Link href={'/auth/login'}>
             <button className="rounded-full  bg-green-800 px-4  py-3 font-nunito text-lg font-bold text-white">
               Mulai Sekarang
             </button>
+            </Link>
           </div>
         </div>
         </FadeAnimation>
@@ -372,14 +380,14 @@ export default function landingPage() {
         </FadeAnimation>
       </section>
 
-      <section className='pricing w-full h-auto py-20 bg-[#FBFFF9]'>
+      <section id='layanan' className='pricing w-full h-auto py-20 bg-[#FBFFF9]'>
         <FadeAnimation direction='up'>
                      <Pricing/>
         </FadeAnimation>
  
       </section>
 
-      <section className='w-full h-auto py-6 flex justify-center items-center '>
+      <section id='testimoni' className='scroll-smooth w-full h-auto py-6 flex justify-center items-center '>
         <div className='flex flex-col gap-8'>
           <FadeAnimation direction='down'>
           <h1 className='text-[2.2rem] font-inter font-bold text-center'>Harita sudah dijadikan solusi</h1>

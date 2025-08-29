@@ -11,6 +11,7 @@
     font-feature-settings: 'kern' !important;
     -webkit-font-smoothing: antialiased;
     letter-spacing: -0.2px;
+    scroll-behavior: smooth;
   }
   :root {
     --background: 0 0% 100%;
