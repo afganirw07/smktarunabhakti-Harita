@@ -139,82 +139,101 @@ export default function TukarSampah() {
       });
   };
 
+
 const handleSubmit = async () => {
-    if (!isFormValid) {
-      alert('Harap lengkapi semua data formulir.');
-      return;
-    }
+    if (!isFormValid) {
+      alert('Harap lengkapi semua data formulir.');
+      return;
+    }
 
-    const massaSampahKg = parseFloat(formData.massaSampah);
-    const selectedBarangData = jenisBarangList.find(b => b.nama_barang === selectedBarang);
+    const massaSampahKg = parseFloat(formData.massaSampah);
+    const selectedBarangData = jenisBarangList.find(b => b.nama_barang === selectedBarang);
 
-    if (!selectedBarangData) {
-      alert('Jenis barang tidak ditemukan.');
-      return;
-    }
+    if (!selectedBarangData) {
+      alert('Jenis barang tidak ditemukan.');
+      return;
+    }
 
-    const totalHaritaCoins = massaSampahKg * 100;
-    const totalBarangDidapat = massaSampahKg * selectedBarangData.nilai_barang_per_kg;
+    const totalHaritaCoins = massaSampahKg * 100;
+    const totalBarangDidapat = massaSampahKg * selectedBarangData.nilai_barang_per_kg;
 
-    const transaction = {
-      nama_lengkap: formData.namaLengkap,
-      nomor_handphone: formData.nomorHandphone,
-      email: formData.email,
-      massa_sampah_kg: massaSampahKg,
-      nama_harita_pos: formData.haritaPos,
-      jenis_barang: selectedBarang,
-      harita_coins_didapat: totalHaritaCoins,
-    };
+    const transaction = {
+      nama_lengkap: formData.namaLengkap,
+      nomor_handphone: formData.nomorHandphone,
+      email: formData.email,
+      massa_sampah_kg: massaSampahKg,
+      nama_harita_pos: formData.haritaPos,
+      jenis_barang: selectedBarang,
+      harita_coins_didapat: totalHaritaCoins,
+    };
 
-    try {
-      const userId = localStorage.getItem('user_id');
-      if (!userId) {
-        throw new Error('User ID not found in local storage. Please log in again.');
-      }
+    try {
+      const userId = localStorage.getItem('user_id');
+      if (!userId) {
+        throw new Error('User ID not found in local storage. Please log in again.');
+      }
 
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('point') 
-        .eq('id', userId)
-        .single();
-    
-      if (profileError) {
-        console.error('Error fetching profile:', profileError.message);
-        throw new Error('User profile not found.');
-      }
-    
-      const currentPoints = profile?.point || 0;
-      const newTotalPoints = currentPoints + totalHaritaCoins;
-    
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ point: newTotalPoints })
-        .eq('id', userId);
-        
-      if (updateError) {
-        console.error('Error updating profile points:', updateError.message);
-        throw new Error('Failed to update user points.');
-      }
-      
-      const { data, error } = await supabase
-        .from('tukar_sampah')
-        .insert(transaction)
-        .select();
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('point') 
+        .eq('id', userId)
+        .single();
+    
+      if (profileError) {
+        console.error('Error fetching profile:', profileError.message);
+        throw new Error('User profile not found.');
+      }
+    
+      const currentPoints = profile?.point || 0;
+      const newTotalPoints = currentPoints + totalHaritaCoins;
+    
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ point: newTotalPoints })
+        .eq('id', userId);
+        
+      if (updateError) {
+        console.error('Error updating profile points:', updateError.message);
+        throw new Error('Failed to update user points.');
+      }
+      
+      const { data, error } = await supabase
+        .from('tukar_sampah')
+        .insert(transaction)
+        .select();
 
-      if (error) throw error;
-      
-      setTransaksiData({
-        ...transaction,
-        totalBarangDidapat,
-      });
-      
-      setShowStruk(true); 
+      if (error) throw error;
 
-    } catch (err: any) {
-      console.error('Error submitting form:', err.message);
-      alert(`Gagal mengirim form: ${err.message}`);
-    }
-  };
+      const newTransaction = data[0];
+
+      const notificationData = {
+        user_id: userId,
+        title: 'Penukaran Sampah Berhasil',
+        body: `Selamat! Anda berhasil menukar sampah dan mendapatkan ${totalHaritaCoins} Harita Coins.`,
+        type: 'tukar_sampah',
+        related_id: newTransaction.id, 
+      };
+
+      const { error: notificationError } = await supabase
+        .from('notifications')
+        .insert(notificationData);
+
+      if (notificationError) {
+        console.error('Error inserting notification:', notificationError.message);
+      }
+      
+      setTransaksiData({
+        ...transaction,
+        totalBarangDidapat,
+      });
+      
+      setShowStruk(true); 
+
+    } catch (err: any) {
+      console.error('Error submitting form:', err.message);
+      alert(`Gagal mengirim form: ${err.message}`);
+    }
+  };
   
 
   const isFormValid =

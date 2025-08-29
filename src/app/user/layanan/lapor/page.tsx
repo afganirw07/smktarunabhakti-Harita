@@ -76,22 +76,24 @@ export default function LaporSampah() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async () => {
-    if (!userId) {
-      alert("User belum login!");
-      return;
-    }
+const handleSubmit = async () => {
+  if (!userId) {
+    alert("User belum login!");
+    return;
+  }
 
-    if (!formData.namaLengkap || !formData.nomorHP || !formData.email || !formData.alamat || !formData.wilayah) {
-      alert("Mohon lengkapi semua data!");
-      return;
-    }
+  if (!formData.namaLengkap || !formData.nomorHP || !formData.email || !formData.alamat || !formData.wilayah) {
+    alert("Mohon lengkapi semua data!");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    const biaya = hitungTotal();
+  const biaya = hitungTotal();
 
-    const { error } = await supabase.from("reports").insert([
+  const { data: newReport, error } = await supabase
+    .from("reports")
+    .insert([
       {
         user_id: userId,
         full_name: formData.namaLengkap,
@@ -102,25 +104,49 @@ export default function LaporSampah() {
         description: formData.deskripsi,
         total_cost: biaya.total,
       },
-    ]);
+    ])
+    .select(); 
 
-    setLoading(false);
+  setLoading(false);
 
-    if (error) {
-      console.error("Error submit laporan:", error);
-      alert("Gagal mengirim laporan!");
-    } else {
-      alert("Laporan sampah berhasil dikirim!");
-      setFormData({
-        namaLengkap: "",
-        nomorHP: "",
-        email: "",
-        alamat: "",
-        wilayah: "",
-        deskripsi: "",
-      });
+  if (error) {
+    console.error("Error submit laporan:", error);
+    alert("Gagal mengirim laporan!");
+  } else {
+    alert("Laporan sampah berhasil dikirim!");
+
+    if (newReport && newReport.length > 0) {
+      const reportId = newReport[0].id; 
+      
+      const notificationData = {
+        user_id: userId,
+        title: "Laporan Sampah Diterima",
+        body: `Laporan Anda untuk pembersihan sampah di ${formData.alamat} telah berhasil kami terima. Petugas akan segera menindaklanjuti.`,
+        type: 'lapor_sampah',
+        related_id: reportId,
+      };
+
+      const { error: notificationError } = await supabase
+        .from('notifications')
+        .insert(notificationData);
+
+      if (notificationError) {
+        console.error("Error inserting notification:", notificationError.message);
+      }
     }
-  };
+
+    setFormData({
+      namaLengkap: "",
+      nomorHP: "",
+      email: "",
+      alamat: "",
+      wilayah: "",
+      deskripsi: "",
+    });
+    setTotalPanggilan(prevCount => prevCount + 1);
+  }
+};
+
 
   const biaya = hitungTotal();
 
