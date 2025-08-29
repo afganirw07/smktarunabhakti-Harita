@@ -92,7 +92,7 @@ const Dashboard = () => {
 
       const { count: countTrx, error: errorTrx } = await supabase
         .from('transactions')
-        .select('id', { count: 'exact', head: true });
+        .select('user_id', { count: 'exact', head: true });
       if (errorTrx) throw errorTrx;
 
       const { count: countTukar, error: errorTukar } = await supabase
