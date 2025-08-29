@@ -275,7 +275,7 @@ const AppSidebar: React.FC = () => {
             <>
               <Image
                 className="dark:hidden"
-                src="/images/logo/logoWithText.png"
+                src="/images/logo/LogoWithText.png"
                 alt="Logo"
                 width={150}
                 height={40}

@@ -7,7 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/public/components/ui/dropdown-menu";
+} from "components/dropdown/dropdown-menu";
 import dayjs from "dayjs";
 import { createClient } from "@supabase/supabase-js";
 

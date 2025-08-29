@@ -11,6 +11,7 @@
     "@chakra-ui/tooltip": "^2.2.6",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@google/genai": "^1.16.0",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/auth-ui-shared": "^0.1.8",

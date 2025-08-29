@@ -74,7 +74,7 @@ const AppHeader: React.FC = () => {
       : 'bg-gradient-to-r from-lime-500 via-lime-600 to-green-700';
 
   return (
-    <header className="sticky top-0 z-50 flex w-full border-green-700 bg-white/50 backdrop-blur-lg dark:border-gray-800 dark:bg-gray-900 lg:border-b">
+    <header className="sticky top-0 z-50 flex w-full h-fit border-green-700 bg-white/50 backdrop-blur-lg dark:border-gray-800 dark:bg-gray-900 lg:border-b">
       <div className="flex grow flex-col items-center justify-between lg:flex-row lg:px-6">
         <div className="items-cent er flex w-full justify-between gap-2 border-b border-gray-200 px-3 py-3 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
           <button
@@ -120,7 +120,7 @@ const AppHeader: React.FC = () => {
               width={120}
               height={120}
               className="dark:hidden"
-              src="/images/logo/logoWithText.png"
+              src="/images/logo/LogoWithText.png"
               alt="Logo"
             />
           </Link>

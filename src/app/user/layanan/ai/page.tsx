@@ -1,7 +1,22 @@
-"use client"
+'use client';
 
-import React, { useState, useRef, useEffect, KeyboardEvent, ChangeEvent } from 'react';
-import { Send, User, Bot, Copy, ThumbsUp, ThumbsDown, MoreHorizontal, Sparkles, MessageCircle } from 'lucide-react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  KeyboardEvent,
+  ChangeEvent,
+} from 'react';
+import {
+  Send,
+  User,
+  Bot,
+  Copy,
+  ThumbsUp,
+  ThumbsDown,
+  MessageCircle,
+} from 'lucide-react';
+import { Prompt } from './prompt';
 
 // Types
 interface Message {
@@ -24,18 +39,21 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
     {
       id: 1,
       type: 'ai',
-      content: 'Hello! I\'m your AI assistant. How can I help you today?',
-      timestamp: new Date().toISOString()
-    }
+      content: 'Halo, saya adalah HaritaAI yang siap menjawab pertanyaan anda ',
+      timestamp: new Date().toISOString(),
+    },
   ],
-  botName = 'Asisten AI',
-  botDescription = 'Powered by Advanced AI'
+  botName = 'HaritaAI',
+  botDescription = 'Powered by Google Gemini',
 }) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputMessage, setInputMessage] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // ✅ API Key dan URL
+  const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
   const scrollToBottom = (): void => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -45,67 +63,162 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
     scrollToBottom();
   }, [messages]);
 
+  // Validasi API Key saat komponen dimuat
+  useEffect(() => {
+    if (!API_KEY) {
+      console.error(' NEXT_PUBLIC_GEMINI_API_KEY tidak ditemukan!');
+    } else {
+      console.log(' API Key ditemukan');
+    }
+  }, [API_KEY]);
+
+  // ✅ Fungsi untuk parse markdown sederhana
+  const parseMarkdown = (text: string): string => {
+    return text
+      .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>');
+  };
+
+  // ✅ Hapus quick response → langsung kirim ke Gemini
+  const callGeminiAPI = async (userMessage: string): Promise<string> => {
+    try {
+      if (!API_KEY) {
+        throw new Error('API Key tidak ditemukan');
+      }
+
+      console.log(' Mengirim request ke Gemini API...');
+      console.log('User message:', userMessage);
+
+      // Riwayat percakapan + Prompt
+      const fullPrompt = `${Prompt.SYSTEM_PROMPT}
+
+Riwayat Percakapan:
+${messages
+  .slice(-4)
+  .map((msg) => `${msg.type === 'user' ? 'User' : 'AI'}: ${msg.content}`)
+  .join('\n')}
+
+User: ${userMessage}
+AI:`;
+
+      // Body request
+      const requestBody = {
+        contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        },
+      };
+
+      // Fetch ke Gemini
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody),
+        },
+      );
+
+      console.log(' Response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Gemini API Error:', errorText);
+        throw new Error(
+          `Gemini API error ${response.status}: ${
+            errorText || 'Unknown error'
+          }`,
+        );
+      }
+
+      const data = await response.json();
+      console.log(' Gemini Response JSON:', data);
+
+      // Ambil teks respons
+      const text =
+        data?.candidates?.[0]?.content?.parts
+          ?.map((p: any) => p.text || '')
+          .join(' ')
+          .trim() || '';
+
+      if (!text) {
+        return ' Maaf, saya tidak bisa memberikan respons saat ini.';
+      }
+
+      console.log(' Respons berhasil:', text);
+      return text;
+    } catch (err: any) {
+      console.error('Gemini API Error:', err);
+      return (
+        err.message ||
+        ' Terjadi kesalahan saat menghubungi AI. Silakan coba lagi.'
+      );
+    }
+  };
+
   const handleSendMessage = async (): Promise<void> => {
     if (!inputMessage.trim()) return;
+
+    // Validasi API Key sebelum mengirim
+    if (!API_KEY) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          type: 'ai',
+          content:
+            ' API Key tidak ditemukan. Pastikan NEXT_PUBLIC_GEMINI_API_KEY sudah diset di file .env.local dan restart development server.',
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+      return;
+    }
 
     const newUserMessage: Message = {
       id: Date.now(),
       type: 'user',
       content: inputMessage,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
-    setMessages(prev => [...prev, newUserMessage]);
+    setMessages((prev) => [...prev, newUserMessage]);
     const currentMessage = inputMessage;
     setInputMessage('');
     setIsTyping(true);
 
     try {
       let aiResponseContent: string;
-      
+
       if (onSendMessage) {
         aiResponseContent = await onSendMessage(currentMessage);
       } else {
-        // Simulate AI response with different responses based on input
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        aiResponseContent = getSimulatedResponse(currentMessage);
+        aiResponseContent = await callGeminiAPI(currentMessage);
       }
 
       const aiResponse: Message = {
         id: Date.now() + 1,
         type: 'ai',
         content: aiResponseContent,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
-      setMessages(prev => [...prev, aiResponse]);
+
+      setMessages((prev) => [...prev, aiResponse]);
     } catch (error) {
       console.error('Error getting AI response:', error);
       const errorMessage: Message = {
         id: Date.now() + 1,
         type: 'ai',
-        content: 'Sorry, I encountered an error. Please try again.',
-        timestamp: new Date().toISOString()
+        content:
+          ' Maaf, terjadi kesalahan saat memproses permintaan Anda. Silakan coba lagi dalam beberapa saat.',
+        timestamp: new Date().toISOString(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsTyping(false);
-    }
-  };
-
-  const getSimulatedResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
-      return 'Hello! It\'s great to meet you. How can I assist you today?';
-    } else if (lowerMessage.includes('help')) {
-      return 'I\'m here to help! You can ask me questions, request information, or have a conversation. What would you like to know?';
-    } else if (lowerMessage.includes('weather')) {
-      return 'I don\'t have access to real-time weather data, but you can check your local weather service or weather apps for current conditions.';
-    } else if (lowerMessage.includes('time')) {
-      return `The current time is ${new Date().toLocaleTimeString()}.`;
-    } else {
-      return 'I understand your question. This is a simulated response from the AI assistant. In a real implementation, this would be connected to an actual AI service like OpenAI, Claude, or another language model.';
     }
   };
 
@@ -118,185 +231,219 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
 
   const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
     setInputMessage(e.target.value);
-    
-    // Auto-resize textarea
     e.target.style.height = 'auto';
-    e.target.style.height = e.target.scrollHeight + 'px';
+    e.target.style.height = Math.min(e.target.scrollHeight, 128) + 'px';
   };
 
   const copyToClipboard = async (text: string): Promise<void> => {
     try {
       await navigator.clipboard.writeText(text);
+      console.log('Text copied to clipboard');
     } catch (error) {
       console.error('Failed to copy text:', error);
     }
   };
 
   const formatTime = (timestamp: string): string => {
-    return new Date(timestamp).toLocaleTimeString('en-US', {
+    return new Date(timestamp).toLocaleTimeString('id-ID', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   const handleFeedback = (messageId: number, isPositive: boolean): void => {
-    console.log(`Feedback for message ${messageId}: ${isPositive ? 'positive' : 'negative'}`);
-    // Implement feedback logic here
+    console.log(
+      `Feedback for message ${messageId}: ${
+        isPositive ? 'positive' : 'negative'
+      }`,
+    );
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-green-50 to-green-100 overflow-hidden">
+    <div className="flex h-screen flex-col overflow-hidden bg-gradient-to-br from-green-50 to-green-100">
       {/* Header */}
-      <header className="flex-shrink-0 bg-white border-b border-green-200 shadow-sm rounded">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-700 rounded-xl flex items-center justify-center shadow-lg">
-                <MessageCircle className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-green-900">{botName}</h1>
-                <p className="text-sm text-green-600 font-medium">{botDescription}</p>
-              </div>
+      <header className="flex-shrink-0 border-b border-green-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r from-green-500 to-green-700 shadow-lg">
+              <MessageCircle className="h-7 w-7 text-white" />
             </div>
-           
+            <div>
+              <h1 className="text-2xl font-bold text-green-900">{botName}</h1>
+              <p className="text-sm font-medium text-green-600">
+                {botDescription}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 rounded-full bg-green-100 px-3 py-1">
+            <div
+              className={`h-2 w-2 rounded-full ${
+                API_KEY ? 'animate-pulse bg-green-500' : 'bg-red-500'
+              }`}
+            ></div>
+            <span className="text-xs font-medium text-green-700">
+              {API_KEY ? 'Online' : 'API Key Missing'}
+            </span>
           </div>
         </div>
       </header>
 
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto min-h-0">
-        <div className="px-6 py-6 h-full">
-          {messages.map((message) => (
-            <div 
-              key={message.id} 
-              className={`mb-6 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+      {/* Messages */}
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6">
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`mb-6 flex ${
+              message.type === 'user' ? 'justify-end' : 'justify-start'
+            }`}
+          >
+            <div
+              className={`flex w-full max-w-4xl ${
+                message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
+              } gap-4`}
             >
-              <div className={`flex max-w-4xl w-full ${message.type === 'user' ? 'flex-row-reverse justify-start' : 'flex-row'} gap-4`}>
-                {/* Avatar */}
-                <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-                  message.type === 'user' 
-                    ? 'bg-green-800 shadow-lg' 
+              {/* Avatar */}
+              <div
+                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${
+                  message.type === 'user'
+                    ? 'bg-green-800 shadow-lg'
                     : 'bg-gradient-to-r from-green-500 to-green-700 shadow-lg'
-                }`}>
-                  {message.type === 'user' ? (
-                    <User className="w-6 h-6 text-white" />
-                  ) : (
-                    <Bot className="w-6 h-6 text-white" />
+                }`}
+              >
+                {message.type === 'user' ? (
+                  <User className="h-6 w-6 text-white" />
+                ) : (
+                  <Bot className="h-6 w-6 text-white" />
+                )}
+              </div>
+
+              {/* Bubble */}
+              <div
+                className={`group flex flex-col ${
+                  message.type === 'user' ? 'items-end' : 'items-start'
+                } min-w-0 flex-1`}
+              >
+                <div
+                  className={`relative rounded-2xl px-5 py-4 ${
+                    message.type === 'user'
+                      ? 'max-w-2xl break-words bg-green-800 text-white shadow-lg'
+                      : 'max-w-2xl border border-green-200 bg-white text-green-900 shadow-sm'
+                  }`}
+                >
+                  <div
+                    className="whitespace-pre-wrap break-words text-base leading-relaxed"
+                    dangerouslySetInnerHTML={{
+                      __html: parseMarkdown(message.content),
+                    }}
+                  />
+                </div>
+
+                {/* Actions */}
+                <div
+                  className={`mt-2 flex items-center gap-2 ${
+                    message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
+                  }`}
+                >
+                  <span className="text-xs font-semibold text-green-600">
+                    {formatTime(message.timestamp)}
+                  </span>
+                  {message.type === 'ai' && (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => copyToClipboard(message.content)}
+                        className="rounded-lg p-1.5 text-green-500 transition-all hover:bg-green-100 hover:text-green-700"
+                        title="Copy message"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleFeedback(message.id, true)}
+                        className="rounded-lg p-1.5 text-green-500 transition-all hover:bg-green-100 hover:text-green-700"
+                        title="Good response"
+                      >
+                        <ThumbsUp className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleFeedback(message.id, false)}
+                        className="rounded-lg p-1.5 text-green-500 transition-all hover:bg-green-100 hover:text-green-700"
+                        title="Poor response"
+                      >
+                        <ThumbsDown className="h-4 w-4" />
+                      </button>
+                    </div>
                   )}
                 </div>
-
-                {/* Message Content */}
-                <div className={`group flex flex-col ${message.type === 'user' ? 'items-end' : 'items-start'} flex-1 min-w-0`}>
-                  <div className={`relative px-5 py-4 rounded-2xl ${
-                    message.type === 'user'
-                      ? 'bg-green-800 text-white shadow-lg max-w-2xl break-words'
-                      : 'bg-white border border-green-200 text-green-900 shadow-sm max-w-2xl'
-                  }`}>
-                    <p className="text-base leading-relaxed whitespace-pre-wrap break-words">
-                      {message.content}
-                    </p>
-                  </div>
-                  
-                  {/* Message Actions */}
-                  <div className={`flex items-center gap-2 mt-2 ${
-                    message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
-                  }`}>
-                    <span className="text-xs text-green-600 font-semibold">{formatTime(message.timestamp)}</span>
-                    {message.type === 'ai' && (
-                      <div className="flex items-center gap-1">
-                        <button 
-                          onClick={() => copyToClipboard(message.content)}
-                          className="p-1.5 text-green-500 hover:text-green-700 rounded-lg hover:bg-green-100 transition-all duration-200"
-                          title="Copy message"
-                          aria-label="Copy message"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                        <button 
-                          onClick={() => handleFeedback(message.id, true)}
-                          className="p-1.5 text-green-500 hover:text-green-700 rounded-lg hover:bg-green-100 transition-all duration-200"
-                          title="Good response"
-                          aria-label="Good response"
-                        >
-                          <ThumbsUp className="w-4 h-4" />
-                        </button>
-                        <button 
-                          onClick={() => handleFeedback(message.id, false)}
-                          className="p-1.5 text-green-500 hover:text-green-700 rounded-lg hover:bg-green-100 transition-all duration-200"
-                          title="Bad response"
-                          aria-label="Bad response"
-                        >
-                          <ThumbsDown className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
               </div>
-            </div>
-          ))}
-
-          {/* Typing Indicator */}
-          {isTyping && (
-            <div className="mb-6 flex justify-start">
-              <div className="flex gap-4 max-w-4xl w-full">
-                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-700 rounded-full flex items-center justify-center shadow-lg">
-                  <Bot className="w-6 h-6 text-white" />
-                </div>
-                <div className="bg-white border border-green-200 rounded-2xl px-5 py-4 shadow-sm">
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce"></div>
-                    <div 
-                      className="w-2 h-2 bg-green-500 rounded-full animate-bounce" 
-                      style={{animationDelay: '0.1s'}}
-                    ></div>
-                    <div 
-                      className="w-2 h-2 bg-green-500 rounded-full animate-bounce" 
-                      style={{animationDelay: '0.2s'}}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
-
-      {/* Input Area */}
-      <div className="flex-shrink-0 border-t border-green-200 bg-white">
-        <div className="px-6 py-5">
-          <div className="relative max-w-4xl">
-            <div className="flex items-end gap-3 bg-green-50 rounded-2xl border-2 border-green-200 focus-within:border-green-500 focus-within:ring-4 focus-within:ring-green-100 transition-all duration-200 shadow-sm">
-              <textarea
-                ref={inputRef}
-                value={inputMessage}
-                onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your message here..."
-                className="flex-1 bg-transparent px-5 py-4 text-green-900 rounded-2xl placeholder-green-500 resize-none focus:outline-none min-h-[20px] max-h-32 leading-relaxed"
-                rows={1}
-                disabled={isTyping}
-                aria-label="Message input"
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputMessage.trim() || isTyping}
-                className={`flex-shrink-0 m-2 p-3 rounded-xl transition-all duration-200 ${
-                  inputMessage.trim() && !isTyping
-                    ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl hover:scale-105'
-                    : 'bg-green-300 text-green-500 cursor-not-allowed'
-                }`}
-                aria-label="Send message"
-              >
-                <Send className="w-5 h-5" />
-              </button>
             </div>
           </div>
-          <p className="text-xs text-green-600 text-left mt-3 font-medium">
-            Tekan Enter untuk mengirim, tekan shift + enter untuk baris baru
+        ))}
+
+        {/* Typing indicator */}
+        {isTyping && (
+          <div className="mb-6 flex justify-start">
+            <div className="flex w-full max-w-4xl gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-green-700 shadow-lg">
+                <Bot className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex items-center gap-2 rounded-2xl border border-green-200 bg-white px-5 py-4 shadow-sm">
+                <div className="flex gap-1">
+                  <div className="h-2 w-2 animate-bounce rounded-full bg-green-500"></div>
+                  <div
+                    className="h-2 w-2 animate-bounce rounded-full bg-green-500"
+                    style={{ animationDelay: '0.1s' }}
+                  ></div>
+                  <div
+                    className="h-2 w-2 animate-bounce rounded-full bg-green-500"
+                    style={{ animationDelay: '0.2s' }}
+                  ></div>
+                </div>
+                <span className="text-sm text-green-600">
+                  Sedang mengetik...
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input */}
+      <div className="flex-shrink-0 border-t border-green-200 bg-white px-6 py-5">
+        <div className="relative max-w-4xl">
+          <div className="flex items-end gap-3 rounded-2xl border-2 border-green-200 bg-green-50 shadow-sm transition-all focus-within:border-green-500 focus-within:ring-4 focus-within:ring-green-100">
+            <textarea
+              ref={inputRef}
+              value={inputMessage}
+              onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
+              placeholder="Ketik pesan Anda di sini..."
+              className="bg-transparent max-h-32 min-h-[20px] flex-1 resize-none rounded-2xl px-5 py-4 leading-relaxed text-green-900 placeholder-green-500 focus:outline-none"
+              rows={1}
+              disabled={isTyping}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputMessage.trim() || isTyping}
+              className={`m-2 flex-shrink-0 rounded-xl p-3 transition-all ${
+                inputMessage.trim() && !isTyping
+                  ? 'bg-green-600 text-white shadow-lg hover:scale-105 hover:bg-green-700'
+                  : 'cursor-not-allowed bg-green-300 text-green-500'
+              }`}
+              title={!API_KEY ? 'API Key tidak ditemukan' : 'Kirim pesan'}
+            >
+              <Send className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+        <div className="mt-3 flex items-center justify-between">
+          <p className="text-xs font-medium text-green-600">
+            Tekan Enter untuk mengirim, Shift + Enter untuk baris baru
           </p>
+          {!API_KEY && (
+            <p className="text-xs font-medium text-red-500">
+              API Key tidak ditemukan
+            </p>
+          )}
         </div>
       </div>
     </div>

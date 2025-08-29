@@ -118,7 +118,7 @@ const Navbar = (props: {
             </div>
           }
           animation="origin-[65%_0%] md:origin-top-right transition-all duration-300 ease-in-out"
-          classNames={'py-2 top-4 -left-[230px] md:-left-[440px] w-max'}
+          classNames={'py-2 top-4 -left-[170px] md:-left-[440px] w-max'}
         >
           <div className="flex w-[360px] flex-col gap-3 rounded-[20px] bg-white p-4 shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:text-white dark:shadow-none sm:w-[460px]">
             <div className="flex items-center justify-between">
