@@ -1,88 +1,53 @@
-type RowObj = {
-  name: [string, boolean];
-  progress: string;
-  quantity: number;
-  date: string;
-  info: boolean;
+
+export type RowObj = {
+  name: string;       // nama orang
+  progress: string;   // jenis barang / area
+  layanan: string;   
+  date: string;       // tanggal
 };
 
 const tableDataCheck: RowObj[] = [
   {
-    name: ['Horizon UI PRO', true],
-    quantity: 2458,
-    progress: '17.5%',
-    date: '12 Jan 2021',
-    info: false,
+    name: 'Budi Santoso',
+    layanan: 'Report',
+    progress: 'Plastik',
+    date: '12 Jan 2025',
   },
   {
-    name: ['Horizon UI Free', true],
-    quantity: 1485,
-    progress: '10.8%',
-    date: '21 Feb 2021',
-    info: true,
+    name: 'Siti Aminah',
+    layanan: 'Report',
+    progress: 'Kertas',
+    date: '15 Jan 2025',
   },
   {
-    name: ['Weekly Update', true],
-    quantity: 1024,
-    progress: '21.3%',
-    date: '13 Mar 2021',
-    info: true,
+    name: 'Andi Wijaya',
+    layanan: 'Report',
+    progress: 'Logam',
+    date: '20 Jan 2025',
   },
   {
-    name: ['Venus 3D Asset', true],
-    quantity: 858,
-    progress: '31.5%',
-    date: '24 Jan 2021',
-    info: true,
+    name: 'Rina Kartika',
+    layanan: 'Report',
+    progress: 'Jalan Rusak',
+    date: '21 Jan 2025',
   },
   {
-    name: ['Marketplace', true],
-    quantity: 258,
-    progress: '12.2%',
-    date: '24 Oct 2022',
-    info: false,
+    name: 'Dewi Lestari',
+    layanan: 'Report',
+    progress: 'Sampah Menumpuk',
+    date: '24 Jan 2025',
   },
   {
-    name: ['Horizon UI Free', true],
-    quantity: 1485,
-    progress: '10.8%',
-    date: '21 Feb 2021',
-    info: true,
+    name: 'Ahmad Fauzi',
+    layanan: 'Report',
+    progress: 'Pohon Tumbang',
+    date: '28 Jan 2025',
   },
   {
-    name: ['Weekly Update', true],
-    quantity: 1024,
-    progress: '21.3%',
-    date: '13 Mar 2021',
-    info: true,
-  },
-  {
-    name: ['Venus 3D Asset', true],
-    quantity: 858,
-    progress: '31.5%',
-    date: '24 Jan 2021',
-    info: true,
-  },
-  {
-    name: ['Horizon UI Free', true],
-    quantity: 1485,
-    progress: '10.8%',
-    date: '21 Feb 2021',
-    info: true,
-  },
-  {
-    name: ['Weekly Update', true],
-    quantity: 1024,
-    progress: '21.3%',
-    date: '13 Mar 2021',
-    info: true,
-  },
-  {
-    name: ['Venus 3D Asset', true],
-    quantity: 858,
-    progress: '31.5%',
-    date: '24 Jan 2021',
-    info: true,
+    name: 'Joko Widodo',
+    layanan: 'Report',
+    progress: 'Botol Kaca',
+    date: '30 Jan 2025',
   },
 ];
 

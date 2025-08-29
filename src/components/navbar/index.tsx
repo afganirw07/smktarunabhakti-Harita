@@ -1,19 +1,18 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect } from 'react';
 import Dropdown from 'components/dropdown';
 import { FiAlignJustify } from 'react-icons/fi';
 import NavLink from 'components/link/NavLink';
-import navbarimage from '/public/img/layout/Navbar.png';
 import { BsArrowBarUp } from 'react-icons/bs';
-import { FiSearch } from 'react-icons/fi';
-import { RiMoonFill, RiSunFill } from 'react-icons/ri';
-// import { RiMoonFill, RiSunFill } from 'react-icons/ri';
-// import Configurator from './Configurator';
-import {
-  IoMdNotificationsOutline,
-  IoMdInformationCircleOutline,
-} from 'react-icons/io';
-import avatar from '/public/img/avatars/avatar4.png';
+import { IoMdNotificationsOutline } from 'react-icons/io';
+import { createClient } from "@supabase/supabase-js";
 import Image from 'next/image';
+
+// Supabase Client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const Navbar = (props: {
   onOpenSidenav: () => void;
@@ -21,10 +20,51 @@ const Navbar = (props: {
   secondary?: boolean | string;
   [x: string]: any;
 }) => {
-  const { onOpenSidenav, brandText, mini, hovered } = props;
-  const [darkmode, setDarkmode] = React.useState(
+  const { onOpenSidenav, brandText } = props;
+  const [darkmode, setDarkmode] = useState(
     document.body.classList.contains('dark'),
   );
+
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [notifying, setNotifying] = useState(true);
+
+  useEffect(() => {
+    const fetchAllNotifications = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching notifications:", error);
+        setError(error);
+        setNotifications([]);
+      } else {
+        setNotifications(data);
+        const unreadExists = data.some(notification => !notification.is_read);
+        setNotifying(unreadExists);
+      }
+      setLoading(false);
+    };
+
+    fetchAllNotifications();
+  }, []);
+
+  const handleNotificationClick = async () => {
+    setNotifying(false);
+    try {
+      await supabase
+        .from("notifications")
+        .update({ is_read: true })
+        .eq("is_read", false); 
+    } catch (err) {
+      console.error("Error updating notifications status:", err);
+    }
+  };
+
   return (
     <nav className="sticky top-4 z-40 flex flex-row flex-wrap items-center justify-between rounded-xl bg-white/10 p-2 backdrop-blur-xl dark:bg-[#0b14374d]">
       <div className="ml-[6px]">
@@ -66,9 +106,16 @@ const Navbar = (props: {
         {/* start Notification */}
         <Dropdown
           button={
-            <p className="cursor-pointer">
-              <IoMdNotificationsOutline className="h-4 w-4 text-gray-600 dark:text-white" />
-            </p>
+            <div className="relative cursor-pointer" onClick={handleNotificationClick}>
+              <IoMdNotificationsOutline className="h-5 w-5   text-gray-600 dark:text-white" />
+              <span
+                className={`absolute top-0 right-0 h-2 w-2 rounded-full bg-green-900 ${
+                  !notifying ? "hidden" : "flex"
+                }`}
+              >
+                <span className="absolute inline-flex w-full h-full bg-green-300 rounded-full opacity-75 animate-ping"></span>
+              </span>
+            </div>
           }
           animation="origin-[65%_0%] md:origin-top-right transition-all duration-300 ease-in-out"
           classNames={'py-2 top-4 -left-[230px] md:-left-[440px] w-max'}
@@ -78,88 +125,45 @@ const Navbar = (props: {
               <p className="text-base font-bold text-navy-700 dark:text-white">
                 Notification
               </p>
-              <p className="text-sm font-bold text-navy-700 dark:text-white">
-                Mark all read
-              </p>
             </div>
-
-            <button className="flex w-full items-center">
-              <div className="flex h-full w-[85px] items-center justify-center rounded-xl bg-gradient-to-b from-brandLinear to-brand-500 py-4 text-2xl text-white">
-                <BsArrowBarUp />
-              </div>
-              <div className="ml-2 flex h-full w-full flex-col justify-center rounded-lg px-1 text-sm">
-                <p className="mb-1 text-left text-base font-bold text-gray-900 dark:text-white">
-                  New Update: Horizon UI Dashboard PRO
-                </p>
-                <p className="font-base text-left text-xs text-gray-900 dark:text-white">
-                  A new update for your downloaded item is available!
-                </p>
-              </div>
-            </button>
-
-            <button className="flex w-full items-center">
-              <div className="flex h-full w-[85px] items-center justify-center rounded-xl bg-gradient-to-b from-brandLinear to-brand-500 py-4 text-2xl text-white">
-                <BsArrowBarUp />
-              </div>
-              <div className="ml-2 flex h-full w-full flex-col justify-center rounded-lg px-1 text-sm">
-                <p className="mb-1 text-left text-base font-bold text-gray-900 dark:text-white">
-                  New Update: Horizon UI Dashboard PRO
-                </p>
-                <p className="font-base text-left text-xs text-gray-900 dark:text-white">
-                  A new update for your downloaded item is available!
-                </p>
-              </div>
-            </button>
+            {/* Tampilkan notifikasi dinamis di sini */}
+            {loading && (
+              <p className="text-center text-gray-500 dark:text-gray-400">Loading...</p>
+            )}
+            {error && (
+              <p className="text-center text-red-500">Error: {error.message}</p>
+            )}
+            {!loading && notifications.length === 0 && (
+              <p className="text-center text-gray-500 dark:text-gray-400">
+                Tidak ada notifikasi.
+              </p>
+            )}
+            {!loading && notifications.map((notification) => (
+              <button key={notification.id} className="flex w-full items-center">
+                <div className="flex h-full w-[85px] items-center justify-center rounded-xl bg-gradient-to-b from-green-800 to-green-900 py-4 text-2xl text-white">
+                  <BsArrowBarUp />
+                </div>
+                <div className="ml-2 flex h-full w-full flex-col justify-center rounded-lg px-1 text-sm">
+                  <p className="mb-1 text-left text-base font-bold text-gray-900 dark:text-white">
+                    {notification.title}
+                  </p>
+                  <p className="font-base text-left text-xs text-gray-900 dark:text-white">
+                    {notification.message}
+                  </p>
+                  <p className="font-base text-left text-xs text-gray-500 dark:text-gray-300">
+                    {new Date(notification.created_at).toLocaleString()}
+                  </p>
+                </div>
+              </button>
+            ))}
           </div>
         </Dropdown>
-        {/* start Horizon PRO */}
-        <Dropdown
-          button={
-            <p className="cursor-pointer">
-              <IoMdInformationCircleOutline className="h-4 w-4 text-gray-600 dark:text-white" />
-            </p>
-          }
-          classNames={'py-2 top-6 -left-[250px] md:-left-[330px] w-max'}
-          animation="origin-[75%_0%] md:origin-top-right transition-all duration-300 ease-in-out"
-        >
-          <div className="flex w-[350px] flex-col gap-2 rounded-[20px] bg-white p-4 shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:text-white dark:shadow-none">
-            <div
-              style={{
-                backgroundImage: `url(${navbarimage.src})`,
-                backgroundRepeat: 'no-repeat',
-                backgroundSize: 'cover',
-              }}
-              className="mb-2 aspect-video w-full rounded-lg"
-            />
-            <a
-              target="blank"
-              href="https://horizon-ui.com/pro?ref=live-free-tailwind-react"
-              className="px-full linear flex cursor-pointer items-center justify-center rounded-xl bg-brand-500 py-[11px] font-bold text-white transition duration-200 hover:bg-brand-600 hover:text-white active:bg-brand-700 dark:bg-brand-400 dark:hover:bg-brand-300 dark:active:bg-brand-200"
-            >
-              Buy Horizon UI PRO
-            </a>
-            <a
-              target="blank"
-              href="https://horizon-ui.com/docs-tailwind/docs/react/installation?ref=live-free-tailwind-react"
-              className="px-full linear flex cursor-pointer items-center justify-center rounded-xl border py-[11px] font-bold text-navy-700 transition duration-200 hover:bg-gray-200 hover:text-navy-700 dark:!border-white/10 dark:text-white dark:hover:bg-white/20 dark:hover:text-white dark:active:bg-white/10"
-            >
-              See Documentation
-            </a>
-            <a
-              target="blank"
-              href="https://horizon-ui.com/?ref=live-free-tailwind-react"
-              className="hover:bg-black px-full linear flex cursor-pointer items-center justify-center rounded-xl py-[11px] font-bold text-navy-700 transition duration-200 hover:text-navy-700 dark:text-white dark:hover:text-white"
-            >
-              Try Horizon Free
-            </a>
-          </div>
-        </Dropdown>
-      
+        
         {/* Profile & Dropdown */}
         <Dropdown
           button={
             <Image
-              width="2"
+              width="20"
               height="20"
               className="h-10 w-10 rounded-full"
               src='https://i.pinimg.com/564x/f1/b9/13/f1b9133c65ec275f4657dc916abad249.jpg'
@@ -168,7 +172,7 @@ const Navbar = (props: {
           }
           classNames={'py-2 top-8 -left-[180px] w-max'}
         >
-          
+          {/* ... */}
         </Dropdown>
       </div>
     </nav>

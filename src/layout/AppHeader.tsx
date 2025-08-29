@@ -1,14 +1,20 @@
-"use client";
+'use client';
 
-import NotificationDropdown from "../components/header/NotificationDropdown";
-import UserDropdown from "../components/header/UserDropdown";
-import { useSidebar } from "../contexts/SidebarContextUser";
-import Image from "next/image";
-import Link from "next/link";
-import React, { useState ,useEffect,useRef} from "react";
+import NotificationDropdown from '../components/header/NotificationDropdown';
+import UserDropdown from '../components/header/UserDropdown';
+import { useSidebar } from '../contexts/SidebarContextUser';
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { useState, useEffect, useRef } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
+  const [plan, setPlan] = useState<string>(''); 
 
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
 
@@ -23,29 +29,56 @@ const AppHeader: React.FC = () => {
   const toggleApplicationMenu = () => {
     setApplicationMenuOpen(!isApplicationMenuOpen);
   };
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
         event.preventDefault();
         inputRef.current?.focus();
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
+  useEffect(() => {
+    const fetchUserPlan = async () => {
+      const userId = localStorage.getItem('user_id');
+      if (!userId) return;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('plan')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user plan:', error);
+      } else if (data) {
+        setPlan(data.plan || 'Trial');
+      }
+    };
+
+    fetchUserPlan();
+  }, []);
+
+  const planStyle =
+    plan === 'Trial'
+      ? 'bg-gray-400'
+      : 'bg-gradient-to-r from-lime-500 via-lime-600 to-green-700';
+
   return (
-    <header className="sticky top-0 flex w-full bg-white/50 backdrop-blur-lg border-green-700 z-50 dark:border-gray-800 dark:bg-gray-900 lg:border-b">
-      <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
-        <div className="flex items-cent er justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
+    <header className="sticky top-0 z-50 flex w-full border-green-700 bg-white/50 backdrop-blur-lg dark:border-gray-800 dark:bg-gray-900 lg:border-b">
+      <div className="flex grow flex-col items-center justify-between lg:flex-row lg:px-6">
+        <div className="items-cent er flex w-full justify-between gap-2 border-b border-gray-200 px-3 py-3 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
           <button
-            className=" flex items-center justify-center w-10 h-10 text-white  bg-green-800 rounded-lg z-50 hover:bg-green-600 transition-colors duration-300 ease-out lg:flex lg:h-11 lg:w-11 lg:border"
+            className=" z-50 flex h-10 w-10 items-center justify-center  rounded-lg bg-green-800 text-white transition-colors duration-300 ease-out hover:bg-green-600 lg:flex lg:h-11 lg:w-11 lg:border"
             onClick={handleToggle}
             aria-label="Toggle Sidebar"
           >
@@ -80,7 +113,6 @@ const AppHeader: React.FC = () => {
                 />
               </svg>
             )}
-            {/* Cross Icon */}
           </button>
 
           <Link href="/home" className="lg:hidden">
@@ -95,7 +127,7 @@ const AppHeader: React.FC = () => {
 
           <button
             onClick={toggleApplicationMenu}
-            className="flex items-center justify-center w-10 h-10 text-green-800 rounded-lg z-50 hover:bg-green-700 hover:text-white transition-all duration-300 ease-out  lg:hidden"
+            className="z-50 flex h-10 w-10 items-center justify-center rounded-lg text-green-800 transition-all duration-300 ease-out hover:bg-green-700 hover:text-white  lg:hidden"
           >
             <svg
               width="24"
@@ -115,18 +147,19 @@ const AppHeader: React.FC = () => {
         </div>
         <div
           className={`${
-            isApplicationMenuOpen ? "flex" : "hidden"
-          } items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none`}
+            isApplicationMenuOpen ? 'flex' : 'hidden'
+          } shadow-theme-md w-full items-center justify-between gap-4 px-5 py-4 lg:flex lg:justify-end lg:px-0 lg:shadow-none`}
         >
-            <div className="bg-gradient-to-r from-lime-500 via-lime-600 to-green-700 px-4 py-1 text-base font-nunito text-white font-bold rounded-full  hover:scale-110 transition-all duration-300 ease-out ">
-              Plus
+          <div
+            className={`${planStyle} rounded-full px-4 py-1 font-nunito text-base font-bold text-white transition-all duration-300 ease-out hover:scale-110`}
+          >
+            {plan || 'Trial'}
           </div>
-          <div className="flex items-center gap-4 2xsm:gap-3">
-           <NotificationDropdown /> 
-          {/* <!-- User Area --> */}
-          <UserDropdown /> 
+
+          <div className="2xsm:gap-3 flex items-center gap-4">
+            <NotificationDropdown />
+            <UserDropdown />
           </div>
-    
         </div>
       </div>
     </header>

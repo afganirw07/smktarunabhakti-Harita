@@ -80,7 +80,8 @@ export async function POST(request: Request) {
 
         const transaction = await snap.createTransaction(parameter);
         const transactionToken = transaction.token;
-        const durationDays = planDuration[planName] || 30; // default 30 hari
+        // Ambil total_duration dari frontend, kalau tidak ada fallback ke default planDuration
+        const durationDays = body.total_duration || planDuration[planName] || 30;
         const endDate = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
 
 
@@ -103,8 +104,12 @@ export async function POST(request: Request) {
 
         const { error: updatePlanError } = await supabase
             .from('profiles')
-            .update({ plan: enumPlanName })
+            .update({
+                plan: enumPlanName,
+                end_date: endDate, // ✅ simpan juga tanggal akhir yang udah ditambah sisa
+            })
             .eq('id', userId);
+
 
         if (updatePlanError) {
             console.error('Error updating user plan:', updatePlanError);
