@@ -47,7 +47,7 @@
         });
 
         if (signUpError) {
-          throw signUpError; // Lempar error Supabase ke blok catch
+          throw signUpError; 
         }
         
         const userId = signUpData.user.id;
