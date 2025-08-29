@@ -26,7 +26,7 @@
     
     const [poin, setPoin] = useState(0); 
     const [role, setRole] = useState('user'); 
-    const [plan, setPlan] = useState('trial'); 
+    const [plan, setPlan] = useState('Trial'); 
     const [status, setStatus] = useState('yes'); 
     const [activeToken, setActiveToken] = useState(Math.random().toString(36).substring(2, 15));
     

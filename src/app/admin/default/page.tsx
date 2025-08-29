@@ -38,7 +38,6 @@ const Dashboard = () => {
         return;
       }
 
-      // Mengambil jumlah baris dari tabel 'profiles'
       const { count, error } = await supabase
         .from('profiles')
         .select('id', { count: 'exact', head: true });
