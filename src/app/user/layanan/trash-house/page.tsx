@@ -3,6 +3,12 @@
 import { useState, useEffect } from 'react';
 import { SketchCalendarPicker } from 'components/magicui/calendar';
 import { Coins, Camera } from 'lucide-react';
+import { createClient } from "@supabase/supabase-js"
+
+// Supabase Client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function TrashHouse() {
   const [date, setDate] = useState(new Date());
@@ -10,51 +16,190 @@ export default function TrashHouse() {
   const [date2, setDate2] = useState('');
   const [date3, setDate3] = useState('');
   const [date4, setDate4] = useState('');
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [currentMonth, setCurrentMonth] = useState('');
   const [minDate, setMinDate] = useState('');
   const [maxDate, setMaxDate] = useState('');
+  const [highlightDates, setHighlightDates] = useState<{month:number,date:number}[]>([]);
+  const [highlightDates2, setHighlightDates2] = useState<{month:number,date:number}[]>([]);
 
+  const userId = typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
+
+  // Setup kalender 
   useEffect(() => {
     const today = new Date();
-
     const dayOfWeek = today.getDay();
 
     const nextMonday = new Date(today);
     nextMonday.setDate(today.getDate() + ((8 - dayOfWeek) % 7));
-
     const nextSunday = new Date(nextMonday);
     nextSunday.setDate(nextMonday.getDate() + 6);
 
-    const nextWeekMonth = nextMonday.toLocaleString('id-ID', { month: 'long' });
-    setCurrentMonth(nextWeekMonth);
+    setCurrentMonth(nextMonday.toLocaleString('id-ID', { month: 'long' }));
+    setMinDate(nextMonday.toISOString().split('T')[0]);
+    setMaxDate(nextSunday.toISOString().split('T')[0]);
 
-    const minDateString = nextMonday.toISOString().split('T')[0];
-    const maxDateString = nextSunday.toISOString().split('T')[0];
+    // Ambil jadwal minggu depan dari Supabase
+    const fetchSchedules = async () => {
+      if (!userId) return;
 
-    setMinDate(minDateString);
-    setMaxDate(maxDateString);
-  }, []);
+      const { data } = await supabase
+        .from('pickup_schedules')
+        .select('*')
+        .eq('user_id', userId)
+        .gte('pickup_date', nextMonday.toISOString())
+        .lte('pickup_date', nextSunday.toISOString());
 
-  const handleFileUpload = (event) => {
+      if (data) {
+        const highlights = data.map((d:any) => ({
+          month: new Date(d.pickup_date).getMonth(),
+          date: new Date(d.pickup_date).getDate()
+        }));
+        setHighlightDates(highlights);
+      }
+    };
+    fetchSchedules();
+  }, [userId]);
+
+  // Upload file
+  const handleFileUpload = (event:any) => {
     const file = event.target.files[0];
     setUploadedFile(file);
   };
 
-  const handleFormSubmit = (e) => {
+  // Submit jadwal
+  const handleFormSubmit = (e:any) => {
     e.preventDefault();
     if (!date1) {
       alert('Minimal isi tanggal pertama!');
       return;
     }
-    console.log('Form submitted:', {
-      date1,
-      date2,
-      date3,
-      date4,
-      currentMonth,
-    });
+
+    const saveSchedules = async () => {
+      if (!userId) return;
+      const dates = [date1, date2, date3, date4].filter(Boolean);
+      for (const d of dates) {
+        await supabase.from('pickup_schedules').insert({
+          user_id: userId,
+          pickup_date: d,
+          is_custom: true,
+          status: 'pending'
+        });
+      }
+      alert('Jadwal berhasil disimpan!');
+    };
+    saveSchedules();
   };
+
+  // Submit foto bonus
+  const handleBonusSubmit = async () => {
+    if (!userId || !uploadedFile) return;
+
+    const sanitizedFileName = uploadedFile.name
+      .replace(/\s+/g, '_')       
+      .replace(/[^\w.-]/g, '');   
+
+    // upload ke storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('photo_url')
+      .upload(`${userId}/${sanitizedFileName}`, uploadedFile, { upsert: true });
+
+    if (uploadError) {
+      console.log(uploadError);
+      alert('Gagal upload foto');
+      return;
+    }
+
+    const photoUrl = supabase.storage.from('photo_url').getPublicUrl(uploadData.path).data.publicUrl;
+
+    // simpan ke tabel bonus_claims
+    await supabase.from('bonus_claims').insert({
+      user_id: userId,
+      photo_url: photoUrl,
+      status: 'pending'
+    });
+
+    alert('Bonus diklaim, tunggu verifikasi admin!');
+    setUploadedFile(null);
+  };
+
+  // Klaim Coins
+const handleClaimCoins = async () => {
+  const userId = localStorage.getItem("user_id");
+
+  if (!userId) {
+    alert("User tidak ditemukan");
+    return;
+  }
+
+  const { data: claimData, error: claimError } = await supabase
+    .from("bonus_claims")
+    .select("photo_url, claimed_at")
+    .eq("user_id", userId)
+    .order("claimed_at", { ascending: false }) 
+    .limit(1)
+    .single();
+
+  if (claimError && claimError.code !== "PGRST116") {
+    console.error(claimError);
+    alert("Gagal cek data klaim");
+    return;
+  }
+
+  if (!claimData || !claimData.photo_url) {
+    alert(" Kamu harus upload foto dulu sebelum klaim poin!");
+    return;
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+  if (claimData?.claimed_at) {
+    const lastClaim = new Date(claimData.claimed_at)
+      .toISOString()
+      .split("T")[0];
+
+    if (today === lastClaim) {
+      alert("⚠️ Kamu sudah klaim hari ini. Coba lagi besok!");
+      return;
+    }
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("point")
+    .eq("id", userId)
+    .single();
+
+  if (profileError) {
+    console.error(profileError);
+    alert("Gagal mengambil data profil");
+    return;
+  }
+
+  const { error: updateError } = await supabase
+    .from("profiles")
+    .update({ point: (profile.point || 0) + 300 })
+    .eq("id", userId);
+
+  if (updateError) {
+    console.error(updateError);
+    alert("Gagal klaim coins");
+    return;
+  }
+
+  const { error: insertError } = await supabase
+    .from("bonus_claims")
+    .insert([{ user_id: userId, photo_url: claimData.photo_url, claimed_at: new Date() }]);
+
+  if (insertError) {
+    console.error(insertError);
+    alert("Coins berhasil ditambah, tapi gagal simpan log klaim");
+    return;
+  }
+
+  alert(" Berhasil klaim 300 Coins!");
+};
+
+
 
   return (
     <section className="h-auto w-full py-8">
@@ -65,6 +210,8 @@ export default function TrashHouse() {
       </div>
 
       <div className="grid h-fit w-full grid-cols-1 gap-6 lg:grid-cols-9 lg:grid-rows-[auto_auto_auto]">
+
+        {/* Kalender */}
         <div className="order-1 h-fit flex flex-col justify-center items-center rounded-2xl bg-white p-6 shadow-lg lg:col-span-4 lg:row-span-2 lg:row-start-1">
           <div className="flex flex-col items-center justify-center gap-4">
             <h3 className="mb-4 font-nunito text-xl font-bold text-green-700">
@@ -76,21 +223,13 @@ export default function TrashHouse() {
               variant="artistic"
               value={date}
               onChange={setDate}
-              highlightDates={[
-                { month: 7, date: 28 },
-                { month: 7, date: 29 },
-                { month: 7, date: 31 },
-              ]}
+              highlightDates={highlightDates}
               highlightClassName="bg-amber-500 text-white"
-              highlightDates2={[
-                { month: 8, date: 3 },
-                { month: 8, date: 4 },
-                { month: 8, date: 6 },
-              ]}
+              highlightDates2={highlightDates2}
               highlightClassName2="bg-blue-500 text-white"
             />
           </div>
-          <div className="mt-4 flex flex-wrap  justify-center gap-4 border-t pt-4  md:gap-6 lg:gap-2">
+          <div className="mt-4 flex flex-wrap justify-center gap-4 border-t pt-4 md:gap-6 lg:gap-2">
             <div className="flex items-center gap-2">
               <div className="h-4 w-4 rounded-full bg-green-700"></div>
               <h1 className="font-nunito text-base font-semibold text-black">
@@ -110,21 +249,9 @@ export default function TrashHouse() {
               </h1>
             </div>
           </div>
-
-          <div className="my-4 flex w-[320px] h-[100px]  items-center justify-between rounded-xl bg-green-700 px-8">
-            {/* Kiri */}
-            <div className="flex flex-col justify-center">
-              <span className="font-inter text-lg font-semibold text-white">
-                Jatah pengangkutan
-              </span>
-              <span className="text-base -mt-1 text-white opacity-80">Bulan ini</span>
-            </div>
-
-            {/* Kanan */}
-            <div className="text-3xl font-bold text-yellow-200">12x</div>
-          </div>
         </div>
 
+        {/* Bonus & Upload Foto */}
         <div className="relative order-3 rounded-2xl bg-white p-6 shadow-lg lg:order-2 lg:col-span-4 lg:row-start-3">
           <div className="space-y-4 pt-8">
             <div className="flex w-full items-center justify-start gap-2 font-inter text-xl font-semibold">
@@ -159,20 +286,23 @@ export default function TrashHouse() {
                   <button
                     className="w-full rounded-lg bg-green-700 px-4 py-2 font-semibold text-white transition-colors hover:bg-green-800"
                     disabled={!uploadedFile}
+                    onClick={handleBonusSubmit}
                   >
-                    Submit
+                    Kirim
+                  </button>
+                  <button
+                    className="w-full rounded-lg bg-green-700 px-4 py-2 font-semibold text-white transition-colors hover:bg-green-800"
+                    onClick={handleClaimCoins}
+                  >
+                    Klaim 300 Coins
                   </button>
                 </div>
               </div>
             </div>
-            <div className="pt-2">
-              <button className="w-full rounded-lg bg-green-700 px-4 py-2 font-inter text-sm font-semibold text-white transition-colors hover:bg-green-800">
-                Klaim 300 Coins
-              </button>
-            </div>
           </div>
         </div>
 
+        {/* Susun jadwal */}
         <div className="order-2 rounded-2xl border-2 border-green-700 bg-white p-6 shadow-md lg:order-3 lg:col-span-5 lg:row-span-2 lg:row-start-1 lg:row-end-3">
           <h1 className="mb-6 text-center font-inter text-2xl font-bold text-black">
             Susun jadwal pengangkutan
@@ -189,73 +319,36 @@ export default function TrashHouse() {
                 className="w-full rounded-lg border-2 border-green-300 bg-white p-3 font-medium text-gray-700"
               />
             </div>
-
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-green-700">
-                    Pengangkutan 1 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={date1}
-                    onChange={(e) => setDate1(e.target.value)}
-                    min={minDate}
-                    max={maxDate}
-                    className="w-full rounded-lg border-2 border-green-300 p-3 focus:border-green-700 focus:outline-none"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-green-700">
-                    Pengangkutan 2
-                  </label>
-                  <input
-                    type="date"
-                    value={date2}
-                    onChange={(e) => setDate2(e.target.value)}
-                    min={minDate}
-                    max={maxDate}
-                    className="w-full rounded-lg border-2 border-green-300 p-3 focus:border-green-700 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-green-700">
-                    Pengangkutan 3
-                  </label>
-                  <input
-                    type="date"
-                    value={date3}
-                    onChange={(e) => setDate3(e.target.value)}
-                    min={minDate}
-                    max={maxDate}
-                    className="w-full rounded-lg border-2 border-green-300 p-3 focus:border-green-700 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-green-700">
-                    Tambahan{' '}
-                    <span className="text-xs text-black">(Opsional)</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={date4}
-                    onChange={(e) => setDate4(e.target.value)}
-                    min={minDate}
-                    max={maxDate}
-                    className="w-full rounded-lg border-2 border-green-300 p-3 focus:border-green-700 focus:outline-none"
-                  />
-                </div>
+                {[date1,date2,date3,date4].map((d,i)=>(
+                  <div key={i}>
+                    <label className="mb-2 block text-sm font-semibold text-green-700">
+                      Pengangkutan {i+1} {i===0 && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="date"
+                      value={[date1,date2,date3,date4][i]}
+                      onChange={(e)=>{
+                        const val = e.target.value;
+                        if(i===0) setDate1(val);
+                        else if(i===1) setDate2(val);
+                        else if(i===2) setDate3(val);
+                        else setDate4(val);
+                      }}
+                      min={minDate}
+                      max={maxDate}
+                      className="w-full rounded-lg border-2 border-green-300 p-3 focus:border-green-700 focus:outline-none"
+                      required={i===0}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 
             <div className="border-l-4 border-yellow-400 bg-yellow-50 p-4">
               <p className="text-sm text-yellow-800">
-                <strong>Info:</strong> Anda hanya dapat memilih tanggal untuk
-                pekan berikutnya
+                <strong>Info:</strong> Anda hanya dapat memilih tanggal untuk pekan berikutnya
               </p>
             </div>
 
@@ -268,7 +361,8 @@ export default function TrashHouse() {
           </div>
         </div>
 
-        <div className="relative order-4 overflow-hidden rounded-2xl border border-gray-200 bg-white p-8 shadow-xl lg:col-span-5 ">
+        {/* Tata Cara Mendapatkan Bonus Coin */}
+        <div className="relative order-4 overflow-hidden rounded-2xl border border-gray-200 bg-white p-8 shadow-xl lg:col-span-5">
           <div className="mb-6 inline-flex items-center justify-center rounded-xl bg-green-700 p-3 shadow-md">
             <Coins className="h-6 w-6 text-white" />
           </div>
