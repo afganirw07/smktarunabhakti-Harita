@@ -108,7 +108,7 @@ const Navbar = () => {
                     <ul className="space-y-2">
                         <li>
                             <a 
-                                href="#" 
+                                href="#beranda" 
                                 className="block px-6 py-4 text-lg font-family-nunito text-gray-800 hover:bg-green-50 hover:text-green-800 hover:border-r-4 hover:border-green-600 transition-all duration-200"
                                 onClick={toggleMenu}
                             >
@@ -117,7 +117,7 @@ const Navbar = () => {
                         </li>
                         <li>
                             <a 
-                                href="#" 
+                                href="#tentang" 
                                 className="block px-6 py-4 text-lg font-family-nunito text-gray-800 hover:bg-green-50 hover:text-green-800 hover:border-r-4 hover:border-green-600 transition-all duration-200"
                                 onClick={toggleMenu}
                             >
@@ -126,7 +126,7 @@ const Navbar = () => {
                         </li>
                         <li>
                             <a 
-                                href="#" 
+                                href="#layanan" 
                                 className="block px-6 py-4 text-lg font-family-nunito text-gray-800 hover:bg-green-50 hover:text-green-800 hover:border-r-4 hover:border-green-600 transition-all duration-200"
                                 onClick={toggleMenu}
                             >
@@ -135,7 +135,7 @@ const Navbar = () => {
                         </li>
                         <li>
                             <a 
-                                href="#" 
+                                href="#kontak" 
                                 className="block px-6 py-4 text-lg font-family-nunito text-gray-800 hover:bg-green-50 hover:text-green-800 hover:border-r-4 hover:border-green-600 transition-all duration-200"
                                 onClick={toggleMenu}
                             >
