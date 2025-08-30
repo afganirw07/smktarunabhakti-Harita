@@ -152,7 +152,7 @@ export default function ProductCard({
   };
 
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-green-700 bg-white shadow-md">
+    <div className="w-full h-[420px] overflow-hidden rounded-xl border border-green-700 bg-white shadow-md">
       {/* Gambar Produk */}
       <div className="relative h-48 w-full">
         <Image
