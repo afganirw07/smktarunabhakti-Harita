@@ -149,5 +149,5 @@ Email : afganirwansyah070708@gmail.com
 Pass : 123456789
 ```
 
-© 2025 Afgan Irwansyah
+© 2025 Harita
 
