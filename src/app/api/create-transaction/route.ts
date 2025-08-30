@@ -106,7 +106,7 @@ export async function POST(request: Request) {
             .from('profiles')
             .update({
                 plan: enumPlanName,
-                end_date: endDate, // ✅ simpan juga tanggal akhir yang udah ditambah sisa
+                end_date: endDate,
             })
             .eq('id', userId);
 

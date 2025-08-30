@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { SketchCalendarPicker } from 'components/magicui/calendar';
 import { Coins, Camera } from 'lucide-react';
-import { createClient } from "@supabase/supabase-js"
+import { createClient } from '@supabase/supabase-js';
 
 // Supabase Client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function TrashHouse() {
   const [date, setDate] = useState(new Date());
@@ -20,75 +20,183 @@ export default function TrashHouse() {
   const [currentMonth, setCurrentMonth] = useState('');
   const [minDate, setMinDate] = useState('');
   const [maxDate, setMaxDate] = useState('');
-  const [highlightDates, setHighlightDates] = useState<{month:number,date:number}[]>([]);
-  const [highlightDates2, setHighlightDates2] = useState<{month:number,date:number}[]>([]);
+  const [highlightDates, setHighlightDates] = useState<
+    { month: number; date: number }[]
+  >([]);
+  const [highlightDates2, setHighlightDates2] = useState<
+    { month: number; date: number }[]
+  >([]);
+  const [highlightDatesDefault, setHighlightDatesDefault] = useState<
+    { month: number; date: number }[]
+  >([]);
+  const [remainingQuota, setRemainingQuota] = useState<number | null>(null);
 
-  const userId = typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
+  const userId =
+    typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
 
-  // Setup kalender 
-  useEffect(() => {
+  // Setup kalender & fetch data
+useEffect(() => {
     const today = new Date();
     const dayOfWeek = today.getDay();
 
-    const nextMonday = new Date(today);
-    nextMonday.setDate(today.getDate() + ((8 - dayOfWeek) % 7));
-    const nextSunday = new Date(nextMonday);
-    nextSunday.setDate(nextMonday.getDate() + 6);
+    // Hitung tanggal untuk minggu ini
+    const thisWeekStart = new Date(today);
+    thisWeekStart.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)); // Senin minggu ini
+    thisWeekStart.setHours(0, 0, 0, 0);
 
-    setCurrentMonth(nextMonday.toLocaleString('id-ID', { month: 'long' }));
-    setMinDate(nextMonday.toISOString().split('T')[0]);
-    setMaxDate(nextSunday.toISOString().split('T')[0]);
+    const thisWeekEnd = new Date(thisWeekStart);
+    thisWeekEnd.setDate(thisWeekEnd.getDate() + 6);
+    thisWeekEnd.setHours(23, 59, 59, 999);
 
-    // Ambil jadwal minggu depan dari Supabase
-    const fetchSchedules = async () => {
-      if (!userId) return;
+    // Hitung tanggal untuk minggu depan
+    const nextWeekStart = new Date(thisWeekEnd);
+    nextWeekStart.setDate(nextWeekStart.getDate() + 1);
+    nextWeekStart.setHours(0, 0, 0, 0);
 
-      const { data } = await supabase
+    const nextWeekEnd = new Date(nextWeekStart);
+    nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
+    nextWeekEnd.setHours(23, 59, 59, 999);
+
+    setCurrentMonth(nextWeekStart.toLocaleString('id-ID', { month: 'long' }));
+    setMinDate(nextWeekStart.toISOString().split('T')[0]);
+    setMaxDate(nextWeekEnd.toISOString().split('T')[0]);
+
+    // Ambil jatah dan jadwal dari Supabase
+    const fetchData = async () => {
+      const userId = typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
+
+      if (!userId) {
+        setRemainingQuota(null);
+        return;
+      }
+
+      // Ambil jatah pengangkutan
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('pickup_quota')
+        .eq('id', userId)
+        .single();
+
+      if (profileData) {
+        setRemainingQuota(profileData.pickup_quota);
+      } else {
+        console.error('Gagal mengambil jatah:', profileError);
+      }
+
+      // Ambil jadwal kustom untuk minggu ini dan minggu depan
+      const { data: scheduleData, error: scheduleError } = await supabase
         .from('pickup_schedules')
         .select('*')
         .eq('user_id', userId)
-        .gte('pickup_date', nextMonday.toISOString())
-        .lte('pickup_date', nextSunday.toISOString());
+        .eq('is_custom', true)
+        .gte('pickup_date', thisWeekStart.toISOString())
+        .lte('pickup_date', nextWeekEnd.toISOString());
 
-      if (data) {
-        const highlights = data.map((d:any) => ({
-          month: new Date(d.pickup_date).getMonth(),
-          date: new Date(d.pickup_date).getDate()
-        }));
-        setHighlightDates(highlights);
+      if (scheduleData) {
+        const defaultHighlights = [];
+        const customHighlights = [];
+
+        // Jadwal default (Senin, Rabu, Kamis)
+        const defaultDates = [
+          new Date(thisWeekStart),
+          new Date(thisWeekStart.getTime() + 2 * 24 * 60 * 60 * 1000), // Rabu
+          new Date(thisWeekStart.getTime() + 3 * 24 * 60 * 60 * 1000), // Kamis
+        ];
+
+        // Filter jadwal default yang belum lewat dan tambahkan ke highlight
+        defaultDates.forEach(d => {
+          if (d.getTime() >= today.getTime()) {
+            defaultHighlights.push({ month: d.getMonth(), date: d.getDate() });
+          }
+        });
+
+        // Filter jadwal kustom
+        scheduleData.forEach((d: any) => {
+          const pickupDate = new Date(d.pickup_date);
+          const highlight = { month: pickupDate.getMonth(), date: pickupDate.getDate() };
+          
+          if (pickupDate.getTime() >= today.getTime() && pickupDate.getTime() <= thisWeekEnd.getTime()) {
+            // Jika tanggal kustom ada di minggu ini, warnai kuning
+            defaultHighlights.push(highlight);
+          } else if (pickupDate.getTime() >= nextWeekStart.getTime() && pickupDate.getTime() <= nextWeekEnd.getTime()) {
+            // Jika tanggal kustom ada di minggu depan, warnai biru
+            customHighlights.push(highlight);
+          }
+        });
+        
+        // Atur state highlight kalender
+        setHighlightDatesDefault(defaultHighlights);
+        setHighlightDates2(customHighlights);
+
+      } else {
+        console.error('Gagal mengambil jadwal:', scheduleError);
       }
     };
-    fetchSchedules();
+    
+    fetchData();
   }, [userId]);
 
+  
   // Upload file
-  const handleFileUpload = (event:any) => {
+  const handleFileUpload = (event: any) => {
     const file = event.target.files[0];
     setUploadedFile(file);
   };
 
   // Submit jadwal
-  const handleFormSubmit = (e:any) => {
+  const handleFormSubmit = async (e: any) => {
     e.preventDefault();
     if (!date1) {
       alert('Minimal isi tanggal pertama!');
       return;
     }
 
-    const saveSchedules = async () => {
-      if (!userId) return;
-      const dates = [date1, date2, date3, date4].filter(Boolean);
-      for (const d of dates) {
-        await supabase.from('pickup_schedules').insert({
+    if (remainingQuota === null || remainingQuota === 0) {
+      alert('Jatah pengangkutan Anda sudah habis!');
+      return;
+    }
+
+    if (!userId) return;
+
+    const dates = [date1, date2, date3, date4].filter(Boolean);
+    if (dates.length > remainingQuota) {
+      alert(
+        `Jatah Anda hanya ${remainingQuota} kali. Silakan pilih tanggal lebih sedikit.`,
+      );
+      return;
+    }
+
+    const { error: insertError } = await supabase
+      .from('pickup_schedules')
+      .insert(
+        dates.map((d) => ({
           user_id: userId,
           pickup_date: d,
           is_custom: true,
-          status: 'pending'
-        });
-      }
-      alert('Jadwal berhasil disimpan!');
-    };
-    saveSchedules();
+          status: 'pending',
+        })),
+      );
+
+    if (insertError) {
+      console.error('Gagal menyimpan jadwal:', insertError);
+      alert('Gagal menyimpan jadwal!');
+      return;
+    }
+
+    // Kurangi jatah pengangkutan
+    const newQuota = remainingQuota - dates.length;
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ pickup_quota: newQuota })
+      .eq('id', userId);
+
+    if (updateError) {
+      console.error('Gagal mengurangi jatah:', updateError);
+      alert('Jadwal berhasil disimpan, tapi gagal mengurangi jatah.');
+    } else {
+      setRemainingQuota(newQuota);
+      alert('Jadwal berhasil disimpan! Jatah Anda berkurang.');
+    }
   };
 
   // Submit foto bonus
@@ -96,8 +204,8 @@ export default function TrashHouse() {
     if (!userId || !uploadedFile) return;
 
     const sanitizedFileName = uploadedFile.name
-      .replace(/\s+/g, '_')       
-      .replace(/[^\w.-]/g, '');   
+      .replace(/\s+/g, '_')
+      .replace(/[^\w.-]/g, '');
 
     // upload ke storage
     const { data: uploadData, error: uploadError } = await supabase.storage
@@ -105,101 +213,112 @@ export default function TrashHouse() {
       .upload(`${userId}/${sanitizedFileName}`, uploadedFile, { upsert: true });
 
     if (uploadError) {
-      console.log(uploadError);
+      console.error('Gagal upload foto:', uploadError);
       alert('Gagal upload foto');
       return;
     }
 
-    const photoUrl = supabase.storage.from('photo_url').getPublicUrl(uploadData.path).data.publicUrl;
+    const photoUrl = supabase.storage
+      .from('photo_url')
+      .getPublicUrl(uploadData.path).data.publicUrl;
 
     // simpan ke tabel bonus_claims
-    await supabase.from('bonus_claims').insert({
+    const { error: insertError } = await supabase.from('bonus_claims').insert({
       user_id: userId,
       photo_url: photoUrl,
-      status: 'pending'
+      status: 'pending',
     });
 
-    alert('Bonus diklaim, tunggu verifikasi admin!');
-    setUploadedFile(null);
+    if (insertError) {
+      console.error('Gagal menyimpan klaim bonus:', insertError);
+      alert('Gagal menyimpan klaim bonus');
+    } else {
+      alert('Bonus diklaim, tunggu verifikasi admin!');
+      setUploadedFile(null);
+    }
   };
 
   // Klaim Coins
-const handleClaimCoins = async () => {
-  const userId = localStorage.getItem("user_id");
+  const handleClaimCoins = async () => {
+    const userId = localStorage.getItem('user_id');
 
-  if (!userId) {
-    alert("User tidak ditemukan");
-    return;
-  }
-
-  const { data: claimData, error: claimError } = await supabase
-    .from("bonus_claims")
-    .select("photo_url, claimed_at")
-    .eq("user_id", userId)
-    .order("claimed_at", { ascending: false }) 
-    .limit(1)
-    .single();
-
-  if (claimError && claimError.code !== "PGRST116") {
-    console.error(claimError);
-    alert("Gagal cek data klaim");
-    return;
-  }
-
-  if (!claimData || !claimData.photo_url) {
-    alert(" Kamu harus upload foto dulu sebelum klaim poin!");
-    return;
-  }
-
-  const today = new Date().toISOString().split("T")[0];
-  if (claimData?.claimed_at) {
-    const lastClaim = new Date(claimData.claimed_at)
-      .toISOString()
-      .split("T")[0];
-
-    if (today === lastClaim) {
-      alert("⚠️ Kamu sudah klaim hari ini. Coba lagi besok!");
+    if (!userId) {
+      alert('User tidak ditemukan');
       return;
     }
-  }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("point")
-    .eq("id", userId)
-    .single();
+    const { data: claimData, error: claimError } = await supabase
+      .from('bonus_claims')
+      .select('photo_url, claimed_at')
+      .eq('user_id', userId)
+      .order('claimed_at', { ascending: false })
+      .limit(1)
+      .single();
 
-  if (profileError) {
-    console.error(profileError);
-    alert("Gagal mengambil data profil");
-    return;
-  }
+    if (claimError && claimError.code !== 'PGRST116') {
+      console.error(claimError);
+      alert('Gagal cek data klaim');
+      return;
+    }
 
-  const { error: updateError } = await supabase
-    .from("profiles")
-    .update({ point: (profile.point || 0) + 300 })
-    .eq("id", userId);
+    if (!claimData || !claimData.photo_url) {
+      alert(' Kamu harus upload foto dulu sebelum klaim poin!');
+      return;
+    }
 
-  if (updateError) {
-    console.error(updateError);
-    alert("Gagal klaim coins");
-    return;
-  }
+    const today = new Date().toISOString().split('T')[0];
+    if (claimData?.claimed_at) {
+      const lastClaim = new Date(claimData.claimed_at)
+        .toISOString()
+        .split('T')[0];
 
-  const { error: insertError } = await supabase
-    .from("bonus_claims")
-    .insert([{ user_id: userId, photo_url: claimData.photo_url, claimed_at: new Date() }]);
+      if (today === lastClaim) {
+        alert('⚠️ Kamu sudah klaim hari ini. Coba lagi besok!');
+        return;
+      }
+    }
 
-  if (insertError) {
-    console.error(insertError);
-    alert("Coins berhasil ditambah, tapi gagal simpan log klaim");
-    return;
-  }
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('point')
+      .eq('id', userId)
+      .single();
 
-  alert(" Berhasil klaim 300 Coins!");
-};
+    if (profileError) {
+      console.error(profileError);
+      alert('Gagal mengambil data profil');
+      return;
+    }
 
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ point: (profile.point || 0) + 300 })
+      .eq('id', userId);
 
+    if (updateError) {
+      console.error(updateError);
+      alert('Gagal klaim coins');
+      return;
+    }
+
+    const { error: insertError } = await supabase
+      .from('bonus_claims')
+      .insert([
+        {
+          user_id: userId,
+          photo_url: claimData.photo_url,
+          claimed_at: new Date(),
+        },
+      ]);
+
+    if (insertError) {
+      console.error(insertError);
+      alert('Coins berhasil ditambah, tapi gagal simpan log klaim');
+      return;
+    }
+
+    alert(' Berhasil klaim 300 Coins!');
+  };
 
   return (
     <section className="h-auto w-full py-8">
@@ -210,9 +329,8 @@ const handleClaimCoins = async () => {
       </div>
 
       <div className="grid h-fit w-full grid-cols-1 gap-6 lg:grid-cols-9 lg:grid-rows-[auto_auto_auto]">
-
         {/* Kalender */}
-        <div className="order-1 h-fit flex flex-col justify-center items-center rounded-2xl bg-white p-6 shadow-lg lg:col-span-4 lg:row-span-2 lg:row-start-1">
+        <div className="order-1 flex h-fit flex-col items-center justify-center rounded-2xl bg-white p-6 shadow-lg lg:col-span-4 lg:row-span-2 lg:row-start-1">
           <div className="flex flex-col items-center justify-center gap-4">
             <h3 className="mb-4 font-nunito text-xl font-bold text-green-700">
               Jadwal Pengangkutan
@@ -223,9 +341,9 @@ const handleClaimCoins = async () => {
               variant="artistic"
               value={date}
               onChange={setDate}
-              highlightDates={highlightDates}
+              highlightDates={highlightDatesDefault} // Jadwal default minggu ini (kuning)
               highlightClassName="bg-amber-500 text-white"
-              highlightDates2={highlightDates2}
+              highlightDates2={highlightDates2} // Jadwal kustom minggu depan (biru)
               highlightClassName2="bg-blue-500 text-white"
             />
           </div>
@@ -248,18 +366,22 @@ const handleClaimCoins = async () => {
                 Minggu Depan
               </h1>
             </div>
-            <div className="my-4 flex w-[320px] h-[100px]  items-center justify-between rounded-xl bg-green-700 px-8">
-            {/* Kiri */}
-            <div className="flex flex-col justify-center">
-              <span className="font-inter text-lg font-semibold text-white">
-                Jatah pengangkutan
-              </span>
-              <span className="text-base -mt-1 text-white opacity-80">Bulan ini</span>
-            </div>
+            <div className="my-4 flex h-[100px] w-[320px]  items-center justify-between rounded-xl bg-green-700 px-8">
+              {/* Kiri */}
+              <div className="flex flex-col justify-center">
+                <span className="font-inter text-lg font-semibold text-white">
+                  Jatah pengangkutan
+                </span>
+                <span className="-mt-1 text-base text-white opacity-80">
+                  Bulan ini
+                </span>
+              </div>
 
-            {/* Kanan */}
-            <div className="text-3xl font-bold text-yellow-200">12x</div>
-          </div>
+              {/* Kanan */}
+              <div className="text-3xl font-bold text-yellow-200">
+                {remainingQuota !== null ? `${remainingQuota}x` : '...'}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -333,25 +455,26 @@ const handleClaimCoins = async () => {
             </div>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                {[date1,date2,date3,date4].map((d,i)=>(
+                {[date1, date2, date3, date4].map((d, i) => (
                   <div key={i}>
                     <label className="mb-2 block text-sm font-semibold text-green-700">
-                      Pengangkutan {i+1} {i===0 && <span className="text-red-500">*</span>}
+                      Pengangkutan {i + 1}{' '}
+                      {i === 0 && <span className="text-red-500">*</span>}
                     </label>
                     <input
                       type="date"
-                      value={[date1,date2,date3,date4][i]}
-                      onChange={(e)=>{
+                      value={[date1, date2, date3, date4][i]}
+                      onChange={(e) => {
                         const val = e.target.value;
-                        if(i===0) setDate1(val);
-                        else if(i===1) setDate2(val);
-                        else if(i===2) setDate3(val);
+                        if (i === 0) setDate1(val);
+                        else if (i === 1) setDate2(val);
+                        else if (i === 2) setDate3(val);
                         else setDate4(val);
                       }}
                       min={minDate}
                       max={maxDate}
                       className="w-full rounded-lg border-2 border-green-300 p-3 focus:border-green-700 focus:outline-none"
-                      required={i===0}
+                      required={i === 0}
                     />
                   </div>
                 ))}
@@ -360,7 +483,8 @@ const handleClaimCoins = async () => {
 
             <div className="border-l-4 border-yellow-400 bg-yellow-50 p-4">
               <p className="text-sm text-yellow-800">
-                <strong>Info:</strong> Anda hanya dapat memilih tanggal untuk pekan berikutnya
+                <strong>Info:</strong> Anda hanya dapat memilih tanggal untuk
+                pekan berikutnya
               </p>
             </div>
 

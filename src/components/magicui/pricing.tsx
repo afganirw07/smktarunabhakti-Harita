@@ -175,6 +175,7 @@ export default function WasteManagementPricing({
   const [userPhone, setUserPhone] = useState('Loading...');
   const [remainingDays, setRemainingDays] = useState(0);
   const [currentPlan, setCurrentPlan] = useState<string | null>(null);
+  const [pickup_quota, setPickup_quota] = useState(12);
   const [isCurrentPlanTrial, setIsCurrentPlanTrial] = useState(false);
   const [newPlanDuration, setNewPlanDuration] = useState(0);
 
@@ -215,6 +216,7 @@ export default function WasteManagementPricing({
         setUserEmail(data?.email || 'Loading...');
         setUserPhone(data?.phone || 'Loading...');
         setCurrentPlan(data?.plan || null);
+        setPickup_quota(12);
         setIsCurrentPlanTrial(data?.plan === 'Trial');
 
         if (data?.end_date) {
