@@ -602,14 +602,6 @@ const handleModalConfirm = async () => {
               </div>
             ))}
           </div>
-          <div className="mt-12 text-center">
-            <p className="mb-4 font-nunito text-lg text-gray-500">
-              Butuh layanan khusus untuk kompleks perumahan atau bisnis?
-            </p>
-            <button className="font-nunito text-base font-semibold text-green-800 transition-colors duration-200 hover:text-green-500">
-              Hubungi Tim Kami untuk Konsultasi →
-            </button>
-          </div>
         </div>
       </div>
       <ConfirmationModal
