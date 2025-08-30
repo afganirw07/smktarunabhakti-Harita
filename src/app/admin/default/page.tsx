@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import MiniCalendar from '../../../components/miniCalendar/MiniCalendar';
 import WeeklyRevenue from 'components/admin/default/WeeklyRevenue';
 import TotalSpent from 'components/admin/default/TotalSpent';
 import PieChartCard from 'components/admin/default/PieChartCard';
@@ -9,12 +8,7 @@ import { MdBarChart, MdDashboard } from 'react-icons/md';
 import { FaUserFriends } from 'react-icons/fa';
 
 import Widget from 'components/widget/Widget';
-import CheckTable from 'components/admin/default/CheckTable';
-import ComplexTable from 'components/admin/default/ComplexTable';
 import DailyTraffic from 'components/admin/default/DailyTraffic';
-import TaskCard from 'components/admin/default/TaskCard';
-import tableDataCheck from 'variables/data-tables/tableDataCheck';
-import tableDataComplex from 'variables/data-tables/tableDataComplex';
 import { createClient } from '@supabase/supabase-js';
 
 // Inisialisasi Supabase Client
@@ -168,24 +162,131 @@ const Dashboard = () => {
 
       {/* Tables & Charts */}
       <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
-        {/* Check Table */}
-        <div>
-          <CheckTable tableData={tableDataCheck} />
-        </div>
         {/* Traffic chart & Pie Chart */}
         <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
           <DailyTraffic />
           <PieChartCard />
         </div>
-        {/* Complex Table , Task & Calendar */}
+
+                {/* confirmation photo */}
+        <div className="relative flex h-auto w-full flex-col gap-6 rounded-2xl py-8 md:px-6">
+          {/* Header */}
+          <div>
+            <h1 className="text-xl font-bold">Konfirmasi Foto Sampah</h1>
+          </div>
+          
+          <div className='w-full lg:h-[350px] h-auto overflow-y-auto scrollbar-none flex lg:flex-col flex-col md:flex-row lg:flex-nowrap flex-nowrap md:flex-wrap  gap-6 '>
+          {/* Card */}
+          <div className="flex w-full lg:w-full md:w-fit items-center gap-4 rounded-xl border border-black/20 lg:p-4 p-4 md:px-6 py-4">
+            {/* Image placeholder */}
+            <div className="flex h-20 w-32 items-center justify-center rounded-xl bg-blueSecondary">
+              <h1 className="text-center text-sm font-bold text-white">
+                Gambar dari user
+              </h1>
+            </div>
+
+            {/* User info */}
+            <div className="flex h-full flex-col justify-between">
+              <h1 className="text-base font-bold">
+                Ahsan Rosikhan Yusri
+              </h1>
+              <p className="text-sm font-semibold text-black/40">
+                25 Agustus 2025
+              </p>
+
+              <button className="mt-2 rounded-lg bg-green-700 px-4 py-1 font-nunito text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-green-800 ">
+                Konfirmasi
+              </button>
+            </div>
+          </div>
+
+         
+          <div className="flex w-full lg:w-full md:w-fit items-center gap-4 rounded-xl border border-black/20 lg:p-4 p-4 md:px-6 py-4">
+            {/* Image placeholder */}
+            <div className="flex h-20 w-32 items-center justify-center rounded-xl bg-blueSecondary">
+              <h1 className="text-center text-sm font-bold text-white">
+                Gambar dari user
+              </h1>
+            </div>
+
+            {/* User info */}
+            <div className="flex h-full flex-col justify-between">
+              <h1 className="text-base font-bold">
+                Ahsan Rosikhan Yusri
+              </h1>
+              <p className="text-sm font-semibold text-black/40">
+                25 Agustus 2025
+              </p>
+
+              <button className="mt-2 rounded-lg bg-green-700 px-4 py-1 font-nunito text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-green-800 ">
+                Konfirmasi
+              </button>
+            </div>
+          </div>
+
+         
+          <div className="flex w-full lg:w-full md:w-fit items-center gap-4 rounded-xl border border-black/20 lg:p-4 p-4 md:px-6 py-4">
+            {/* Image placeholder */}
+            <div className="flex h-20 w-32 items-center justify-center rounded-xl bg-blueSecondary">
+              <h1 className="text-center text-sm font-bold text-white">
+                Gambar dari user
+              </h1>
+            </div>
+
+            {/* User info */}
+            <div className="flex h-full flex-col justify-between">
+              <h1 className="text-base font-bold">
+                Ahsan Rosikhan Yusri
+              </h1>
+              <p className="text-sm font-semibold text-black/40">
+                25 Agustus 2025
+              </p>
+
+              <button className="mt-2 rounded-lg bg-green-700 px-4 py-1 font-nunito text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-green-800 ">
+                Konfirmasi
+              </button>
+            </div>
+          </div>
+
+         
+          <div className="flex w-full lg:w-full md:w-fit items-center gap-4 rounded-xl border border-black/20 lg:p-4 p-4 md:px-6 py-4">
+            {/* Image placeholder */}
+            <div className="flex h-20 w-32 items-center justify-center rounded-xl bg-blueSecondary">
+              <h1 className="text-center text-sm font-bold text-white">
+                Gambar dari user
+              </h1>
+            </div>
+
+            {/* User info */}
+            <div className="flex h-full flex-col justify-between">
+              <h1 className="text-base font-bold">
+                Ahsan Rosikhan Yusri
+              </h1>
+              <p className="text-sm font-semibold text-black/40">
+                25 Agustus 2025
+              </p>
+
+              <button className="mt-2 rounded-lg bg-green-700 px-4 py-1 font-nunito text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-green-800 ">
+                Konfirmasi
+              </button>
+            </div>
+          </div>
+
+         
+          </div>
+
+
+        </div>
+
+        {/* Complex Table , Task & Calendar
         <ComplexTable tableData={tableDataComplex} />
-        {/* Task chart & Calendar */}
+        Task chart & Calendar
         <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
           <TaskCard />
           <div className="grid grid-cols-1 rounded-[20px]">
             <MiniCalendar />
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

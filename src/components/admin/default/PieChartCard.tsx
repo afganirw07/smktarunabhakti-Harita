@@ -21,7 +21,7 @@ const PieChartCard = () => {
         </div>
       </div>
 
-      <div className="mb-auto flex h-[220px] w-full items-center justify-center">
+      <div className="mb-auto lg:mt-10 flex h-[250px] w-full items-center justify-center">
         <PieChart chartOptions={pieChartOptions} chartData={pieChartData} />
       </div>
       <div className="flex flex-row !justify-between rounded-2xl  px-2 py-3 shadow-2xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
