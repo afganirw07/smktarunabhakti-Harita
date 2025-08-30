@@ -156,56 +156,113 @@ export default function TrashHouse() {
   // Submit jadwal
   const handleFormSubmit = async (e: any) => {
     e.preventDefault();
-    if (!date1) {
-      alert('Minimal isi tanggal pertama!');
+
+    const dates = [date1, date2, date3, date4].filter(Boolean);
+
+    if (dates.length === 0) {
+      alert("Minimal isi tanggal pertama!");
+      return;
+    }
+
+    if (dates.length > 4) {
+      alert("Anda hanya bisa memilih maksimal 4 tanggal pengangkutan.");
+      return;
+    }
+
+    const uniqueDates = new Set(dates);
+    if (uniqueDates.size !== dates.length) {
+      alert("Tidak boleh memilih tanggal yang sama lebih dari sekali di input!");
       return;
     }
 
     if (remainingQuota === null || remainingQuota === 0) {
-      alert('Jatah pengangkutan Anda sudah habis!');
+      alert("Jatah pengangkutan Anda sudah habis!");
+      return;
+    }
+
+    const nextWeekStart = new Date(minDate);
+    const nextWeekEnd = new Date(maxDate);
+
+    const invalidDates = dates.filter((d) => {
+      const dateObj = new Date(d);
+      return dateObj < nextWeekStart || dateObj > nextWeekEnd;
+    });
+
+    if (invalidDates.length > 0) {
+      alert(
+        `Tanggal ${invalidDates.join(
+          ", "
+        )} tidak valid. Anda hanya bisa memilih tanggal di minggu depan.`
+      );
       return;
     }
 
     if (!userId) return;
 
-    const dates = [date1, date2, date3, date4].filter(Boolean);
-    if (dates.length > remainingQuota) {
-      alert(
-        `Jatah Anda hanya ${remainingQuota} kali. Silakan pilih tanggal lebih sedikit.`,
-      );
+    // 🔥 CEK APAKAH TANGGAL SUDAH ADA DI DB
+    const { data: existingSchedules, error: existingError } = await supabase
+      .from("pickup_schedules")
+      .select("pickup_date")
+      .eq("user_id", userId)
+      .gte("pickup_date", minDate)
+      .lte("pickup_date", maxDate);
+
+    if (existingError) {
+      console.error("Gagal cek jadwal:", existingError);
+      alert("Gagal cek jadwal lama!");
       return;
     }
 
+    const existingDates = existingSchedules?.map((s: any) =>
+      new Date(s.pickup_date).toISOString().split("T")[0]
+    ) || [];
+
+    const duplicates = dates.filter((d) => existingDates.includes(d));
+    if (duplicates.length > 0) {
+      alert(`Tanggal ${duplicates.join(", ")} sudah ada di jadwal Anda!`);
+      return;
+    }
+
+    // 🚨 FIX: kalau user input manual → hapus default minggu depan
+    await supabase
+      .from("pickup_schedules")
+      .delete()
+      .eq("user_id", userId)
+      .eq("is_custom", false) // hapus default
+      .gte("pickup_date", minDate)
+      .lte("pickup_date", maxDate);
+
+    // INSERT JADWAL BARU
     const { error: insertError } = await supabase
-      .from('pickup_schedules')
+      .from("pickup_schedules")
       .insert(
         dates.map((d) => ({
           user_id: userId,
           pickup_date: d,
           is_custom: true,
-          status: 'pending',
-        })),
+          status: "pending",
+        }))
       );
 
     if (insertError) {
-      console.error('Gagal menyimpan jadwal:', insertError);
-      alert('Gagal menyimpan jadwal!');
+      console.error("Gagal menyimpan jadwal:", insertError);
+      alert("Jadwal gagal disimpan!");
       return;
     }
 
-    // Kurangi jatah pengangkutan
+    // UPDATE QUOTA
     const newQuota = remainingQuota - dates.length;
     const { error: updateError } = await supabase
-      .from('profiles')
+      .from("profiles")
       .update({ pickup_quota: newQuota })
-      .eq('id', userId);
+      .eq("id", userId);
 
     if (updateError) {
-      console.error('Gagal mengurangi jatah:', updateError);
-      alert('Jadwal berhasil disimpan, tapi gagal mengurangi jatah.');
+      console.error("Gagal mengurangi jatah:", updateError);
+      alert("Jadwal berhasil disimpan, tapi gagal mengurangi jatah.");
     } else {
       setRemainingQuota(newQuota);
-      alert('Jadwal berhasil disimpan! Jatah Anda berkurang.');
+      alert("Jadwal berhasil disimpan! Default minggu depan sudah diganti dengan input Anda.");
     }
   };
 
@@ -249,7 +306,7 @@ export default function TrashHouse() {
   };
 
   // Klaim Coins (Logic Baru)
-const handleClaimCoins = async () => {
+  const handleClaimCoins = async () => {
     const userId = localStorage.getItem('user_id');
 
     if (!userId) {
@@ -329,7 +386,7 @@ const handleClaimCoins = async () => {
     }
 
     alert(`Berhasil klaim ${bonusPoints} Coins!`);
-};
+  };
 
   return (
     <section className="h-auto w-full py-8">
@@ -377,7 +434,7 @@ const handleClaimCoins = async () => {
                 Minggu Depan
               </h1>
             </div>
-            <div className="my-4 flex h-[100px] w-[320px]  items-center justify-between rounded-xl bg-green-700 px-8">
+            <div className="my-4 flex h-[100px] w-[320px]  items-center justify-between rounded-xl bg-green-700 px-8">
               {/* Kiri */}
               <div className="flex flex-col justify-center">
                 <span className="font-inter text-lg font-semibold text-white">
