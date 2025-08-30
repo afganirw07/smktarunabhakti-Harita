@@ -15,6 +15,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import jsPDF from 'jspdf';
 import { toPng } from 'html-to-image';
+import Image from 'next/image';
 
 // Configure Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -80,7 +81,6 @@ export default function TukarSampah() {
           .select('id, nama_barang, nilai_ha_coins, nilai_barang_per_kg');
         if (barangError) throw barangError;
         setJenisBarangList(barangData as JenisBarang[]);
-
       } catch (err: any) {
         console.error('Error fetching data:', err.message);
         setError('Gagal memuat data. Silakan coba lagi.');
@@ -107,16 +107,17 @@ export default function TukarSampah() {
     }));
     setIsDropdownOpen(false);
   };
-  
+
   const handleDownloadPdf = () => {
     const strukElement = document.getElementById('struk-content');
     if (!strukElement) return;
 
     toPng(strukElement)
       .then((dataUrl) => {
-        const imgWidth = 210; 
-        const pageHeight = 297; 
-        const imgHeight = (strukElement.clientHeight * imgWidth) / strukElement.clientWidth;
+        const imgWidth = 210;
+        const pageHeight = 297;
+        const imgHeight =
+          (strukElement.clientHeight * imgWidth) / strukElement.clientWidth;
         const pdf = new jsPDF('p', 'mm', 'a4');
         let heightLeft = imgHeight;
 
@@ -139,15 +140,16 @@ export default function TukarSampah() {
       });
   };
 
-
-const handleSubmit = async () => {
+  const handleSubmit = async () => {
     if (!isFormValid) {
       alert('Harap lengkapi semua data formulir.');
       return;
     }
 
     const massaSampahKg = parseFloat(formData.massaSampah);
-    const selectedBarangData = jenisBarangList.find(b => b.nama_barang === selectedBarang);
+    const selectedBarangData = jenisBarangList.find(
+      (b) => b.nama_barang === selectedBarang,
+    );
 
     if (!selectedBarangData) {
       alert('Jenis barang tidak ditemukan.');
@@ -155,7 +157,8 @@ const handleSubmit = async () => {
     }
 
     const totalHaritaCoins = massaSampahKg * 100;
-    const totalBarangDidapat = massaSampahKg * selectedBarangData.nilai_barang_per_kg;
+    const totalBarangDidapat =
+      massaSampahKg * selectedBarangData.nilai_barang_per_kg;
 
     const transaction = {
       nama_lengkap: formData.namaLengkap,
@@ -170,33 +173,35 @@ const handleSubmit = async () => {
     try {
       const userId = localStorage.getItem('user_id');
       if (!userId) {
-        throw new Error('User ID not found in local storage. Please log in again.');
+        throw new Error(
+          'User ID not found in local storage. Please log in again.',
+        );
       }
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('point') 
+        .select('point')
         .eq('id', userId)
         .single();
-    
+
       if (profileError) {
         console.error('Error fetching profile:', profileError.message);
         throw new Error('User profile not found.');
       }
-    
+
       const currentPoints = profile?.point || 0;
       const newTotalPoints = currentPoints + totalHaritaCoins;
-    
+
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ point: newTotalPoints })
         .eq('id', userId);
-        
+
       if (updateError) {
         console.error('Error updating profile points:', updateError.message);
         throw new Error('Failed to update user points.');
       }
-      
+
       const { data, error } = await supabase
         .from('tukar_sampah')
         .insert(transaction)
@@ -211,7 +216,7 @@ const handleSubmit = async () => {
         title: 'Penukaran Sampah Berhasil',
         body: `Selamat! Anda berhasil menukar sampah dan mendapatkan ${totalHaritaCoins} Harita Coins.`,
         type: 'tukar_sampah',
-        related_id: newTransaction.id, 
+        related_id: newTransaction.id,
       };
 
       const { error: notificationError } = await supabase
@@ -219,22 +224,23 @@ const handleSubmit = async () => {
         .insert(notificationData);
 
       if (notificationError) {
-        console.error('Error inserting notification:', notificationError.message);
+        console.error(
+          'Error inserting notification:',
+          notificationError.message,
+        );
       }
-      
+
       setTransaksiData({
         ...transaction,
         totalBarangDidapat,
       });
-      
-      setShowStruk(true); 
 
+      setShowStruk(true);
     } catch (err: any) {
       console.error('Error submitting form:', err.message);
       alert(`Gagal mengirim form: ${err.message}`);
     }
   };
-  
 
   const isFormValid =
     formData.namaLengkap &&
@@ -248,9 +254,13 @@ const handleSubmit = async () => {
     <>
       <section className="min-h-screen w-full py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-          {loading && <p className="col-span-full text-center">Memuat data...</p>}
-          {error && <p className="col-span-full text-center text-red-500">{error}</p>}
-          
+          {loading && (
+            <p className="col-span-full text-center">Memuat data...</p>
+          )}
+          {error && (
+            <p className="col-span-full text-center text-red-500">{error}</p>
+          )}
+
           {!loading && !error && (
             <>
               {/* Lokasi pos terdekat */}
@@ -263,12 +273,15 @@ const handleSubmit = async () => {
                 </h1>
                 <div className="flex flex-col gap-4">
                   {lokasiPosList.map((lokasi) => (
-                    <div key={lokasi.id} className="flex items-center gap-4 rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow duration-200">
-                      <div className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <MapPin className="w-8 h-8 text-green-600" />
+                    <div
+                      key={lokasi.id}
+                      className="flex items-center gap-4 rounded-lg border border-gray-200 p-4 transition-shadow duration-200 hover:shadow-md"
+                    >
+                      <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-green-100">
+                        <MapPin className="h-8 w-8 text-green-600" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-inter text-lg font-semibold text-green-800 mb-1">
+                        <h3 className="mb-1 font-inter text-lg font-semibold text-green-800">
                           {lokasi.nama}
                         </h3>
                         <p className="font-nunito text-sm text-gray-600">
@@ -277,35 +290,70 @@ const handleSubmit = async () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                          <p className="font-nunito text-base font-bold text-gray-800">{lokasi.rating.toFixed(1)}</p>
+                          <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                          <p className="font-nunito text-base font-bold text-gray-800">
+                            {lokasi.rating.toFixed(1)}
+                          </p>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-              
+
               {/* Barang yang ditukar */}
-              <div className="rounded-2xl bg-white p-6 shadow-lg lg:col-span-3 lg:row-start-2 lg:row-span-3">
-                <h1 className="text-lg font-bold font-inter text-center">
+              <div className="rounded-2xl bg-white p-6 shadow-lg lg:col-span-3 lg:row-span-3 lg:row-start-2">
+                <h1 className="text-center font-inter text-lg font-bold">
                   Pilih Barang yang ditukar
                 </h1>
                 <div className="mt-4 grid w-full grid-cols-3 gap-4">
-                  {jenisBarangList.map((barang) => (
-                    <button
-                      key={barang.id}
-                      type="button"
-                      onClick={() => setSelectedBarang(barang.nama_barang)}
-                      className={`col-span-1 h-[100px] rounded-xl flex justify-center items-center font-bold text-2xl transition-all ${
-                        selectedBarang === barang.nama_barang
-                          ? 'bg-green-700 text-white shadow-lg scale-105'
-                          : 'bg-blue-500 text-white hover:bg-green-600'
-                      }`}
-                    >
-                      {barang.nama_barang}
-                    </button>
-                  ))}
+                  {jenisBarangList.map((barang) => {
+                    // Mapping gambar sesuai nama_barang
+                    const imageMap: Record<string, string> = {
+                      Pupuk: '/img/user/pupuk.jpg',
+                      'Paving Blok': '/img/user/pavingBlock.jpg',
+                      // default fallback kalau tidak ada
+                      default: '/img/user/Briket.jpg',
+                    };
+
+                    const imageSrc =
+                      imageMap[barang.nama_barang] || imageMap.default;
+
+                    return (
+                      <button
+                        key={barang.id}
+                        type="button"
+                        onClick={() => setSelectedBarang(barang.nama_barang)}
+                        className={`group relative col-span-1 h-[150px] overflow-hidden rounded-xl transition-all ${
+                          selectedBarang === barang.nama_barang
+                            ? 'scale-105 ring-4 ring-green-700'
+                            : 'hover:scale-105'
+                        }`}
+                      >
+                        {/* Gambar */}
+                        <Image
+                          src={imageSrc}
+                          alt={barang.nama_barang}
+                          fill
+                          className="object-cover object-center"
+                        />
+
+                        {/* Overlay gradient hitam */}
+                        <div className="to-transparent absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 opacity-0 transition-opacity group-hover:opacity-100"></div>
+
+                        {/* Nama barang */}
+                        <span
+                          className={`absolute bottom-3 left-1/2 -translate-x-1/2 rounded-md px-2 py-1 text-sm font-bold transition-all ${
+                            selectedBarang === barang.nama_barang
+                              ? 'text-white'
+                              : 'text-white opacity-0 group-hover:opacity-100'
+                          }`}
+                        >
+                          {barang.nama_barang}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -437,7 +485,7 @@ const handleSubmit = async () => {
                                 {lokasi.nama}
                               </span>
                               <div className="flex items-center gap-1">
-                                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                                <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
                                 <span className="font-nunito text-sm font-semibold text-gray-800">
                                   {lokasi.rating.toFixed(1)}
                                 </span>
@@ -480,50 +528,61 @@ const handleSubmit = async () => {
       {/* Modal Struk */}
       {showStruk && transaksiData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div id="struk-content" className="relative max-w-lg w-full p-8 bg-white rounded-lg shadow-2xl m-4">
-            <h2 className="text-3xl font-bold text-center text-green-700 mb-6">
+          <div
+            id="struk-content"
+            className="relative m-4 w-full max-w-lg rounded-lg bg-white p-8 shadow-2xl"
+          >
+            <h2 className="mb-6 text-center text-3xl font-bold text-green-700">
               Struk Penukaran Sampah
             </h2>
             <div className="space-y-4">
               <p className="font-nunito text-lg">
-                <span className="font-bold">Nama:</span> {transaksiData.nama_lengkap}
+                <span className="font-bold">Nama:</span>{' '}
+                {transaksiData.nama_lengkap}
               </p>
               <p className="font-nunito text-lg">
-                <span className="font-bold">Nomor HP:</span> {transaksiData.nomor_handphone}
+                <span className="font-bold">Nomor HP:</span>{' '}
+                {transaksiData.nomor_handphone}
               </p>
               <p className="font-nunito text-lg">
-                <span className="font-bold">Harita Pos:</span> {transaksiData.nama_harita_pos}
+                <span className="font-bold">Harita Pos:</span>{' '}
+                {transaksiData.nama_harita_pos}
               </p>
               <p className="font-nunito text-lg">
-                <span className="font-bold">Massa Sampah:</span> {transaksiData.massa_sampah_kg} Kg
+                <span className="font-bold">Massa Sampah:</span>{' '}
+                {transaksiData.massa_sampah_kg} Kg
               </p>
               <p className="font-nunito text-lg">
-                <span className="font-bold">Barang yang Dipilih:</span> {transaksiData.jenis_barang}
+                <span className="font-bold">Barang yang Dipilih:</span>{' '}
+                {transaksiData.jenis_barang}
               </p>
-              <div className="bg-green-50 p-4 rounded-lg mt-4">
-                <p className="font-nunito text-md text-gray-600 mb-2">
-                  Anda akan mendapatkan {transaksiData.totalBarangDidapat} Kg {transaksiData.jenis_barang}
+              <div className="mt-4 rounded-lg bg-green-50 p-4">
+                <p className="text-md mb-2 font-nunito text-gray-600">
+                  Anda akan mendapatkan {transaksiData.totalBarangDidapat} Kg{' '}
+                  {transaksiData.jenis_barang}
                 </p>
                 <div className="flex items-center gap-2">
                   <span className="text-3xl font-extrabold text-green-800">
                     {transaksiData.harita_coins_didapat}
                   </span>
-                  <span className="font-inter text-xl font-bold text-gray-700">Harita Coins</span>
+                  <span className="font-inter text-xl font-bold text-gray-700">
+                    Harita Coins
+                  </span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 flex flex-col sm:flex-row gap-4">
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <button
                 onClick={handleDownloadPdf}
-                className="flex items-center justify-center gap-2 w-full sm:w-1/2 bg-blue-500 text-white font-bold py-3 rounded-xl transition-colors hover:bg-blue-600"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-3 font-bold text-white transition-colors hover:bg-blue-600 sm:w-1/2"
               >
                 <Download className="h-5 w-5" />
                 Unduh Struk
               </button>
               <button
                 onClick={() => setShowStruk(false)}
-                className="w-full sm:w-1/2 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition-colors hover:bg-gray-300"
+                className="w-full rounded-xl bg-gray-200 py-3 font-bold text-gray-700 transition-colors hover:bg-gray-300 sm:w-1/2"
               >
                 Tutup
               </button>
