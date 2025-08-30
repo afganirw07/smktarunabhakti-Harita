@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [totalKaryawan, setTotalkaryawan] = useState(0);
   const [Layanan, SetLayanan] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [photosToConfirm, setPhotosToConfirm] = useState([]);
 
   const fetchTotalUsers = async () => {
     try {
@@ -45,10 +46,6 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchTotalUsers();
-  }, []);
 
   const fetchTotalKaryawan = async () => {
     try {
@@ -110,12 +107,77 @@ const Dashboard = () => {
     }
   };
 
-  useEffect(() => {
-    fetchTotalKaryawan();
-  }, []);
+  const fetchFoto = async () => {
+    try {
+      if (!supabase) {
+        console.error('Supabase client not initialized');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('bonus_claims')
+        .select('*, profiles(first_name, last_name)')
+        .eq('status', 'pending')
+        .order('claimed_at', { ascending: false });
+
+      if (error) throw error;
+
+      // langsung pakai photo_url dari DB
+      const photosWithPublicUrls = data.map((photo) => ({
+        ...photo,
+        public_url: photo.photo_url,
+      }));
+
+      setPhotosToConfirm(photosWithPublicUrls);
+      console.log('Fetched photos:', photosWithPublicUrls);
+    } catch (error) {
+      console.error('Error fetching photos:', error);
+    }
+  };
+
+  const handleConfirmation = async (photoId) => {
+    try {
+      if (!supabase) {
+        console.error('Supabase client not initialized');
+        return;
+      }
+
+      // You can get the admin user ID from the Supabase session
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        console.error('Admin user not authenticated.');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('bonus_claims')
+        .update({
+          status: 'Konfirmasi',
+          is_claimed: true,
+          admin_id: user.id,
+        })
+        .eq('id', photoId);
+
+      if (error) {
+        throw error;
+      }
+
+      console.log('Photo confirmed successfully:', data);
+      // Re-fetch the list to update the UI
+      fetchFoto();
+    } catch (error) {
+      console.error('Error confirming photo:', error);
+    }
+  };
 
   useEffect(() => {
+    fetchTotalUsers();
+    fetchTotalKaryawan();
     fetchTotalLayanan();
+    fetchFoto();
   }, []);
 
   return (
@@ -168,125 +230,59 @@ const Dashboard = () => {
           <PieChartCard />
         </div>
 
-                {/* confirmation photo */}
+        {/* confirmation photo */}
         <div className="relative flex h-auto w-full flex-col gap-6 rounded-2xl py-8 md:px-6">
           {/* Header */}
           <div>
             <h1 className="text-xl font-bold">Konfirmasi Foto Sampah</h1>
           </div>
-          
-          <div className='w-full lg:h-[350px] h-auto overflow-y-auto scrollbar-none flex lg:flex-col flex-col md:flex-row lg:flex-nowrap flex-nowrap md:flex-wrap  gap-6 '>
-          {/* Card */}
-          <div className="flex w-full lg:w-full md:w-fit items-center gap-4 rounded-xl border border-black/20 lg:p-4 p-4 md:px-6 py-4">
-            {/* Image placeholder */}
-            <div className="flex h-20 w-32 items-center justify-center rounded-xl bg-blueSecondary">
-              <h1 className="text-center text-sm font-bold text-white">
-                Gambar dari user
-              </h1>
-            </div>
 
-            {/* User info */}
-            <div className="flex h-full flex-col justify-between">
-              <h1 className="text-base font-bold">
-                Ahsan Rosikhan Yusri
-              </h1>
-              <p className="text-sm font-semibold text-black/40">
-                25 Agustus 2025
-              </p>
+          <div className="scrollbar-none flex h-auto w-full flex-col flex-nowrap gap-6 overflow-y-auto md:flex-row md:flex-wrap lg:h-[350px] lg:flex-col  lg:flex-nowrap ">
+            {photosToConfirm.length > 0 ? (
+              photosToConfirm.map((photo) => (
+                <div
+                  key={photo.id}
+                  className="flex w-full items-center gap-4 rounded-xl border border-black/20 p-4 py-4 md:w-fit md:px-6 lg:w-full lg:p-4"
+                >
+                  {/* Image from user */}
+                  <div className="flex h-20 w-32 items-center justify-center rounded-xl bg-blueSecondary">
+                    {photo.public_url ? (
+                      <img
+                        src={photo.public_url}
+                        alt="Gambar dari user"
+                        className="h-full w-full rounded-xl object-cover"
+                      />
+                    ) : (
+                      <h1 className="text-center text-sm font-bold text-white">
+                        Gambar dari user
+                      </h1>
+                    )}
+                  </div>
 
-              <button className="mt-2 rounded-lg bg-green-700 px-4 py-1 font-nunito text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-green-800 ">
-                Konfirmasi
-              </button>
-            </div>
+                  {/* User info */}
+                  <div className="flex h-full flex-col justify-between">
+                    <h1 className="text-base font-bold">
+                      {photo.profiles?.first_name}{' '}
+                      {photo.profiles?.last_name || 'User tidak ditemukan'}
+                    </h1>
+                    <p className="text-sm font-semibold text-black/40">
+                      {new Date(photo.claimed_at).toLocaleDateString()}
+                    </p>
+
+                    <button
+                      onClick={() => handleConfirmation(photo.id)}
+                      className="mt-2 rounded-lg bg-green-700 px-4 py-1 font-nunito text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-green-800 "
+                    >
+                      Konfirmasi
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>Tidak ada foto yang perlu dikonfirmasi saat ini.</p>
+            )}
           </div>
-
-         
-          <div className="flex w-full lg:w-full md:w-fit items-center gap-4 rounded-xl border border-black/20 lg:p-4 p-4 md:px-6 py-4">
-            {/* Image placeholder */}
-            <div className="flex h-20 w-32 items-center justify-center rounded-xl bg-blueSecondary">
-              <h1 className="text-center text-sm font-bold text-white">
-                Gambar dari user
-              </h1>
-            </div>
-
-            {/* User info */}
-            <div className="flex h-full flex-col justify-between">
-              <h1 className="text-base font-bold">
-                Ahsan Rosikhan Yusri
-              </h1>
-              <p className="text-sm font-semibold text-black/40">
-                25 Agustus 2025
-              </p>
-
-              <button className="mt-2 rounded-lg bg-green-700 px-4 py-1 font-nunito text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-green-800 ">
-                Konfirmasi
-              </button>
-            </div>
-          </div>
-
-         
-          <div className="flex w-full lg:w-full md:w-fit items-center gap-4 rounded-xl border border-black/20 lg:p-4 p-4 md:px-6 py-4">
-            {/* Image placeholder */}
-            <div className="flex h-20 w-32 items-center justify-center rounded-xl bg-blueSecondary">
-              <h1 className="text-center text-sm font-bold text-white">
-                Gambar dari user
-              </h1>
-            </div>
-
-            {/* User info */}
-            <div className="flex h-full flex-col justify-between">
-              <h1 className="text-base font-bold">
-                Ahsan Rosikhan Yusri
-              </h1>
-              <p className="text-sm font-semibold text-black/40">
-                25 Agustus 2025
-              </p>
-
-              <button className="mt-2 rounded-lg bg-green-700 px-4 py-1 font-nunito text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-green-800 ">
-                Konfirmasi
-              </button>
-            </div>
-          </div>
-
-         
-          <div className="flex w-full lg:w-full md:w-fit items-center gap-4 rounded-xl border border-black/20 lg:p-4 p-4 md:px-6 py-4">
-            {/* Image placeholder */}
-            <div className="flex h-20 w-32 items-center justify-center rounded-xl bg-blueSecondary">
-              <h1 className="text-center text-sm font-bold text-white">
-                Gambar dari user
-              </h1>
-            </div>
-
-            {/* User info */}
-            <div className="flex h-full flex-col justify-between">
-              <h1 className="text-base font-bold">
-                Ahsan Rosikhan Yusri
-              </h1>
-              <p className="text-sm font-semibold text-black/40">
-                25 Agustus 2025
-              </p>
-
-              <button className="mt-2 rounded-lg bg-green-700 px-4 py-1 font-nunito text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-green-800 ">
-                Konfirmasi
-              </button>
-            </div>
-          </div>
-
-         
-          </div>
-
-
         </div>
-
-        {/* Complex Table , Task & Calendar
-        <ComplexTable tableData={tableDataComplex} />
-        Task chart & Calendar
-        <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
-          <TaskCard />
-          <div className="grid grid-cols-1 rounded-[20px]">
-            <MiniCalendar />
-          </div>
-        </div> */}
       </div>
     </div>
   );
