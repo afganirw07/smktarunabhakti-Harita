@@ -27,6 +27,7 @@
     const [poin, setPoin] = useState(0); 
     const [role, setRole] = useState('user'); 
     const [plan, setPlan] = useState('Trial'); 
+    const [pickup_quota,setPickup_quota] = useState(4)
     const [status, setStatus] = useState('yes'); 
     const [activeToken, setActiveToken] = useState(Math.random().toString(36).substring(2, 15));
     
@@ -66,6 +67,7 @@
             point: poin,
             role: role,
             plan: plan,
+            pickup_quota: pickup_quota,
             status: status,
             active_token: activeToken,
           });
