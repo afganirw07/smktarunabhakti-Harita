@@ -8,7 +8,6 @@ import {
   Scale,
   ChevronDown,
   Star,
-  FileText,
   Download,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -48,6 +47,16 @@ interface JenisBarang {
   nilai_ha_coins: number;
   nilai_barang_per_kg: number;
 }
+
+// 🔑 Tambahan fungsi normalisasi
+const normalizeName = (name: string) =>
+  name.toLowerCase().replace(/\s+/g, '');
+
+const imageMap: Record<string, string> = {
+  pupuk: '/img/user/pupuk.jpg',
+  pavingblok: '/img/user/pavingblock.jpg',
+  briket: '/img/user/briket.jpg',
+};
 
 export default function TukarSampah() {
   const [formData, setFormData] = useState<FormData>({
@@ -302,22 +311,14 @@ export default function TukarSampah() {
               </div>
 
               {/* Barang yang ditukar */}
-              <div className="rounded-2xl bg-white p-6 shadow-lg lg:col-span-3 lg:row-span-3 lg:row-start-2">
+              <div className="rounded-2xl bg-white p-6 shadow-lg lg:col-span-3 lg:row-start-2">
                 <h1 className="text-center font-inter text-lg font-bold">
                   Pilih Barang yang ditukar
                 </h1>
                 <div className="mt-4 grid w-full grid-cols-3 gap-4">
                   {jenisBarangList.map((barang) => {
-                    // Mapping gambar sesuai nama_barang
-                    const imageMap: Record<string, string> = {
-                      Pupuk: '/img/user/pupuk.jpg',
-                      'Briket': '/img/user/briket.jpg',
-                      // default fallback kalau tidak ada
-                      default: '/img/user/pavingblock.jpg',
-                    };
-
-                    const imageSrc =
-                      imageMap[barang.nama_barang] || imageMap.default;
+                    const key = normalizeName(barang.nama_barang);
+                    const imageSrc = imageMap[key] || imageMap.briket;
 
                     return (
                       <button
@@ -339,7 +340,7 @@ export default function TukarSampah() {
                         />
 
                         {/* Overlay gradient hitam */}
-                        <div className="to-transparent absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 opacity-0 transition-opacity group-hover:opacity-100"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100"></div>
 
                         {/* Nama barang */}
                         <span
@@ -527,7 +528,7 @@ export default function TukarSampah() {
 
       {/* Modal Struk */}
       {showStruk && transaksiData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div
             id="struk-content"
             className="relative m-4 w-full max-w-lg rounded-lg bg-white p-8 shadow-2xl"
