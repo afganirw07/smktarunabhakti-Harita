@@ -311,9 +311,9 @@ export default function TukarSampah() {
                     // Mapping gambar sesuai nama_barang
                     const imageMap: Record<string, string> = {
                       Pupuk: '/img/user/pupuk.jpg',
-                      'Paving Blok': '/img/user/pavingblock.jpg',
+                      'Briket': '/img/user/briket.jpg',
                       // default fallback kalau tidak ada
-                      default: '/img/user/briket.jpg',
+                      default: '/img/user/pavingblock.jpg',
                     };
 
                     const imageSrc =
