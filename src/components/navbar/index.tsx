@@ -104,60 +104,66 @@ const Navbar = (props: {
           <FiAlignJustify className="h-5 w-5" />
         </span>
         {/* start Notification */}
-        <Dropdown
-          button={
-            <div className="relative cursor-pointer" onClick={handleNotificationClick}>
-              <IoMdNotificationsOutline className="h-5 w-5   text-gray-600 dark:text-white" />
-              <span
-                className={`absolute top-0 right-0 h-2 w-2 rounded-full bg-green-900 ${
-                  !notifying ? "hidden" : "flex"
-                }`}
-              >
-                <span className="absolute inline-flex w-full h-full bg-green-300 rounded-full opacity-75 animate-ping"></span>
-              </span>
+<Dropdown
+  button={
+    <div className="relative cursor-pointer" onClick={handleNotificationClick}>
+      <IoMdNotificationsOutline className="h-5 w-5 text-gray-600 dark:text-white" />
+      <span
+        className={`absolute top-0 right-0 h-2 w-2 rounded-full bg-green-900 ${
+          !notifying ? "hidden" : "flex"
+        }`}
+      >
+        <span className="absolute inline-flex w-full h-full bg-green-300 rounded-full opacity-75 animate-ping"></span>
+      </span>
+    </div>
+  }
+  animation="origin-[65%_0%] md:origin-top-right transition-all duration-300 ease-in-out"
+  classNames='py-2 top-4 -left-[170px] md:-left-[440px] w-max max-h-[80vh] overflow-y-scroll' 
+>
+  <div className="flex w-[360px] sm:w-[460px] flex-col rounded-[20px] bg-white p-4 shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:text-white dark:shadow-none">
+    <div className="flex items-center justify-between mb-2">
+      <p className="text-base font-bold text-navy-700 dark:text-white">
+        Notification
+      </p>
+    </div>
+
+    {loading && (
+      <p className="text-center text-gray-500 dark:text-gray-400">Loading...</p>
+    )}
+    {error && (
+      <p className="text-center text-red-500">Error: {error.message}</p>
+    )}
+    {!loading && notifications.length === 0 && (
+      <p className="text-center text-gray-500 dark:text-gray-400">
+        Tidak ada notifikasi.
+      </p>
+    )}
+
+    <div className="flex flex-col gap-3">
+      {!loading &&
+        notifications.map((notification) => (
+          <button key={notification.id} className="flex w-full items-center">
+            <div className="flex h-full w-[85px] items-center justify-center rounded-xl bg-gradient-to-b from-green-800 to-green-900 py-4 text-2xl text-white">
+              <BsArrowBarUp />
             </div>
-          }
-          animation="origin-[65%_0%] md:origin-top-right transition-all duration-300 ease-in-out"
-          classNames={'py-2 top-4 -left-[170px] md:-left-[440px] w-max'}
-        >
-          <div className="flex w-[360px] flex-col gap-3 rounded-[20px] bg-white p-4 shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:text-white dark:shadow-none sm:w-[460px]">
-            <div className="flex items-center justify-between">
-              <p className="text-base font-bold text-navy-700 dark:text-white">
-                Notification
+            <div className="ml-2 flex h-full w-full flex-col justify-center rounded-lg px-1 text-sm">
+              <p className="mb-1 text-left text-base font-bold text-gray-900 dark:text-white">
+                {notification.title}
+              </p>
+              <p className="font-base text-left text-xs text-gray-900 dark:text-white">
+                {notification.message}
+              </p>
+              <p className="font-base text-left text-xs text-gray-500 dark:text-gray-300">
+                {new Date(notification.created_at).toLocaleString()}
               </p>
             </div>
-            {/* Tampilkan notifikasi dinamis di sini */}
-            {loading && (
-              <p className="text-center text-gray-500 dark:text-gray-400">Loading...</p>
-            )}
-            {error && (
-              <p className="text-center text-red-500">Error: {error.message}</p>
-            )}
-            {!loading && notifications.length === 0 && (
-              <p className="text-center text-gray-500 dark:text-gray-400">
-                Tidak ada notifikasi.
-              </p>
-            )}
-            {!loading && notifications.map((notification) => (
-              <button key={notification.id} className="flex w-full items-center">
-                <div className="flex h-full w-[85px] items-center justify-center rounded-xl bg-gradient-to-b from-green-800 to-green-900 py-4 text-2xl text-white">
-                  <BsArrowBarUp />
-                </div>
-                <div className="ml-2 flex h-full w-full flex-col justify-center rounded-lg px-1 text-sm">
-                  <p className="mb-1 text-left text-base font-bold text-gray-900 dark:text-white">
-                    {notification.title}
-                  </p>
-                  <p className="font-base text-left text-xs text-gray-900 dark:text-white">
-                    {notification.message}
-                  </p>
-                  <p className="font-base text-left text-xs text-gray-500 dark:text-gray-300">
-                    {new Date(notification.created_at).toLocaleString()}
-                  </p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </Dropdown>
+          </button>
+        ))}
+    </div>
+  </div>
+</Dropdown>
+
+
         
         {/* Profile & Dropdown */}
         <Dropdown
