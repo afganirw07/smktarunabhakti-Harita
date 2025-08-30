@@ -35,7 +35,7 @@ export default function TrashHouse() {
     typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
 
   // Setup kalender & fetch data
-useEffect(() => {
+  useEffect(() => {
     const today = new Date();
     const dayOfWeek = today.getDay();
 
@@ -238,7 +238,7 @@ useEffect(() => {
     }
   };
 
-  // Klaim Coins
+  // Klaim Coins (Logic Baru)
   const handleClaimCoins = async () => {
     const userId = localStorage.getItem('user_id');
 
@@ -247,37 +247,31 @@ useEffect(() => {
       return;
     }
 
-    const { data: claimData, error: claimError } = await supabase
+    // 1. Cari klaim bonus dengan status 'Konfirmasi' yang belum diklaim poinnya
+    const { data: claims, error: claimsError } = await supabase
       .from('bonus_claims')
-      .select('photo_url, claimed_at')
+      .select('id, photo_url')
       .eq('user_id', userId)
-      .order('claimed_at', { ascending: false })
-      .limit(1)
-      .single();
+      .eq('status', 'Konfirmasi'); // HANYA mencari status 'Konfirmasi'
 
-    if (claimError && claimError.code !== 'PGRST116') {
-      console.error(claimError);
+    if (claimsError) {
+      console.error(claimsError);
       alert('Gagal cek data klaim');
       return;
     }
 
-    if (!claimData || !claimData.photo_url) {
-      alert(' Kamu harus upload foto dulu sebelum klaim poin!');
+    // 2. Periksa apakah ada klaim yang memenuhi syarat
+    if (!claims || claims.length === 0) {
+      alert('Tidak ada foto yang sudah dikonfirmasi untuk diklaim.');
       return;
     }
+    
+    // Asumsi kita hanya mengklaim yang pertama ditemukan jika ada banyak
+    const claimToProcess = claims[0];
+    const claimId = claimToProcess.id;
+    const bonusPoints = 300;
 
-    const today = new Date().toISOString().split('T')[0];
-    if (claimData?.claimed_at) {
-      const lastClaim = new Date(claimData.claimed_at)
-        .toISOString()
-        .split('T')[0];
-
-      if (today === lastClaim) {
-        alert('⚠️ Kamu sudah klaim hari ini. Coba lagi besok!');
-        return;
-      }
-    }
-
+    // 3. Ambil poin pengguna saat ini
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('point')
@@ -290,34 +284,31 @@ useEffect(() => {
       return;
     }
 
-    const { error: updateError } = await supabase
+    // 4. Tambahkan poin ke profil pengguna
+    const { error: updateProfileError } = await supabase
       .from('profiles')
-      .update({ point: (profile.point || 0) + 300 })
+      .update({ point: (profile.point || 0) + bonusPoints })
       .eq('id', userId);
 
-    if (updateError) {
-      console.error(updateError);
+    if (updateProfileError) {
+      console.error(updateProfileError);
       alert('Gagal klaim coins');
       return;
     }
 
-    const { error: insertError } = await supabase
+    // 5. Ubah status klaim bonus menjadi 'Diklaim' agar tidak bisa diklaim lagi
+    const { error: updateClaimError } = await supabase
       .from('bonus_claims')
-      .insert([
-        {
-          user_id: userId,
-          photo_url: claimData.photo_url,
-          claimed_at: new Date(),
-        },
-      ]);
+      .update({ status: 'Diklaim', claimed_at: new Date() })
+      .eq('id', claimId);
 
-    if (insertError) {
-      console.error(insertError);
-      alert('Coins berhasil ditambah, tapi gagal simpan log klaim');
+    if (updateClaimError) {
+      console.error(updateClaimError);
+      alert('Coins berhasil ditambah, tapi gagal perbarui status klaim.');
       return;
     }
 
-    alert(' Berhasil klaim 300 Coins!');
+    alert(`Berhasil klaim ${bonusPoints} Coins!`);
   };
 
   return (
@@ -366,7 +357,7 @@ useEffect(() => {
                 Minggu Depan
               </h1>
             </div>
-            <div className="my-4 flex h-[100px] w-[320px]  items-center justify-between rounded-xl bg-green-700 px-8">
+            <div className="my-4 flex h-[100px] w-[320px]  items-center justify-between rounded-xl bg-green-700 px-8">
               {/* Kiri */}
               <div className="flex flex-col justify-center">
                 <span className="font-inter text-lg font-semibold text-white">
@@ -378,7 +369,7 @@ useEffect(() => {
               </div>
 
               {/* Kanan */}
-              <div className="text-3xl font-bold text-yellow-200">
+              <div className="text-3xl font-bold text-yellow-200 mt-7 ">
                 {remainingQuota !== null ? `${remainingQuota}x` : '...'}
               </div>
             </div>
