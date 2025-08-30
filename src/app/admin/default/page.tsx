@@ -10,6 +10,7 @@ import { FaUserFriends } from 'react-icons/fa';
 import Widget from 'components/widget/Widget';
 import DailyTraffic from 'components/admin/default/DailyTraffic';
 import { createClient } from '@supabase/supabase-js';
+import Image from 'next/image';
 
 // Inisialisasi Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -245,9 +246,11 @@ const Dashboard = () => {
                   className="flex w-full items-center gap-4 rounded-xl border border-black/20 p-4 py-4 md:w-fit md:px-6 lg:w-full lg:p-4"
                 >
                   {/* Image from user */}
-                  <div className="flex h-20 w-32 items-center justify-center rounded-xl bg-blueSecondary">
+                  <div className="flex h-20 w-28 items-center justify-center rounded-xl bg-blueSecondary">
                     {photo.public_url ? (
-                      <img
+                      <Image
+                      height={80}
+                      width={128}
                         src={photo.public_url}
                         alt="Gambar dari user"
                         className="h-full w-full rounded-xl object-cover"
@@ -268,13 +271,17 @@ const Dashboard = () => {
                     <p className="text-sm font-semibold text-black/40">
                       {new Date(photo.claimed_at).toLocaleDateString()}
                     </p>
-
+                    <div className='flex gap-2 items-center justify-start'>
+                      <button className='mt-2 rounded-lg bg-red-500 px-4 py-1 font-nunito text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-red-400'>
+                        Tolak
+                      </button>
                     <button
                       onClick={() => handleConfirmation(photo.id)}
                       className="mt-2 rounded-lg bg-green-700 px-4 py-1 font-nunito text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-green-800 "
                     >
                       Konfirmasi
                     </button>
+                    </div>
                   </div>
                 </div>
               ))
