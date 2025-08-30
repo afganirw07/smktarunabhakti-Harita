@@ -311,9 +311,9 @@ export default function TukarSampah() {
                     // Mapping gambar sesuai nama_barang
                     const imageMap: Record<string, string> = {
                       Pupuk: '/img/user/pupuk.jpg',
-                      'Paving Blok': '/img/user/pavingBlock.jpg',
+                      'Paving Blok': '/img/user/pavingblock.jpg',
                       // default fallback kalau tidak ada
-                      default: '/img/user/Briket.jpg',
+                      default: '/img/user/briket.jpg',
                     };
 
                     const imageSrc =
@@ -462,7 +462,7 @@ export default function TukarSampah() {
                             formData.haritaPos ? 'text-black' : 'text-gray-400'
                           }
                         >
-                          {formData.haritaPos || 'Pilih pos terdekat'}
+                          {formData.haritaPos || 'Pilih pos'}
                         </span>
                         <ChevronDown
                           className={`h-5 w-5 transition-transform ${
