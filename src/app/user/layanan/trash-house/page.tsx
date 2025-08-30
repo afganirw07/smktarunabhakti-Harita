@@ -41,7 +41,9 @@ export default function TrashHouse() {
 
     // Hitung tanggal untuk minggu ini
     const thisWeekStart = new Date(today);
-    thisWeekStart.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)); // Senin minggu ini
+    thisWeekStart.setDate(
+      today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1),
+    ); // Senin minggu ini
     thisWeekStart.setHours(0, 0, 0, 0);
 
     const thisWeekEnd = new Date(thisWeekStart);
@@ -63,7 +65,8 @@ export default function TrashHouse() {
 
     // Ambil jatah dan jadwal dari Supabase
     const fetchData = async () => {
-      const userId = typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
+      const userId =
+        typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
 
       if (!userId) {
         setRemainingQuota(null);
@@ -104,7 +107,7 @@ export default function TrashHouse() {
         ];
 
         // Filter jadwal default yang belum lewat dan tambahkan ke highlight
-        defaultDates.forEach(d => {
+        defaultDates.forEach((d) => {
           if (d.getTime() >= today.getTime()) {
             defaultHighlights.push({ month: d.getMonth(), date: d.getDate() });
           }
@@ -113,30 +116,37 @@ export default function TrashHouse() {
         // Filter jadwal kustom
         scheduleData.forEach((d: any) => {
           const pickupDate = new Date(d.pickup_date);
-          const highlight = { month: pickupDate.getMonth(), date: pickupDate.getDate() };
-          
-          if (pickupDate.getTime() >= today.getTime() && pickupDate.getTime() <= thisWeekEnd.getTime()) {
+          const highlight = {
+            month: pickupDate.getMonth(),
+            date: pickupDate.getDate(),
+          };
+
+          if (
+            pickupDate.getTime() >= today.getTime() &&
+            pickupDate.getTime() <= thisWeekEnd.getTime()
+          ) {
             // Jika tanggal kustom ada di minggu ini, warnai kuning
             defaultHighlights.push(highlight);
-          } else if (pickupDate.getTime() >= nextWeekStart.getTime() && pickupDate.getTime() <= nextWeekEnd.getTime()) {
+          } else if (
+            pickupDate.getTime() >= nextWeekStart.getTime() &&
+            pickupDate.getTime() <= nextWeekEnd.getTime()
+          ) {
             // Jika tanggal kustom ada di minggu depan, warnai biru
             customHighlights.push(highlight);
           }
         });
-        
+
         // Atur state highlight kalender
         setHighlightDatesDefault(defaultHighlights);
         setHighlightDates2(customHighlights);
-
       } else {
         console.error('Gagal mengambil jadwal:', scheduleError);
       }
     };
-    
+
     fetchData();
   }, [userId]);
 
-  
   // Upload file
   const handleFileUpload = (event: any) => {
     const file = event.target.files[0];
@@ -239,7 +249,7 @@ export default function TrashHouse() {
   };
 
   // Klaim Coins (Logic Baru)
-  const handleClaimCoins = async () => {
+const handleClaimCoins = async () => {
     const userId = localStorage.getItem('user_id');
 
     if (!userId) {
@@ -247,12 +257,11 @@ export default function TrashHouse() {
       return;
     }
 
-    // 1. Cari klaim bonus dengan status 'Konfirmasi' yang belum diklaim poinnya
     const { data: claims, error: claimsError } = await supabase
       .from('bonus_claims')
       .select('id, photo_url')
       .eq('user_id', userId)
-      .eq('status', 'Konfirmasi'); // HANYA mencari status 'Konfirmasi'
+      .eq('status', 'Konfirmasi'); 
 
     if (claimsError) {
       console.error(claimsError);
@@ -260,18 +269,15 @@ export default function TrashHouse() {
       return;
     }
 
-    // 2. Periksa apakah ada klaim yang memenuhi syarat
     if (!claims || claims.length === 0) {
       alert('Tidak ada foto yang sudah dikonfirmasi untuk diklaim.');
       return;
     }
     
-    // Asumsi kita hanya mengklaim yang pertama ditemukan jika ada banyak
     const claimToProcess = claims[0];
     const claimId = claimToProcess.id;
     const bonusPoints = 300;
 
-    // 3. Ambil poin pengguna saat ini
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('point')
@@ -284,7 +290,6 @@ export default function TrashHouse() {
       return;
     }
 
-    // 4. Tambahkan poin ke profil pengguna
     const { error: updateProfileError } = await supabase
       .from('profiles')
       .update({ point: (profile.point || 0) + bonusPoints })
@@ -296,7 +301,6 @@ export default function TrashHouse() {
       return;
     }
 
-    // 5. Ubah status klaim bonus menjadi 'Diklaim' agar tidak bisa diklaim lagi
     const { error: updateClaimError } = await supabase
       .from('bonus_claims')
       .update({ status: 'Diklaim', claimed_at: new Date() })
@@ -308,8 +312,24 @@ export default function TrashHouse() {
       return;
     }
 
+    const notificationData = {
+      user_id: userId,
+      title: 'Klaim Bonus Berhasil!',
+      body: `Selamat! Anda berhasil mengklaim bonus ${bonusPoints} Harita Coins.`,
+      type: 'klaim_bonus',
+      related_id: claimId, 
+    };
+
+    const { error: notificationError } = await supabase
+      .from('notifications')
+      .insert(notificationData);
+
+    if (notificationError) {
+      console.error('Gagal menyimpan notifikasi:', notificationError);
+    }
+
     alert(`Berhasil klaim ${bonusPoints} Coins!`);
-  };
+};
 
   return (
     <section className="h-auto w-full py-8">
@@ -369,7 +389,7 @@ export default function TrashHouse() {
               </div>
 
               {/* Kanan */}
-              <div className="text-3xl font-bold text-yellow-200 mt-7 ">
+              <div className="mt-7 text-3xl font-bold text-yellow-200 ">
                 {remainingQuota !== null ? `${remainingQuota}x` : '...'}
               </div>
             </div>

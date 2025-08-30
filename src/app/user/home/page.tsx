@@ -17,13 +17,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Missing Supabase environment variables');
 }
 
-// Buat instance Supabase client
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const calculateEndDate = (startDate, plan) => {
   if (!startDate || !plan) return null;
 
-  // Ubah string ISO date dari Supabase menjadi objek Date
   const start = new Date(startDate);
 
   switch (plan) {
@@ -49,11 +47,14 @@ export default function Home() {
   const [plan, setPlan] = useState('Loading...');
   const [isClaimed, setIsClaimed] = useState(false);
   const [subscriptionEndDate, setSubscriptionEndDate] = useState(null);
-
-  // State baru untuk produk
   const [products, setProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [errorProducts, setErrorProducts] = useState(null);
+
+  // State baru untuk transaksi
+  const [transactions, setTransactions] = useState([]);
+  const [loadingTransactions, setLoadingTransactions] = useState(true);
+  const [errorTransactions, setErrorTransactions] = useState(null);
 
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -62,37 +63,39 @@ export default function Home() {
     seconds: 0,
   });
 
-  // Fungsi untuk mengambil data pengguna
-const fetchData = async () => {
-  const userId = localStorage.getItem('user_id');
+  const fetchData = async () => {
+    const userId = localStorage.getItem('user_id');
 
-  if (userId) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('first_name, point, plan, subscription_start_date, end_date, is_claimed')
-      .eq('id', userId)
-      .single();
+    if (userId) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(
+          'first_name, point, plan, subscription_start_date, end_date, is_claimed',
+        )
+        .eq('id', userId)
+        .single();
 
-    if (error) {
-      console.error('Error fetching user data:', error);
-    } else {
-      setFirst_Name(data.first_name);
-      setPoin(data.point || 0);
-      setPlan(data.plan || 'Loading...');
-      setIsClaimed(data.is_claimed);
-
-      if (data.end_date) {
-        setSubscriptionEndDate(new Date(data.end_date));
+      if (error) {
+        console.error('Error fetching user data:', error);
       } else {
-        const endDate = calculateEndDate(data.subscription_start_date, data.plan);
-        setSubscriptionEndDate(endDate);
+        setFirst_Name(data.first_name);
+        setPoin(data.point || 0);
+        setPlan(data.plan || 'Loading...');
+        setIsClaimed(data.is_claimed);
+
+        if (data.end_date) {
+          setSubscriptionEndDate(new Date(data.end_date));
+        } else {
+          const endDate = calculateEndDate(
+            data.subscription_start_date,
+            data.plan,
+          );
+          setSubscriptionEndDate(endDate);
+        }
       }
     }
-  }
-};
+  };
 
-
-  // Fungsi untuk mengambil data produk
   const fetchProducts = async () => {
     setLoadingProducts(true);
     try {
@@ -111,13 +114,53 @@ const fetchData = async () => {
     }
   };
 
-  // Menggabungkan kedua fungsi fetch di useEffect
+  const fetchTransactions = async () => {
+    setLoadingTransactions(true);
+    const userId = localStorage.getItem('user_id');
+
+    if (!userId) {
+      console.log('User ID tidak ditemukan di localStorage');
+      setLoadingTransactions(false);
+      return;
+    }
+
+    try {
+      const [trxResponse, asetResponse] = await Promise.all([
+        supabase
+          .from('transactions')
+          .select('id, order_id, created_at, status, plan_name, amount')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('riwayat_aset')
+          .select('id, created_at, barang_ditukar')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false }),
+      ]);
+
+      if (trxResponse.error) throw trxResponse.error;
+      if (asetResponse.error) throw asetResponse.error;
+
+      const combinedData = [
+        ...(trxResponse.data || []).map((item) => ({ ...item, type: 'transaksi' })),
+        ...(asetResponse.data || []).map((item) => ({ ...item, type: 'aset' })),
+      ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      setTransactions(combinedData);
+    } catch (error) {
+      console.error('Error fetching transactions:', error.message);
+      setErrorTransactions(error.message);
+    } finally {
+      setLoadingTransactions(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
     fetchProducts();
+    fetchTransactions(); 
   }, []);
 
-  // Timer useEffect
   useEffect(() => {
     if (!subscriptionEndDate || isNaN(subscriptionEndDate.getTime())) {
       setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -185,7 +228,6 @@ const fetchData = async () => {
   return (
     <>
       <section className="h-auto w-full py-12 md:px-8 ">
-        {/* Header */}
         <Toaster position="top-center" reverseOrder={false} />
         <div className="flex w-full flex-col justify-between md:flex-row md:items-center ">
           <div className="flex flex-col ">
@@ -199,7 +241,6 @@ const fetchData = async () => {
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-7">
-          {/* Card Customers */}
           <div className="flex flex-col gap-2 rounded-xl bg-white p-6 shadow lg:col-span-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -208,14 +249,13 @@ const fetchData = async () => {
               </div>
               {isClaimed && (
                 <span className="rounded-full bg-green-100 px-2 py-0.5 text-sm text-green-600">
-                  + 500
+                  + {poin}
                 </span>
               )}
             </div>
             <h2 className="text-2xl font-bold text-black">{poin}</h2>
           </div>
 
-          {/* Card Orders */}
           <div className="flex flex-col gap-2 rounded-xl bg-white p-6 shadow lg:col-span-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -223,20 +263,21 @@ const fetchData = async () => {
                 <span className="font-medium text-black">Transaksi</span>
               </div>
               <span className="rounded-full bg-green-100 px-2 py-0.5 text-sm text-green-500">
-                + 2
+                +{transactions.length}
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <h2 className="text-2xl font-bold text-black">13x</h2>
-              <Link href={"/user/profile/riwayat"}>
-              <button className="rounded-full bg-green-700 px-2 py-1 font-nunito text-xs font-bold text-white transition-colors duration-200 ease-out hover:bg-green-600 ">
-                Lihat riwayat
-              </button>
+              <h2 className="text-2xl font-bold text-black">
+                {loadingTransactions ? 'Memuat...' : transactions.length}
+              </h2>
+              <Link href={'/user/profile/riwayat'}>
+                <button className="rounded-full bg-green-700 px-2 py-1 font-nunito text-xs font-bold text-white transition-colors duration-200 ease-out hover:bg-green-600 ">
+                  Lihat riwayat
+                </button>
               </Link>
             </div>
           </div>
 
-          {/* Masa Berlangganan */}
           <div className="flex flex-col justify-center gap-4 rounded-xl bg-white p-6 shadow lg:col-span-3 lg:row-span-3">
             <div
               className="flex flex-col items-center justify-center
@@ -254,7 +295,7 @@ const fetchData = async () => {
                 endDate={subscriptionEndDate}
               />
             </div>
-            <div className="w-full mt-2 flex md:justify-between justify-center flex-wrap md:gap-0 gap-4 border-t pt-4 font-nunito text-sm">
+            <div className="mt-2 flex w-full flex-wrap justify-center gap-4 border-t pt-4 font-nunito text-sm md:justify-between md:gap-0">
               <div>
                 <p className="font-semibold text-green-500">Berlangganan</p>
                 <p className="font-bold text-black">
@@ -264,8 +305,9 @@ const fetchData = async () => {
               <div>
                 <p className="font-semibold text-green-500">Sisa Durasi</p>
                 <p className="font-bold text-black">
-  {timeLeft.days}h {timeLeft.hours}j {timeLeft.minutes}m {timeLeft.seconds}s
-</p>
+                  {timeLeft.days}h {timeLeft.hours}j {timeLeft.minutes}m{' '}
+                  {timeLeft.seconds}s
+                </p>
               </div>
               <div>
                 <p className="font-semibold text-green-500">Berakhir pada</p>
@@ -291,7 +333,6 @@ const fetchData = async () => {
             </div>
           </div>
 
-          {/* klaim harita */}
           <div className="flex flex-col gap-4 rounded-xl bg-white p-6 shadow lg:col-span-4">
             <h3 className="text-2xl font-semibold text-green-700">
               Klaim HaritaCoins
@@ -308,7 +349,6 @@ const fetchData = async () => {
               </Link>
             </p>
 
-            {/* Badges */}
             <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
               <span className="flex items-center gap-1 rounded-full bg-green-100 px-4 py-2 text-sm font-medium text-black">
                 Memilah Kategori sampah{' '}
@@ -317,7 +357,6 @@ const fetchData = async () => {
                 </span>
               </span>
 
-              {/* Badge Klaim Coins */}
               <button
                 onClick={handleClaimCoins}
                 disabled={isClaimed}
@@ -350,12 +389,14 @@ const fetchData = async () => {
             {loadingProducts ? (
               <p>Memuat produk...</p>
             ) : errorProducts ? (
-              <p className="text-red-500">Error: Gagal memuat produk. Silakan coba lagi.</p>
+              <p className="text-red-500">
+                Error: Gagal memuat produk. Silakan coba lagi.
+              </p>
             ) : products.length > 0 ? (
               products.map((product) => (
                 <ProductCard
                   key={product.id}
-                  id={product.id} 
+                  id={product.id}
                   title={product.nama}
                   stock={product.stock}
                   imageUrl={product.img}
