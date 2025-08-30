@@ -319,10 +319,10 @@ export default function TukarSampah() {
                   {jenisBarangList.map((barang) => {
                     // Mapping gambar sesuai nama_barang
                     const imageMap: Record<string, string> = {
-                      Pupuk: '/img/user/pupuk.jpg',
-                      'Briket': '/img/user/briket.jpg',
+                      Pupuk: '/img/user/pupuk.webp',
+                      'Briket': '/img/user/briket.webp',
                       // default fallback kalau tidak ada
-                      default: '/img/user/pavingblock.jpg',
+                      default: '/img/user/pavingblock.webp',
                     };
 
                     const imageSrc =
@@ -340,7 +340,8 @@ export default function TukarSampah() {
                         }`}
                       >
                         {/* Gambar */}
-                        <img
+                        <Image
+                        fill
                           src={imageSrc}
                           alt={barang.nama_barang}
                           className="object-cover object-center w-[200px] h-[150px] "
