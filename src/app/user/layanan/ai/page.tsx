@@ -356,20 +356,6 @@ AI:`;
                       >
                         <Copy className="h-4 w-4" />
                       </button>
-                      <button
-                        onClick={() => handleFeedback(message.id, true)}
-                        className="rounded-lg p-1.5 text-green-500 transition-all hover:bg-green-100 hover:text-green-700"
-                        title="Good response"
-                      >
-                        <ThumbsUp className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleFeedback(message.id, false)}
-                        className="rounded-lg p-1.5 text-green-500 transition-all hover:bg-green-100 hover:text-green-700"
-                        title="Poor response"
-                      >
-                        <ThumbsDown className="h-4 w-4" />
-                      </button>
                     </div>
                   )}
                 </div>
