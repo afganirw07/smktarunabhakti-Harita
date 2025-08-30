@@ -278,7 +278,7 @@ export default function TukarSampah() {
                   <span className="text-green-700">
                     <MapPin className="h-auto w-8" />
                   </span>
-                  Lokasi pos terdekat
+                  Lokasi pos Harita
                 </h1>
                 <div className="flex flex-col gap-4">
                   {lokasiPosList.map((lokasi) => (
@@ -311,14 +311,22 @@ export default function TukarSampah() {
               </div>
 
               {/* Barang yang ditukar */}
-              <div className="rounded-2xl bg-white p-6 shadow-lg lg:col-span-3 lg:row-start-2">
+              <div className="rounded-2xl bg-white p-6 shadow-lg lg:col-span-3 lg:row-span-3 lg:row-start-2">
                 <h1 className="text-center font-inter text-lg font-bold">
                   Pilih Barang yang ditukar
                 </h1>
                 <div className="mt-4 grid w-full grid-cols-3 gap-4">
                   {jenisBarangList.map((barang) => {
-                    const key = normalizeName(barang.nama_barang);
-                    const imageSrc = imageMap[key] || imageMap.briket;
+                    // Mapping gambar sesuai nama_barang
+                    const imageMap: Record<string, string> = {
+                      Pupuk: '/img/user/pupuk.jpg',
+                      'Briket': '/img/user/briket.jpg',
+                      // default fallback kalau tidak ada
+                      default: '/img/user/pavingblock.jpg',
+                    };
+
+                    const imageSrc =
+                      imageMap[barang.nama_barang] || imageMap.default;
 
                     return (
                       <button
@@ -332,15 +340,14 @@ export default function TukarSampah() {
                         }`}
                       >
                         {/* Gambar */}
-                        <Image
+                        <img
                           src={imageSrc}
                           alt={barang.nama_barang}
-                          fill
-                          className="object-cover object-center"
+                          className="object-cover object-center w-[200px] h-[150px] "
                         />
 
                         {/* Overlay gradient hitam */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100"></div>
+                        <div className="to-transparent absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 opacity-0 transition-opacity group-hover:opacity-100"></div>
 
                         {/* Nama barang */}
                         <span
@@ -528,7 +535,7 @@ export default function TukarSampah() {
 
       {/* Modal Struk */}
       {showStruk && transaksiData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
             id="struk-content"
             className="relative m-4 w-full max-w-lg rounded-lg bg-white p-8 shadow-2xl"
