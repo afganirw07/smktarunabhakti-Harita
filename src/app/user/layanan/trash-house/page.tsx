@@ -248,6 +248,18 @@ const handleClaimCoins = async () => {
                 Minggu Depan
               </h1>
             </div>
+            <div className="my-4 flex w-[320px] h-[100px]  items-center justify-between rounded-xl bg-green-700 px-8">
+            {/* Kiri */}
+            <div className="flex flex-col justify-center">
+              <span className="font-inter text-lg font-semibold text-white">
+                Jatah pengangkutan
+              </span>
+              <span className="text-base -mt-1 text-white opacity-80">Bulan ini</span>
+            </div>
+
+            {/* Kanan */}
+            <div className="text-3xl font-bold text-yellow-200">12x</div>
+          </div>
           </div>
         </div>
 

@@ -254,7 +254,7 @@ const fetchData = async () => {
                 endDate={subscriptionEndDate}
               />
             </div>
-            <div className="w-full mt-2 flex nd:justify-between justify-center flex-wrap md:gap-0 gap-4 border-t pt-4 font-nunito text-sm">
+            <div className="w-full mt-2 flex md:justify-between justify-center flex-wrap md:gap-0 gap-4 border-t pt-4 font-nunito text-sm">
               <div>
                 <p className="font-semibold text-green-500">Berlangganan</p>
                 <p className="font-bold text-black">
@@ -329,7 +329,7 @@ const fetchData = async () => {
               }`}
               >
                 <Coins className="h-6 w-6" />
-                {isClaimed ? 'Koin Sudah Diklaim' : 'Klaim 500 Coins'}
+                {isClaimed ? 'Koin Sudah Diklaim' : 'Klaim Bulanan 500 Coins'}
               </button>
             </div>
           </div>

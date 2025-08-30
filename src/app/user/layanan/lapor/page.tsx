@@ -173,9 +173,9 @@ const handleSubmit = async () => {
         <div className="flex flex-col gap-1 lg:text-left text-center">
           <h1 className="text-3xl font-inter font-bold text-green-700">Lapor Sampah</h1>
         </div>
-        <button className="rounded-xl bg-green-800 px-4 py-2 font-nunito font-bold text-white transition-all duration-200 ease-out hover:bg-green-700 hover:text-white">
+        {/* <button className="rounded-xl bg-green-800 px-4 py-2 font-nunito font-bold text-white transition-all duration-200 ease-out hover:bg-green-700 hover:text-white">
           Dokumentasi Kami
-        </button>
+        </button> */}
       </div>
 
       {/* grid pertama */}
