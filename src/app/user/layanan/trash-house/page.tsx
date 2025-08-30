@@ -30,25 +30,25 @@ export default function TrashHouse() {
     { month: number; date: number }[]
   >([]);
   const [remainingQuota, setRemainingQuota] = useState<number | null>(null);
+  const [isLocked, setIsLocked] = useState(false);
 
   const userId =
     typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
 
-  // Setup kalender & fetch data
   useEffect(() => {
     const today = new Date();
     const dayOfWeek = today.getDay();
 
-    // Hitung tanggal untuk minggu ini
     const thisWeekStart = new Date(today);
-    thisWeekStart.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)); // Senin minggu ini
+    thisWeekStart.setDate(
+      today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1),
+    );
     thisWeekStart.setHours(0, 0, 0, 0);
 
     const thisWeekEnd = new Date(thisWeekStart);
     thisWeekEnd.setDate(thisWeekEnd.getDate() + 6);
     thisWeekEnd.setHours(23, 59, 59, 999);
 
-    // Hitung tanggal untuk minggu depan
     const nextWeekStart = new Date(thisWeekEnd);
     nextWeekStart.setDate(nextWeekStart.getDate() + 1);
     nextWeekStart.setHours(0, 0, 0, 0);
@@ -61,16 +61,27 @@ export default function TrashHouse() {
     setMinDate(nextWeekStart.toISOString().split('T')[0]);
     setMaxDate(nextWeekEnd.toISOString().split('T')[0]);
 
-    // Ambil jatah dan jadwal dari Supabase
     const fetchData = async () => {
-      const userId = typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
-
       if (!userId) {
         setRemainingQuota(null);
+        console.log('User ID tidak ditemukan.');
         return;
       }
 
-      // Ambil jatah pengangkutan
+      // Check if user has already set a custom schedule for next week
+      const { data: scheduleData } = await supabase
+        .from('pickup_schedules')
+        .select('pickup_date')
+        .eq('user_id', userId)
+        .eq('is_custom', true)
+        .gte('pickup_date', nextWeekStart.toISOString())
+        .lte('pickup_date', nextWeekEnd.toISOString());
+
+      // Set the lock state based on whether a schedule exists
+      const hasCustomSchedule = scheduleData && scheduleData.length > 0;
+      setIsLocked(hasCustomSchedule);
+      console.log('Apakah sudah ada jadwal kustom minggu depan?', hasCustomSchedule);
+
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('pickup_quota')
@@ -79,75 +90,86 @@ export default function TrashHouse() {
 
       if (profileData) {
         setRemainingQuota(profileData.pickup_quota);
+        console.log('Jatah pengangkutan berhasil dimuat:', profileData.pickup_quota);
       } else {
         console.error('Gagal mengambil jatah:', profileError);
       }
 
-      // Ambil jadwal kustom untuk minggu ini dan minggu depan
-      const { data: scheduleData, error: scheduleError } = await supabase
+      const { data: allSchedules, error: scheduleError } = await supabase
         .from('pickup_schedules')
         .select('*')
         .eq('user_id', userId)
-        .eq('is_custom', true)
         .gte('pickup_date', thisWeekStart.toISOString())
         .lte('pickup_date', nextWeekEnd.toISOString());
 
-      if (scheduleData) {
+      if (allSchedules) {
         const defaultHighlights = [];
         const customHighlights = [];
 
-        // Jadwal default (Senin, Rabu, Kamis)
         const defaultDates = [
           new Date(thisWeekStart),
-          new Date(thisWeekStart.getTime() + 2 * 24 * 60 * 60 * 1000), // Rabu
-          new Date(thisWeekStart.getTime() + 3 * 24 * 60 * 60 * 1000), // Kamis
+          new Date(thisWeekStart.getTime() + 2 * 24 * 60 * 60 * 1000),
+          new Date(thisWeekStart.getTime() + 3 * 24 * 60 * 60 * 1000),
         ];
 
-        // Filter jadwal default yang belum lewat dan tambahkan ke highlight
-        defaultDates.forEach(d => {
+        defaultDates.forEach((d) => {
           if (d.getTime() >= today.getTime()) {
             defaultHighlights.push({ month: d.getMonth(), date: d.getDate() });
           }
         });
 
-        // Filter jadwal kustom
-        scheduleData.forEach((d: any) => {
+        allSchedules.forEach((d: any) => {
           const pickupDate = new Date(d.pickup_date);
-          const highlight = { month: pickupDate.getMonth(), date: pickupDate.getDate() };
-          
-          if (pickupDate.getTime() >= today.getTime() && pickupDate.getTime() <= thisWeekEnd.getTime()) {
-            // Jika tanggal kustom ada di minggu ini, warnai kuning
-            defaultHighlights.push(highlight);
-          } else if (pickupDate.getTime() >= nextWeekStart.getTime() && pickupDate.getTime() <= nextWeekEnd.getTime()) {
-            // Jika tanggal kustom ada di minggu depan, warnai biru
+          const highlight = {
+            month: pickupDate.getMonth(),
+            date: pickupDate.getDate(),
+          };
+
+          if (d.is_custom) {
             customHighlights.push(highlight);
+          } else {
+            defaultHighlights.push(highlight);
           }
         });
-        
-        // Atur state highlight kalender
+
         setHighlightDatesDefault(defaultHighlights);
         setHighlightDates2(customHighlights);
-
       } else {
         console.error('Gagal mengambil jadwal:', scheduleError);
       }
     };
-    
-    fetchData();
-  }, [userId]);
 
-  
-  // Upload file
+    fetchData();
+  }, [userId, minDate, maxDate]);
+
   const handleFileUpload = (event: any) => {
     const file = event.target.files[0];
     setUploadedFile(file);
   };
 
-  // Submit jadwal
   const handleFormSubmit = async (e: any) => {
     e.preventDefault();
-    if (!date1) {
+
+    if (isLocked) {
+      alert('Anda hanya bisa menyimpan jadwal 1x per minggu.');
+      return;
+    }
+
+    const dates = [date1, date2, date3, date4].filter(Boolean);
+
+    if (dates.length === 0) {
       alert('Minimal isi tanggal pertama!');
+      return;
+    }
+
+    if (dates.length > 4) {
+      alert('Anda hanya bisa memilih maksimal 4 tanggal pengangkutan.');
+      return;
+    }
+
+    const uniqueDates = new Set(dates);
+    if (uniqueDates.size !== dates.length) {
+      alert('Tidak boleh memilih tanggal yang sama lebih dari sekali di input!');
       return;
     }
 
@@ -156,15 +178,54 @@ export default function TrashHouse() {
       return;
     }
 
-    if (!userId) return;
+    const nextWeekStart = new Date(minDate);
+    const nextWeekEnd = new Date(maxDate);
 
-    const dates = [date1, date2, date3, date4].filter(Boolean);
-    if (dates.length > remainingQuota) {
+    const invalidDates = dates.filter((d) => {
+      const dateObj = new Date(d);
+      return dateObj < nextWeekStart || dateObj > nextWeekEnd;
+    });
+
+    if (invalidDates.length > 0) {
       alert(
-        `Jatah Anda hanya ${remainingQuota} kali. Silakan pilih tanggal lebih sedikit.`,
+        `Tanggal ${invalidDates.join(', ')} tidak valid. Anda hanya bisa memilih tanggal di minggu depan.`,
       );
       return;
     }
+
+    if (!userId) return;
+
+    const { data: existingSchedules, error: existingError } = await supabase
+      .from('pickup_schedules')
+      .select('pickup_date')
+      .eq('user_id', userId)
+      .gte('pickup_date', minDate)
+      .lte('pickup_date', maxDate);
+
+    if (existingError) {
+      console.error('Gagal cek jadwal:', existingError);
+      alert('Gagal cek jadwal lama!');
+      return;
+    }
+
+    const existingDates =
+      existingSchedules?.map(
+        (s: any) => new Date(s.pickup_date).toISOString().split('T')[0],
+      ) || [];
+
+    const duplicates = dates.filter((d) => existingDates.includes(d));
+    if (duplicates.length > 0) {
+      alert(`Tanggal ${duplicates.join(', ')} sudah ada di jadwal Anda!`);
+      return;
+    }
+
+    await supabase
+      .from('pickup_schedules')
+      .delete()
+      .eq('user_id', userId)
+      .eq('is_custom', false)
+      .gte('pickup_date', minDate)
+      .lte('pickup_date', maxDate);
 
     const { error: insertError } = await supabase
       .from('pickup_schedules')
@@ -179,12 +240,14 @@ export default function TrashHouse() {
 
     if (insertError) {
       console.error('Gagal menyimpan jadwal:', insertError);
-      alert('Gagal menyimpan jadwal!');
+      alert('Jadwal gagal disimpan!');
       return;
     }
 
-    // Kurangi jatah pengangkutan
     const newQuota = remainingQuota - dates.length;
+    console.log('Jatah lama:', remainingQuota);
+    console.log('Jatah baru yang akan disimpan:', newQuota);
+
     const { error: updateError } = await supabase
       .from('profiles')
       .update({ pickup_quota: newQuota })
@@ -195,11 +258,11 @@ export default function TrashHouse() {
       alert('Jadwal berhasil disimpan, tapi gagal mengurangi jatah.');
     } else {
       setRemainingQuota(newQuota);
-      alert('Jadwal berhasil disimpan! Jatah Anda berkurang.');
+      setIsLocked(true);
+      alert('Jadwal berhasil disimpan! Default minggu depan sudah diganti dengan input Anda.');
     }
   };
 
-  // Submit foto bonus
   const handleBonusSubmit = async () => {
     if (!userId || !uploadedFile) return;
 
@@ -207,7 +270,6 @@ export default function TrashHouse() {
       .replace(/\s+/g, '_')
       .replace(/[^\w.-]/g, '');
 
-    // upload ke storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('photo_url')
       .upload(`${userId}/${sanitizedFileName}`, uploadedFile, { upsert: true });
@@ -222,7 +284,6 @@ export default function TrashHouse() {
       .from('photo_url')
       .getPublicUrl(uploadData.path).data.publicUrl;
 
-    // simpan ke tabel bonus_claims
     const { error: insertError } = await supabase.from('bonus_claims').insert({
       user_id: userId,
       photo_url: photoUrl,
@@ -238,7 +299,6 @@ export default function TrashHouse() {
     }
   };
 
-  // Klaim Coins (Logic Baru)
   const handleClaimCoins = async () => {
     const userId = localStorage.getItem('user_id');
 
@@ -247,12 +307,11 @@ export default function TrashHouse() {
       return;
     }
 
-    // 1. Cari klaim bonus dengan status 'Konfirmasi' yang belum diklaim poinnya
     const { data: claims, error: claimsError } = await supabase
       .from('bonus_claims')
       .select('id, photo_url')
       .eq('user_id', userId)
-      .eq('status', 'Konfirmasi'); // HANYA mencari status 'Konfirmasi'
+      .eq('status', 'Konfirmasi');
 
     if (claimsError) {
       console.error(claimsError);
@@ -260,18 +319,15 @@ export default function TrashHouse() {
       return;
     }
 
-    // 2. Periksa apakah ada klaim yang memenuhi syarat
     if (!claims || claims.length === 0) {
       alert('Tidak ada foto yang sudah dikonfirmasi untuk diklaim.');
       return;
     }
-    
-    // Asumsi kita hanya mengklaim yang pertama ditemukan jika ada banyak
+
     const claimToProcess = claims[0];
     const claimId = claimToProcess.id;
     const bonusPoints = 300;
 
-    // 3. Ambil poin pengguna saat ini
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('point')
@@ -284,7 +340,6 @@ export default function TrashHouse() {
       return;
     }
 
-    // 4. Tambahkan poin ke profil pengguna
     const { error: updateProfileError } = await supabase
       .from('profiles')
       .update({ point: (profile.point || 0) + bonusPoints })
@@ -296,7 +351,6 @@ export default function TrashHouse() {
       return;
     }
 
-    // 5. Ubah status klaim bonus menjadi 'Diklaim' agar tidak bisa diklaim lagi
     const { error: updateClaimError } = await supabase
       .from('bonus_claims')
       .update({ status: 'Diklaim', claimed_at: new Date() })
@@ -306,6 +360,22 @@ export default function TrashHouse() {
       console.error(updateClaimError);
       alert('Coins berhasil ditambah, tapi gagal perbarui status klaim.');
       return;
+    }
+
+    const notificationData = {
+      user_id: userId,
+      title: 'Klaim Bonus Berhasil!',
+      body: `Selamat! Anda berhasil mengklaim bonus ${bonusPoints} Harita Coins.`,
+      type: 'klaim_bonus',
+      related_id: claimId,
+    };
+
+    const { error: notificationError } = await supabase
+      .from('notifications')
+      .insert(notificationData);
+
+    if (notificationError) {
+      console.error('Gagal menyimpan notifikasi:', notificationError);
     }
 
     alert(`Berhasil klaim ${bonusPoints} Coins!`);
@@ -357,7 +427,7 @@ export default function TrashHouse() {
                 Minggu Depan
               </h1>
             </div>
-            <div className="my-4 flex h-[100px] w-[320px]  items-center justify-between rounded-xl bg-green-700 px-8">
+            <div className="my-4 flex h-[100px] w-[320px] items-center justify-between rounded-xl bg-green-700 px-8">
               {/* Kiri */}
               <div className="flex flex-col justify-center">
                 <span className="font-inter text-lg font-semibold text-white">
@@ -369,7 +439,7 @@ export default function TrashHouse() {
               </div>
 
               {/* Kanan */}
-              <div className="text-3xl font-bold text-yellow-200 mt-7 ">
+              <div className="mt-7 text-3xl font-bold text-yellow-200 ">
                 {remainingQuota !== null ? `${remainingQuota}x` : '...'}
               </div>
             </div>
@@ -466,6 +536,7 @@ export default function TrashHouse() {
                       max={maxDate}
                       className="w-full rounded-lg border-2 border-green-300 p-3 focus:border-green-700 focus:outline-none"
                       required={i === 0}
+                      disabled={isLocked}
                     />
                   </div>
                 ))}
@@ -481,9 +552,15 @@ export default function TrashHouse() {
 
             <button
               onClick={handleFormSubmit}
-              className="w-full transform rounded-lg bg-green-700 px-6 py-4 font-semibold text-white transition-all hover:scale-105 hover:bg-green-800"
+              disabled={isLocked}
+              className={`w-full transform rounded-lg px-6 py-4 font-semibold text-white transition-all
+    ${
+      isLocked
+        ? 'cursor-not-allowed bg-gray-400'
+        : 'bg-green-700 hover:scale-105 hover:bg-green-800'
+    }`}
             >
-              Simpan Jadwal
+              {isLocked ? 'Jadwal sudah disimpan' : 'Simpan Jadwal'}
             </button>
           </div>
         </div>

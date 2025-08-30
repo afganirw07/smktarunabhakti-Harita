@@ -167,10 +167,35 @@ const Dashboard = () => {
       }
 
       console.log('Photo confirmed successfully:', data);
-      // Re-fetch the list to update the UI
       fetchFoto();
     } catch (error) {
       console.error('Error confirming photo:', error);
+    }
+  };
+
+  const handleRejection = async (photoId) => {
+    try {
+      if (!supabase) {
+        console.error('Supabase client not initialized');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('bonus_claims')
+        .update({
+          status: 'Ditolak',
+          is_claimed: false,
+        })
+        .eq('id', photoId);
+
+      if (error) {
+        throw error;
+      }
+
+      console.log('Photo rejected successfully:', data);
+      fetchFoto();
+    } catch (error) {
+      console.error('Error rejecting photo:', error);
     }
   };
 
@@ -272,7 +297,7 @@ const Dashboard = () => {
                       {new Date(photo.claimed_at).toLocaleDateString()}
                     </p>
                     <div className='flex gap-2 items-center justify-start'>
-                      <button className='mt-2 rounded-lg bg-red-500 px-4 py-1 font-nunito text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-red-400'>
+                      <button onClick={() => handleRejection(photo.id)} className='mt-2 rounded-lg bg-red-500 px-4 py-1 font-nunito text-sm font-semibold text-white transition-all duration-200 ease-out hover:bg-red-400'>
                         Tolak
                       </button>
                     <button
