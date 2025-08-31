@@ -112,7 +112,6 @@ export default function LaporSampah() {
   };
 
   // Function to save report to database
-  // Function to save report to database
   const saveReportToDatabase = async (orderId: string) => {
     try {
       const biaya = hitungTotal();
@@ -130,7 +129,7 @@ export default function LaporSampah() {
             description: formData.deskripsi,
             total_cost: biaya.total,
             status: 'Terkonfirmasi',
-            order_id: orderId, // ✅ orderId sekarang diterima sebagai parameter
+            order_id: orderId, 
           },
         ])
         .select();
@@ -176,108 +175,93 @@ export default function LaporSampah() {
     }
   };
 
-  const handleSubmit = async () => {
-    if (!userId) {
-      toast.error('User belum login!');
-      return;
-    }
+// ... kode lu sebelumnya aman
+const handleSubmit = async () => {
+  if (!userId) {
+    toast.error('User belum login!');
+    return;
+  }
 
-    if (
-      !formData.namaLengkap ||
-      !formData.nomorHP ||
-      !formData.email ||
-      !formData.alamat ||
-      !formData.wilayah
-    ) {
-      toast.error('Mohon lengkapi semua data!');
-      return;
-    }
+  if (!formData.namaLengkap || !formData.nomorHP || !formData.email || !formData.alamat || !formData.wilayah) {
+    toast.error('Mohon lengkapi semua data!');
+    return;
+  }
 
-    setLoading(true);
-    const biaya = hitungTotal();
-    const orderId = `LPR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  setLoading(true);
+  const biaya = hitungTotal();
+  const orderId = `LPR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-    try {
-      const response = await fetch('/api/create-lapor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          order_id: orderId,
-          gross_amount: Math.round(biaya.total),
-          customer_details: {
-            id: userId,
-            first_name: formData.namaLengkap,
-            email: formData.email,
-            phone: formData.nomorHP,
+  try {
+    const response = await fetch('/api/create-lapor', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        order_id: orderId,
+        gross_amount: Math.round(biaya.total),
+        customer_details: {
+          id: userId,
+          first_name: formData.namaLengkap,
+          email: formData.email,
+          phone: formData.nomorHP,
+        },
+        item_details: [
+          {
+            id: formData.wilayah,
+            name: `Layanan Lapor Sampah di ${selectedWilayah?.label}`,
+            price: Math.round(biaya.total),
+            quantity: 1,
           },
-          item_details: [
-            {
-              id: formData.wilayah,
-              name: `Layanan Lapor Sampah di ${selectedWilayah?.label}`,
-              price: Math.round(biaya.total),
-              quantity: 1,
-            },
-          ],
-          report_data: {
-            userId,
-            full_name: formData.namaLengkap,
-            phone_number: formData.nomorHP,
-            email: formData.email,
-            address: formData.alamat,
-            area_type: formData.wilayah,
-            description: formData.deskripsi,
-            total_cost: biaya.total,
-          },
-        }),
+        ],
+        report_data: {
+          userId,
+          full_name: formData.namaLengkap,
+          phone_number: formData.nomorHP,
+          email: formData.email,
+          address: formData.alamat,
+          area_type: formData.wilayah,
+          description: formData.deskripsi,
+          total_cost: biaya.total,
+        },
+      }),
+    });
+
+    const data = await response.json();
+    if (response.ok && data.token) {
+      window.snap.pay(data.token, {
+        onSuccess: () => {
+          toast.success('Pembayaran berhasil! Tunggu konfirmasi sistem.');
+
+          // reset form
+          setFormData({
+            namaLengkap: '',
+            nomorHP: '',
+            email: '',
+            alamat: '',
+            wilayah: '',
+            deskripsi: '',
+          });
+
+          // refresh data 3 detik (nunggu webhook update)
+          setTimeout(async () => {
+            await fetchReportsCount();
+          }, 3000);
+        },
+        onPending: () => toast('Menunggu pembayaran...'),
+        onError: () => toast.error('Pembayaran gagal.'),
+        onClose: () => toast.error('Pembayaran dibatalkan.'),
       });
-
-      const data = await response.json();
-      if (response.ok && data.token) {
-        window.snap.pay(data.token, {
-          onSuccess: async (result) => {
-            console.log('Payment success:', result);
-            toast.success('Pembayaran berhasil! Laporan sedang diproses oleh sistem.');
-
-            // Reset form dan refresh data setelah delay
-            setFormData({
-              namaLengkap: '',
-              nomorHP: '',
-              email: '',
-              alamat: '',
-              wilayah: '',
-              deskripsi: '',
-            });
-
-            // Refresh data setelah 3 detik untuk memberi waktu webhook
-            setTimeout(async () => {
-              await fetchReportsCount();
-              await fetchLastReport();
-            }, 3000);
-          },
-          onPending: (result) => {
-            console.log('Payment pending:', result);
-            toast.success('Menunggu pembayaran Anda.');
-          },
-          onError: (result) => {
-            console.log('Payment error:', result);
-            toast.error('Terjadi kesalahan saat pembayaran.');
-          },
-          onClose: () => {
-            console.log('Customer closed the popup');
-            toast.error('Pembayaran dibatalkan.');
-          },
-        });
-      } else {
-        console.error('Failed to get transaction token:', data.error);
-        toast.error('Gagal membuat transaksi. Silakan coba lagi.');
-      }
-    } catch (error) {
-      console.error('Error during transaction process:', error);
-      toast.error('Terjadi kesalahan pada sistem. Silakan coba lagi.');
-    } finally {
-      setLoading(false);
+    } else {
+      console.error('Failed to get token:', data);
+      toast.error('Gagal membuat transaksi.');
     }
-  };
+  } catch (err) {
+    console.error(err);
+    toast.error('Terjadi error sistem.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const biaya = hitungTotal();
 
