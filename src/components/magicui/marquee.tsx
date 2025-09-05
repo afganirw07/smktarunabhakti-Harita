@@ -26,7 +26,8 @@ export default function Marquee({
   return (
     <div
       {...props}
-      style={{ "--duration": duration, "--gap": gap } as React.CSSProperties} // 👈 dipindah ke style
+      style={{ "--duration": duration,
+    "--gap": gap,} as React.CSSProperties}
       className={cn(
         "group flex overflow-hidden p-2 gap-[var(--gap)]", // gap tetap jalan
         {
