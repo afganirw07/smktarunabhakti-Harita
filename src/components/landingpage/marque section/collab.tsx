@@ -12,7 +12,7 @@ const logos = [
 const MarqueeDemo = () => {
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-[#FDFAF4]  ">
-      <Marquee pauseOnHover className="animate-marquee  cursor-pointer">
+      <Marquee pauseOnHover className="cursor-pointer">
         {logos.map((logo, idx) => (
           <Image
             key={idx}
