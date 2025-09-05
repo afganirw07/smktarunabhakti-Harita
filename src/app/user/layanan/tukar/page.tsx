@@ -15,6 +15,7 @@ import { createClient } from '@supabase/supabase-js';
 import jsPDF from 'jspdf';
 import { toPng } from 'html-to-image';
 import Image from 'next/image';
+import toast, { Toaster } from 'react-hot-toast';
 
 // Configure Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -49,8 +50,7 @@ interface JenisBarang {
 }
 
 // 🔑 Tambahan fungsi normalisasi
-const normalizeName = (name: string) =>
-  name.toLowerCase().replace(/\s+/g, '');
+const normalizeName = (name: string) => name.toLowerCase().replace(/\s+/g, '');
 
 const imageMap: Record<string, string> = {
   pupuk: '/img/user/pupuk.jpg',
@@ -151,7 +151,7 @@ export default function TukarSampah() {
 
   const handleSubmit = async () => {
     if (!isFormValid) {
-      alert('Harap lengkapi semua data formulir.');
+      toast.error('Harap lengkapi semua data formulir.');
       return;
     }
 
@@ -161,7 +161,7 @@ export default function TukarSampah() {
     );
 
     if (!selectedBarangData) {
-      alert('Jenis barang tidak ditemukan.');
+      toast.error('Jenis barang tidak ditemukan.');
       return;
     }
 
@@ -247,7 +247,7 @@ export default function TukarSampah() {
       setShowStruk(true);
     } catch (err: any) {
       console.error('Error submitting form:', err.message);
-      alert(`Gagal mengirim form: ${err.message}`);
+      toast.error(`Gagal mengirim form: ${err.message}`);
     }
   };
 
@@ -262,6 +262,7 @@ export default function TukarSampah() {
   return (
     <>
       <section className="min-h-screen w-full py-8">
+        <Toaster position="top-center" reverseOrder={false} />
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
           {loading && (
             <p className="col-span-full text-center">Memuat data...</p>
@@ -341,10 +342,10 @@ export default function TukarSampah() {
                       >
                         {/* Gambar */}
                         <Image
-                        fill
+                          fill
                           src={imageSrc}
                           alt={barang.nama_barang}
-                          className="object-cover object-center w-[200px] h-[150px] "
+                          className="h-[150px] w-[200px] object-cover object-center "
                         />
 
                         {/* Overlay gradient hitam */}

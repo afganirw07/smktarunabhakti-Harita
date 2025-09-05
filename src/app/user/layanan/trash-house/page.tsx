@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { SketchCalendarPicker } from 'components/magicui/calendar';
 import { Coins, Camera } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import toast, { Toaster } from 'react-hot-toast';
 
 // Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -80,7 +81,10 @@ export default function TrashHouse() {
       // Set the lock state based on whether a schedule exists
       const hasCustomSchedule = scheduleData && scheduleData.length > 0;
       setIsLocked(hasCustomSchedule);
-      console.log('Apakah sudah ada jadwal kustom minggu depan?', hasCustomSchedule);
+      console.log(
+        'Apakah sudah ada jadwal kustom minggu depan?',
+        hasCustomSchedule,
+      );
 
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -90,7 +94,10 @@ export default function TrashHouse() {
 
       if (profileData) {
         setRemainingQuota(profileData.pickup_quota);
-        console.log('Jatah pengangkutan berhasil dimuat:', profileData.pickup_quota);
+        console.log(
+          'Jatah pengangkutan berhasil dimuat:',
+          profileData.pickup_quota,
+        );
       } else {
         console.error('Gagal mengambil jatah:', profileError);
       }
@@ -151,30 +158,32 @@ export default function TrashHouse() {
     e.preventDefault();
 
     if (isLocked) {
-      alert('Anda hanya bisa menyimpan jadwal 1x per minggu.');
+      toast.error('Anda hanya bisa menyimpan jadwal 1x per minggu.');
       return;
     }
 
     const dates = [date1, date2, date3, date4].filter(Boolean);
 
     if (dates.length === 0) {
-      alert('Minimal isi tanggal pertama!');
+      toast.error('Minimal isi tanggal pertama!');
       return;
     }
 
     if (dates.length > 4) {
-      alert('Anda hanya bisa memilih maksimal 4 tanggal pengangkutan.');
+      toast.error('Anda hanya bisa memilih maksimal 4 tanggal pengangkutan.');
       return;
     }
 
     const uniqueDates = new Set(dates);
     if (uniqueDates.size !== dates.length) {
-      alert('Tidak boleh memilih tanggal yang sama lebih dari sekali di input!');
+      toast.error(
+        'Tidak boleh memilih tanggal yang sama lebih dari sekali di input!',
+      );
       return;
     }
 
     if (remainingQuota === null || remainingQuota === 0) {
-      alert('Jatah pengangkutan Anda sudah habis!');
+      toast.error('Jatah pengangkutan Anda sudah habis!');
       return;
     }
 
@@ -187,8 +196,10 @@ export default function TrashHouse() {
     });
 
     if (invalidDates.length > 0) {
-      alert(
-        `Tanggal ${invalidDates.join(', ')} tidak valid. Anda hanya bisa memilih tanggal di minggu depan.`,
+      toast.error(
+        `Tanggal ${invalidDates.join(
+          ', ',
+        )} tidak valid. Anda hanya bisa memilih tanggal di minggu depan.`,
       );
       return;
     }
@@ -204,7 +215,7 @@ export default function TrashHouse() {
 
     if (existingError) {
       console.error('Gagal cek jadwal:', existingError);
-      alert('Gagal cek jadwal lama!');
+      toast.error('Gagal cek jadwal lama!');
       return;
     }
 
@@ -215,7 +226,7 @@ export default function TrashHouse() {
 
     const duplicates = dates.filter((d) => existingDates.includes(d));
     if (duplicates.length > 0) {
-      alert(`Tanggal ${duplicates.join(', ')} sudah ada di jadwal Anda!`);
+      toast.error(`Tanggal ${duplicates.join(', ')} sudah ada di jadwal Anda!`);
       return;
     }
 
@@ -240,7 +251,7 @@ export default function TrashHouse() {
 
     if (insertError) {
       console.error('Gagal menyimpan jadwal:', insertError);
-      alert('Jadwal gagal disimpan!');
+      toast.error('Jadwal gagal disimpan!');
       return;
     }
 
@@ -255,11 +266,13 @@ export default function TrashHouse() {
 
     if (updateError) {
       console.error('Gagal mengurangi jatah:', updateError);
-      alert('Jadwal berhasil disimpan, tapi gagal mengurangi jatah.');
+      toast.error('Jadwal berhasil disimpan, tapi gagal mengurangi jatah.');
     } else {
       setRemainingQuota(newQuota);
       setIsLocked(true);
-      alert('Jadwal berhasil disimpan! Default minggu depan sudah diganti dengan input Anda.');
+      toast.success(
+        'Jadwal berhasil disimpan! Default minggu depan sudah diganti dengan input Anda.',
+      );
     }
   };
 
@@ -276,7 +289,7 @@ export default function TrashHouse() {
 
     if (uploadError) {
       console.error('Gagal upload foto:', uploadError);
-      alert('Gagal upload foto');
+      toast.error('Gagal upload foto');
       return;
     }
 
@@ -292,9 +305,9 @@ export default function TrashHouse() {
 
     if (insertError) {
       console.error('Gagal menyimpan klaim bonus:', insertError);
-      alert('Gagal menyimpan klaim bonus');
+      toast.error('Gagal menyimpan klaim bonus');
     } else {
-      alert('Bonus diklaim, tunggu verifikasi admin!');
+      toast.success('Bonus diklaim, tunggu verifikasi admin!');
       setUploadedFile(null);
     }
   };
@@ -303,7 +316,7 @@ export default function TrashHouse() {
     const userId = localStorage.getItem('user_id');
 
     if (!userId) {
-      alert('User tidak ditemukan');
+      toast.error('User tidak ditemukan');
       return;
     }
 
@@ -315,12 +328,12 @@ export default function TrashHouse() {
 
     if (claimsError) {
       console.error(claimsError);
-      alert('Gagal cek data klaim');
+      toast.error('Gagal cek data klaim');
       return;
     }
 
     if (!claims || claims.length === 0) {
-      alert('Tidak ada foto yang sudah dikonfirmasi untuk diklaim.');
+      toast.error('Tidak ada foto yang sudah dikonfirmasi untuk diklaim.');
       return;
     }
 
@@ -336,7 +349,7 @@ export default function TrashHouse() {
 
     if (profileError) {
       console.error(profileError);
-      alert('Gagal mengambil data profil');
+      toast.error('Gagal mengambil data profil');
       return;
     }
 
@@ -347,7 +360,7 @@ export default function TrashHouse() {
 
     if (updateProfileError) {
       console.error(updateProfileError);
-      alert('Gagal klaim coins');
+      toast.error('Gagal klaim coins');
       return;
     }
 
@@ -358,7 +371,7 @@ export default function TrashHouse() {
 
     if (updateClaimError) {
       console.error(updateClaimError);
-      alert('Coins berhasil ditambah, tapi gagal perbarui status klaim.');
+      toast.error('Coins berhasil ditambah, tapi gagal perbarui status klaim.');
       return;
     }
 
@@ -378,11 +391,12 @@ export default function TrashHouse() {
       console.error('Gagal menyimpan notifikasi:', notificationError);
     }
 
-    alert(`Berhasil klaim ${bonusPoints} Coins!`);
+    toast.success(`Berhasil klaim ${bonusPoints} Coins!`);
   };
 
   return (
     <section className="h-auto w-full py-8">
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="mb-8 flex w-full flex-col justify-center gap-4 lg:flex-row lg:justify-between lg:gap-0">
         <h1 className="font-inter text-3xl font-bold text-green-700">
           Trash House

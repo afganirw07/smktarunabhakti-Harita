@@ -1,111 +1,153 @@
-# [Horizon UI Tailwind CSS NextJS ⚡️](https://horizon-ui.com/horizon-tailwind-react-nextjs) [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&logo=twitter)](https://twitter.com/intent/tweet?text=Check%20Horizon%20UI,%20the%20trendiest%20open-source%20admin%20dashboard%20template%20for%20Tailwind%20CSS,%20React%20JS%20and%20NextJS%20-%20https%3A//horizon-ui.com/)
 
-![version](https://img.shields.io/badge/version-3.0.0-blue.svg)
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
-[![GitHub issues open](https://img.shields.io/github/issues/horizon-ui/horizon-tailwind-react-nextjs.svg?maxAge=2592000)](https://github.com/horizon-ui/horizon-tailwind-react-nextjs/issues?q=is%3Aopen+is%3Aissue)
 
-<p>&nbsp;</p>
+# 🌿 Harita – Platform Smart Waste Management
+(https://smktarunabhakti-harita.vercel.app/)
 
-[<img alt="Horizon UI Tailwind CSS NextJS" src="https://i.ibb.co/mtLkcYL/horizon-ui-nextjs-free.png" /> ](https://github.com/horizon-ui/horizon-tailwind-react-nextjs)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![Dibangun dengan Next.js](https://img.shields.io/badge/Dibangun%20dengan-Next.js-black?logo=next.js)](https://nextjs.org/)
+[![Supabase](https://img.shields.io/badge/Backend-Supabase-blue?logo=supabase)](https://supabase.com/)
+[![Midtrans](https://img.shields.io/badge/Pembayaran-Midtrans-orange?logo=midtrans)](https://midtrans.com/)
 
-<p>&nbsp;</p>
-d
-Get started and build your dream web app with Horizon UI Tailwind CSS NextJS, the trendiest & innovative Open Source Admin Template for Tailwind CSS, React & NextJS!
+Harita adalah platform modern berbasis teknologi yang bertujuan meningkatkan pengelolaan sampah di Indonesia. Platform ini memberdayakan komunitas untuk melaporkan, mendaur ulang, dan mengelola sampah secara efektif, sambil meningkatkan kesadaran dan tanggung jawab lingkungan.
 
 ---
-Ngaji
-P
-### Introduction
 
-Designed for those who like modern UI elements and beautiful websites. Made of
-hundred of elements, designed blocks, and fully coded pages, Horizon UI is ready
-to help you create stunning websites and web apps.
 
-Save hundreds of hours trying to create and develop a dashboard from scratch.
-The fastest, most responsive & trendiest dashboard is here. Seriously.
+## 💡 Tentang
 
-With Horizon UI you will find many examples of pages like NFTs Pages,
-Authentication Pages, Profile, and so on. Just choose between a Basic Design or a
-cover and you are good to go!
+Harita dirancang untuk mengatasi masalah sampah yang semakin meningkat di Indonesia. Berdasarkan SIPSN 2022, Indonesia menghasilkan **68,5 juta ton sampah**, dengan **18,5% berupa plastik**, dan **33,42% tidak terkelola**. Kesadaran masyarakat terkait pemisahan sampah masih rendah, menyebabkan banjir, polusi, dan masalah kesehatan.  
 
-### 🎉 [NEW] Horizon UI Components
+Harita memfasilitasi layanan pengelolaan sampah terintegrasi, memudahkan masyarakat berpartisipasi, melaporkan sampah ilegal, dan belajar pengelolaan sampah yang benar melalui asisten AI.
 
-All the main components from both versions. This will help you to see and interact with all & the latest added components of Horizon (also, new components are on the way, stay tuned)! ⚡️
-<a href="https://horizon-ui.com/components/?ref=readme-horizon-tailwind-nextjs" target="_blank">See all components</a>
+---
 
-### Documentation
+## 🛠 Masalah & Solusi
 
-Each element is well presented in a very complex documentation. You can read
-more about the <a href="https://horizon-ui.com/docs-tailwind/docs/react/installation?ref=readme-horizon-tailwind-nextjs" target="_blank">documentation
-here.</a>
+### Masalah
+- Kesadaran masyarakat terhadap pemisahan dan pengelolaan sampah masih rendah.
+- Sebagian besar sampah tidak terkelola.
+- Kebutuhan layanan pengelolaan sampah real-time dan transparan.
 
-### Quick Start
+### Solusi
+Harita menghadirkan pendekatan berbasis teknologi untuk pengelolaan sampah:
 
-Install Horizon UI by running either of the following:
+1. **Layanan Pickup Sampah Digital** – Jadwal dan riwayat pembayaran transparan.
+2. **Toko Daur Ulang HaritaCoins** – Memberikan hadiah untuk pemisahan sampah yang tepat.
+3. **Sistem Pelaporan Sampah** – Memudahkan pelaporan lokasi sampah ilegal.
+4. **Asisten HaritaAI** – AI mengidentifikasi jenis sampah dan memberikan saran pengelolaan.
 
-- Install NodeJS LTS from [NodeJs Official Page](https://nodejs.org/en/?ref=horizon-documentation)
-  (NOTE: Product only works with LTS version)
+---
 
-- Install Yarn CLI from [Yarn Official Page](https://yarnpkg.com/cli/install?ref=horizon-documentation)
+## ⚙ Teknologi
 
-Clone the repository with the following command:
+| Lapisan     | Teknologi / Library |
+|------------|-------------------|
+| Frontend   | Next.js, React, Tailwind CSS |
+| Backend    | Supabase (Auth, Database, Realtime) |
+| Pembayaran | Midtrans Gateway |
+| Hosting    | Vercel |
+| Bahasa     | TypeScript, JavaScript |
+| Library    | Framer Motion, HTML2PDF, Gemini API, Lucide React, React Icons, Magic UI, Shadcn, Horizon Dashboard, TailAdmin V2, Toast, SweetAlert2 |
 
-```bash
-git clone https://github.com/horizon-ui/horizon-tailwind-react-nextjs.git
+---
+
+## 🎯 Tujuan & Manfaat
+
+### Tujuan
+1. Memudahkan akses layanan pengelolaan sampah.
+2. Mengurangi sampah ilegal di masyarakat.
+3. Meningkatkan kesadaran pemisahan sampah.
+4. Mendorong partisipasi aktif dalam kegiatan lingkungan.
+5. Memberikan pekerjaan bagi pemulung.
+
+### Manfaat
+- Lingkungan lebih bersih dan sehat.
+- Promosi produk daur ulang melalui Harita Store.
+
+---
+
+## ✨ Fitur
+
+### Fitur Pengguna
+1. **Pelaporan Sampah**
+   - Kirim laporan sampah (Nama, Telepon, Email, Lokasi, Pembayaran, Jenis Area)
+   - Pantau status dan riwayat transaksi secara real-time
+
+2. **Langganan Trash House**
+   - Pilihan langganan bulanan, triwulanan, semesteran, dan tahunan
+   - Jadwal pickup real-time
+   - Hadiah HaritaCoins untuk pemisahan sampah
+   - Trial gratis 2 minggu per alamat
+
+3. **HaritaAI**
+   - Chatbot AI untuk identifikasi jenis sampah dan panduan pengelolaan
+
+4. **Tukar Daur Ulang**
+   - Kirim sampah untuk ditukar
+   - Konfirmasi penukaran dan unduh struk
+   - Redeem di HaritaPos yang ditunjuk
+
+### Fitur Admin
+1. **Dashboard Utama**
+   - Pantau pendapatan, saldo, pengeluaran, total layanan, pengguna, karyawan, statistik layanan, laporan mingguan, traffic web, presentasi sampah
+   - Setujui/tolak foto Trans House
+
+2. **Manajemen Aset**
+   - Kelola inventaris (kendaraan, alat, gudang)
+   - Tambah, edit, atau hapus aset
+
+3. **Tabel Data**
+   - Akses semua data tersimpan: pengguna, admin, karyawan, aset, penukaran, layanan
+
+4. **Riwayat Transaksi**
+   - Lihat transaksi pengguna, unduh PDF
+
+5. **Profil & Logout**
+   - Kelola akun admin dan logout aman
+
+---
+
+## 🚀 Cara Memulai
+
+### 1. Clone Repository
+```
+git clone https://github.com/afganirw07/smktarunabhakti-Harita.git
+cd harita
 ```
 
-Run in terminal this command:
+### 2. Install Dependencies
 
-```bash
+```
+npm install
+# atau
 yarn install
 ```
+### 3. Setup .env
 
-Then run this command to start your local server
+``` NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-```bash
-yarn dev
+MIDTRANS_CLIENT_KEY=your_midtrans_client_key
+MIDTRANS_SERVER_KEY=your_midtrans_server_key
+
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+
+NEXT_PUBLIC_GEMINI_API_KEY = 'your_key'
 ```
 
-### Example Pages
+### 4. Jalankan Development Server
+```
+npm run dev
+# atau
+yarn dev
+```
+Buka http://localhost:3000
 
-If you want to get inspiration or just show something directly to your clients, you can jump start your development with our pre-built example pages. You will be able to quickly set up the basic structure for your web project. View <a href="https://horizon-ui.com/horizon-tailwind-react-nextjs/?ref=readme-horizon-tailwind-nextjs" target="_blank">example pages here.</a>
+##  Testing Admin Dashboard
+```
+Email : afganirwansyah070708@gmail.com
+Pass : 123456789
+```
 
-### Versions
+© 2025 Harita
 
-| Free Version                                                                                                                                         | PRO Version                                                                                                                                                    |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [![Horizon UI Tailwind NextJS](https://i.ibb.co/mtLkcYL/horizon-ui-nextjs-free.png)](https://www.horizon-ui.com/?ref=readme-horizon-tailwind-nextjs) | [![Horizon UI NextJS PRO](https://i.ibb.co/sPSYxGv/horizon-2-0-pro-presentation-image.png)](https://www.horizon-ui.com/pro?ref=readme-horizon-tailwind-nextjs) |
-
-### Figma Version
-
-Horizon UI is available in Figma format as well! Check it out on Figma
-Community! 🎨
-[See the Horizon UI Figma design files](https://bit.ly/horizon-figma)
-
-### Reporting Issues
-
-We use GitHub Issues as the official bug tracker for the Horizon UI. Here are
-some advices for our users that want to report an issue:
-
-1. Make sure that you are using the latest version of the Horizon UI Dashbaord.
-   Check the CHANGELOG from your dashboard on our
-   [CHANGE LOG File](https://github.com/horizon-ui/horizon-tailwind-react-nextjs/blob/main/CHANGELOG.md?ref=readme-horizon-tailwind-nextjs).
-2. Providing us reproducible steps for the issue will shorten the time it takes
-   for it to be fixed.
-3. Some issues may be browser specific, so specifying in what browser you
-   encountered the issue might help.
-
----
-
-### Community
-
-Connect with the community! Feel free to ask questions, report issues, and meet
-new people that already use Horizon UI!
-
-💬 [Join the #HorizonUI Discord Community!](https://discord.gg/f6tEKFBd4m)
-
-### Copyright and license
-
-⭐️ [Copyright 2023 Simmmple ](https://www.horizon-ui.com/?ref=readme-horizon-tailwind-nextjs)
-
-📄 [Horizon UI License](https://www.horizon-ui.com/?ref=readme-horizon-tailwind-nextjs)

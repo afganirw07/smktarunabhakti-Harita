@@ -19,6 +19,7 @@ import {
 } from 'components/dropdown/dropdown-menu';
 import dayjs from 'dayjs';
 import { createClient } from '@supabase/supabase-js';
+import toast, { Toaster } from 'react-hot-toast';
 
 // Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -35,17 +36,23 @@ export default function LaporSampah() {
     deskripsi: '',
   });
 
-  const [areas, setAreas] = useState<{ value: string; label: string; harga: number }[]>([]);
+  const [areas, setAreas] = useState<
+    { value: string; label: string; harga: number }[]
+  >([]);
   const [totalPanggilan, setTotalPanggilan] = useState(0);
   const [loading, setLoading] = useState(false);
-  const userId = typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
+  const userId =
+    typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
   const [lastReport, setLastReport] = useState<any>(null);
 
   // Load Midtrans Snap JS sandbox
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://app.sandbox.midtrans.com/snap/snap.js';
-    script.setAttribute('data-client-key', process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!);
+    script.setAttribute(
+      'data-client-key',
+      process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!,
+    );
     script.async = true;
     document.body.appendChild(script);
     return () => document.body.removeChild(script);
@@ -59,11 +66,13 @@ export default function LaporSampah() {
         .select('area_code, label, base_price');
       if (error) console.error('Error fetching areas:', error);
       else if (data) {
-        setAreas(data.map((a) => ({
-          value: a.area_code,
-          label: a.label,
-          harga: a.base_price,
-        })));
+        setAreas(
+          data.map((a) => ({
+            value: a.area_code,
+            label: a.label,
+            harga: a.base_price,
+          })),
+        );
       }
     };
 
@@ -80,7 +89,9 @@ export default function LaporSampah() {
     fetchReportsCount();
   }, [userId]);
 
-  const selectedWilayah = areas.find((option) => option.value === formData.wilayah);
+  const selectedWilayah = areas.find(
+    (option) => option.value === formData.wilayah,
+  );
 
   const handleWilayahSelect = (value: string) => {
     setFormData((prev) => ({ ...prev, wilayah: value }));
@@ -93,118 +104,188 @@ export default function LaporSampah() {
     return { hargaDasar, pajak, total };
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async () => {
-    if (!userId) {
-      alert('User belum login!');
-      return;
-    }
-
-    if (!formData.namaLengkap || !formData.nomorHP || !formData.email || !formData.alamat || !formData.wilayah) {
-      alert('Mohon lengkapi semua data!');
-      return;
-    }
-
-    setLoading(true);
-    const biaya = hitungTotal();
-    const orderId = `LPR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
+  // Function to save report to database
+  const saveReportToDatabase = async (orderId: string) => {
     try {
-      const response = await fetch('/api/create-lapor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          order_id: orderId,
-          gross_amount: Math.round(biaya.total),
-          customer_details: {
-            id: userId,
-            first_name: formData.namaLengkap,
+      const biaya = hitungTotal();
+
+      const { data, error } = await supabase
+        .from('reports')
+        .insert([
+          {
+            user_id: userId,
+            full_name: formData.namaLengkap,
+            phone_number: formData.nomorHP,
             email: formData.email,
-            phone: formData.nomorHP,
-          },
-          item_details: [
-            {
-              id: formData.wilayah,
-              name: `Layanan Lapor Sampah di ${selectedWilayah.label}`,
-              price: Math.round(biaya.total),
-              quantity: 1,
-            },
-          ],
-          report_data: {
-            userId,
-            namaLengkap: formData.namaLengkap,
-            nomorHP: formData.nomorHP,
-            email: formData.email,
-            alamat: formData.alamat,
-            wilayah: formData.wilayah,
-            deskripsi: formData.deskripsi,
+            address: formData.alamat,
+            area_type: formData.wilayah,
+            description: formData.deskripsi,
             total_cost: biaya.total,
+            status: 'Terkonfirmasi',
+            order_id: orderId, 
           },
-        }),
+        ])
+        .select();
+
+      if (error) {
+        console.error('Error saving report:', error);
+        throw error;
+      }
+
+      // Save notification
+      await supabase.from('notifications').insert({
+        user_id: userId,
+        title: 'Pembayaran & Laporan Berhasil!',
+        body: `Laporan Anda untuk pembersihan sampah di ${formData.alamat} telah berhasil dikonfirmasi.`,
+        type: 'lapor_sampah',
       });
 
-      const data = await response.json();
-      if (response.ok && data.token) {
-        window.snap.pay(data.token, {
-          onSuccess: (result) => {
-            console.log('Payment success:', result);
-            alert('Pembayaran berhasil! Laporan Anda telah dicatat.');
-            setFormData({
-              namaLengkap: '',
-              nomorHP: '',
-              email: '',
-              alamat: '',
-              wilayah: '',
-              deskripsi: '',
-            });
-            setTotalPanggilan((prev) => prev + 1);
-          },
-          onPending: (result) => {
-            console.log('Payment pending:', result);
-            alert('Menunggu pembayaran Anda. Laporan akan diproses setelah pembayaran berhasil.');
-          },
-          onError: (result) => {
-            console.log('Payment error:', result);
-            alert('Terjadi kesalahan saat pembayaran. Silakan coba lagi.');
-          },
-          onClose: () => {
-            console.log('Customer closed the popup without finishing the payment');
-            alert('Pembayaran dibatalkan. Laporan tidak disimpan.');
-          },
+      // Update total panggilan count
+      setTotalPanggilan((prev) => prev + 1);
+
+      // Reset form
+      setFormData({
+        namaLengkap: '',
+        nomorHP: '',
+        email: '',
+        alamat: '',
+        wilayah: '',
+        deskripsi: '',
+      });
+
+      // Update last report
+      if (data && data.length > 0) {
+        setLastReport({
+          address: formData.alamat,
+          created_at: new Date().toISOString(),
         });
-      } else {
-        console.error('Failed to get transaction token:', data.error);
-        alert('Gagal membuat transaksi. Silakan coba lagi.');
       }
+
+      return data;
     } catch (error) {
-      console.error('Error during transaction process:', error);
-      alert('Terjadi kesalahan pada sistem. Silakan coba lagi.');
-    } finally {
-      setLoading(false);
+      console.error('Error in saveReportToDatabase:', error);
+      throw error;
     }
   };
+
+// ... kode lu sebelumnya aman
+const handleSubmit = async () => {
+  if (!userId) {
+    toast.error('User belum login!');
+    return;
+  }
+
+  if (!formData.namaLengkap || !formData.nomorHP || !formData.email || !formData.alamat || !formData.wilayah) {
+    toast.error('Mohon lengkapi semua data!');
+    return;
+  }
+
+  setLoading(true);
+  const biaya = hitungTotal();
+  const orderId = `LPR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+  try {
+    const response = await fetch('/api/create-lapor', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        order_id: orderId,
+        gross_amount: Math.round(biaya.total),
+        customer_details: {
+          id: userId,
+          first_name: formData.namaLengkap,
+          email: formData.email,
+          phone: formData.nomorHP,
+        },
+        item_details: [
+          {
+            id: formData.wilayah,
+            name: `Layanan Lapor Sampah di ${selectedWilayah?.label}`,
+            price: Math.round(biaya.total),
+            quantity: 1,
+          },
+        ],
+        report_data: {
+          userId,
+          full_name: formData.namaLengkap,
+          phone_number: formData.nomorHP,
+          email: formData.email,
+          address: formData.alamat,
+          area_type: formData.wilayah,
+          description: formData.deskripsi,
+          total_cost: biaya.total,
+        },
+      }),
+    });
+
+    const data = await response.json();
+    if (response.ok && data.token) {
+      window.snap.pay(data.token, {
+        onSuccess: () => {
+          toast.success('Pembayaran berhasil! Tunggu konfirmasi sistem.');
+
+          // reset form
+          setFormData({
+            namaLengkap: '',
+            nomorHP: '',
+            email: '',
+            alamat: '',
+            wilayah: '',
+            deskripsi: '',
+          });
+
+          // refresh data 3 detik (nunggu webhook update)
+          setTimeout(async () => {
+            await fetchReportsCount();
+          }, 3000);
+        },
+        onPending: () => toast('Menunggu pembayaran...'),
+        onError: () => toast.error('Pembayaran gagal.'),
+        onClose: () => toast.error('Pembayaran dibatalkan.'),
+      });
+    } else {
+      console.error('Failed to get token:', data);
+      toast.error('Gagal membuat transaksi.');
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error('Terjadi error sistem.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const biaya = hitungTotal();
 
   useEffect(() => {
     const fetchLastReport = async () => {
+      if (!userId) return;
+
       const { data, error } = await supabase
         .from('reports')
-        .select('alamat, created_at')
+        .select('address, created_at')
+        .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(1);
-      if (!error && data.length > 0) setLastReport(data[0]);
+
+      if (!error && data && data.length > 0) {
+        setLastReport(data[0]);
+      }
     };
     fetchLastReport();
-  }, []);
-
+  }, [userId, totalPanggilan]); // Add totalPanggilan as dependency to refresh after new report
 
   return (
     <section className="h-auto w-full space-y-6 py-8">
+      <Toaster position="top-center" reverseOrder={false} />
       {/* heading */}
       <div className="flex w-full flex-col items-center justify-center gap-4 lg:flex-row lg:justify-between lg:gap-0">
         <div className="flex flex-col gap-1 text-center lg:text-left">
@@ -212,9 +293,6 @@ export default function LaporSampah() {
             Lapor Sampah
           </h1>
         </div>
-        {/* <button className="rounded-xl bg-green-800 px-4 py-2 font-nunito font-bold text-white transition-all duration-200 ease-out hover:bg-green-700 hover:text-white">
-          Dokumentasi Kami
-        </button> */}
       </div>
 
       {/* grid pertama */}
@@ -257,7 +335,7 @@ export default function LaporSampah() {
           </div>
         </div>
 
-        {/* riwayat panggilan (dummy dulu) */}
+        {/* riwayat panggilan */}
         <div className="w-full rounded-2xl bg-gradient-to-br from-lime-600 to-green-600 p-6 shadow-lg lg:col-span-3 lg:row-span-1">
           <div className="flex items-start gap-4">
             <div className="rounded-full border border-white/30 bg-white/20 p-3 backdrop-blur-sm">
@@ -411,7 +489,7 @@ export default function LaporSampah() {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full rounded-lg bg-green-700 px-6 py-3 font-nunito font-bold text-white transition-colors hover:bg-green-800"
+              className="w-full rounded-lg bg-green-700 px-6 py-3 font-nunito font-bold text-white transition-colors hover:bg-green-800 disabled:opacity-50"
             >
               {loading ? 'Mengirim...' : 'Lapor Sekarang'}
             </button>

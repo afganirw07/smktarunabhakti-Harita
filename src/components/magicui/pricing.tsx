@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Check, Truck, Home, Users2, Star } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
+import toast, { Toaster } from 'react-hot-toast';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -179,15 +180,13 @@ export default function WasteManagementPricing({
   const [isCurrentPlanTrial, setIsCurrentPlanTrial] = useState(false);
   const [newPlanDuration, setNewPlanDuration] = useState(0);
 
-
   const planLevel: Record<string, number> = {
-  'Trial': 0,
-  '1 Bulan': 1,
-  '3 Bulan': 2,
-  '6 Bulan': 3,
-  '1 Tahun': 4,
-};
-
+    Trial: 0,
+    '1 Bulan': 1,
+    '3 Bulan': 2,
+    '6 Bulan': 3,
+    '1 Tahun': 4,
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -246,101 +245,103 @@ export default function WasteManagementPricing({
     return 0;
   };
 
-const handlePlanClick = (plan: PricingPlan) => {
-  if (!showModal) {
-    if (onClick) onClick(plan);
-    return;
-  }
-
-  if (currentPlan && planLevel[currentPlan] && planLevel[plan.name]) {
-    if (planLevel[currentPlan] > planLevel[plan.name]) {
-      alert(`Anda sudah berlangganan ${currentPlan}. Tidak bisa downgrade ke ${plan.name}.`);
-      return; 
+  const handlePlanClick = (plan: PricingPlan) => {
+    if (!showModal) {
+      if (onClick) onClick(plan);
+      return;
     }
-  }
 
-  setSelectedPlan(plan);
-  setNewPlanDuration(getPlanDurationInDays(plan.duration));
-  setIsModalOpen(true);
-};
+    if (currentPlan && planLevel[currentPlan] && planLevel[plan.name]) {
+      if (planLevel[currentPlan] > planLevel[plan.name]) {
+        toast.error(
+          `Anda sudah berlangganan ${currentPlan}. Tidak bisa downgrade ke ${plan.name}.`,
+        );
+        return;
+      }
+    }
 
+    setSelectedPlan(plan);
+    setNewPlanDuration(getPlanDurationInDays(plan.duration));
+    setIsModalOpen(true);
+  };
 
-const handleModalConfirm = async () => {
-  if (!selectedPlan) return;
+  const handleModalConfirm = async () => {
+    if (!selectedPlan) return;
 
-  const totalDuration = newPlanDuration + remainingDays; 
+    const totalDuration = newPlanDuration + remainingDays;
 
-  const orderId = `trx-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-  localStorage.setItem('order_id', orderId);
+    const orderId = `trx-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    localStorage.setItem('order_id', orderId);
 
-  const userId = localStorage.getItem('user_id');
-  if (!userId) {
-    alert('User ID not found. Please log in again.');
-    return;
-  }
+    const userId = localStorage.getItem('user_id');
+    if (!userId) {
+      toast.error('User ID not found. Please log in again.');
+      return;
+    }
 
-  try {
-    const response = await fetch('/api/create-transaction', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        order_id: orderId,
-        gross_amount: selectedPlan.price,
-        customer_details: {
-          first_name: userFirstName,
-          last_name: userLastName,
-          email: userEmail,
-          phone: userPhone,
-          id: userId,
+    try {
+      const response = await fetch('/api/create-transaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        item_details: [
-          {
-            id: selectedPlan.name,
-            name: selectedPlan.name,
-            price: selectedPlan.price,
-            quantity: 1,
+        body: JSON.stringify({
+          order_id: orderId,
+          gross_amount: selectedPlan.price,
+          customer_details: {
+            first_name: userFirstName,
+            last_name: userLastName,
+            email: userEmail,
+            phone: userPhone,
+            id: userId,
           },
-        ],
-        // 🔥 kirim juga totalDuration agar backend bisa update end_date sesuai total
-        total_duration: totalDuration,  
-      }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok && data.token) {
-      window.snap.pay(data.token, {
-        onSuccess: function (result: any) {
-          console.log('Payment success:', result);
-          alert('Pembayaran berhasil!');
-          setIsModalOpen(false);
-        },
-        onPending: function (result: any) {
-          console.log('Payment pending:', result);
-          alert('Menunggu pembayaran Anda.');
-          setIsModalOpen(false);
-        },
-        onError: function (result: any) {
-          console.log('Payment error:', result);
-          alert('Terjadi kesalahan saat pembayaran.');
-          setIsModalOpen(false);
-        },
-        onClose: function () {
-          console.log('Customer closed the popup without finishing the payment');
-        },
+          item_details: [
+            {
+              id: selectedPlan.name,
+              name: selectedPlan.name,
+              price: selectedPlan.price,
+              quantity: 1,
+            },
+          ],
+          // 🔥 kirim juga totalDuration agar backend bisa update end_date sesuai total
+          total_duration: totalDuration,
+        }),
       });
-    } else {
-      console.error('Failed to get transaction token:', data.error);
-      alert('Gagal membuat transaksi. Silakan coba lagi.');
-    }
-  } catch (error) {
-    console.error('Error during transaction process:', error);
-    alert('Terjadi kesalahan pada sistem. Silakan coba lagi.');
-  }
-};
 
+      const data = await response.json();
+
+      if (response.ok && data.token) {
+        window.snap.pay(data.token, {
+          onSuccess: function (result: any) {
+            console.log('Payment success:', result);
+            toast.success('Pembayaran berhasil!');
+            setIsModalOpen(false);
+          },
+          onPending: function (result: any) {
+            console.log('Payment pending:', result);
+            toast.success('Menunggu pembayaran Anda.');
+            setIsModalOpen(false);
+          },
+          onError: function (result: any) {
+            console.log('Payment error:', result);
+            toast.error('Terjadi kesalahan saat pembayaran.');
+            setIsModalOpen(false);
+          },
+          onClose: function () {
+            console.log(
+              'Customer closed the popup without finishing the payment',
+            );
+          },
+        });
+      } else {
+        console.error('Failed to get transaction token:', data.error);
+        toast.error('Gagal membuat transaksi. Silakan coba lagi.');
+      }
+    } catch (error) {
+      console.error('Error during transaction process:', error);
+      toast.error('Terjadi kesalahan pada sistem. Silakan coba lagi.');
+    }
+  };
 
   const handleBillingChange = (newPeriod: BillingPeriod) => {
     if (newPeriod !== billingPeriod) {
@@ -472,6 +473,7 @@ const handleModalConfirm = async () => {
   return (
     <>
       <div className="min-h-screen bg-[#FBFFF9] px-4 py-12 sm:px-6 lg:px-8">
+        <Toaster position="top-center" reverseOrder={false} />
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 text-center">
             <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-green-800">
