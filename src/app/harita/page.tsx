@@ -280,7 +280,6 @@ export default function landingPage() {
         <FadeAnimation
         direction='up'>
         <div className="mt-12 flex w-full flex-wrap items-center justify-center gap-10 lg:flex-row lg:justify-between lg:gap-0">
-          {/* Card 1: Hijau Segar */}
           <Card
             heading="Lapor Sampah"
             desc="Fitur melaporkan lokasi yang tercemar sampah untuk dibersihkan"
@@ -292,7 +291,6 @@ export default function landingPage() {
             image={'/img/Landingpage/Vector1.png'}
           />
 
-          {/* Card 2: Hijau Gelap Elegan */}
           <Card
             heading="Trash House"
             desc="Fitur layanan pengangkutan sampah rumah anda secara rutin"
@@ -304,7 +302,6 @@ export default function landingPage() {
             image={'/img/Landingpage/Vector2.png'}
           />
 
-          {/* Card 3: Hijau Lembut Variasi Lime */}
           <Card
             heading="Tukar Sampah"
             desc="Tukar sampah anda menjadi produk daur ulang pilihan dan bonus HaCoins"
@@ -313,7 +310,7 @@ export default function landingPage() {
               'bg-green-400 top-10 right-14 w-[180px] h-[180px]',
               'bg-lime-300 bottom-12 left-14 w-[240px] h-[240px]',
             ]}
-            image={'/img/Landingpage/Vector3.png'}
+            image={'/img/Landingpage/vector3.png'}
           />
         </div>
         </FadeAnimation>
