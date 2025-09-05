@@ -50,7 +50,7 @@ const LogoutButton = () => {
       }}
     >
       <MdLogout />
-      Log Out
+      Keluar
     </button>
   );
 };

@@ -12,7 +12,7 @@ import {
 
 const allRoutes = [
   {
-    name: 'Main Dashboard',
+    name: 'Dashboard Utama',
     layout: '/admin',
     path: 'default',
     icon: <MdHome className="h-6 w-6" />,
@@ -32,7 +32,7 @@ const allRoutes = [
     secondary: true,
   },
   {
-    name: 'Data Tables',
+    name: 'Tabel Data',
     layout: '/admin',
     icon: <MdBarChart className="h-6 w-6" />,
     path: 'data-tables',
@@ -44,13 +44,13 @@ const allRoutes = [
     path: 'riwayat-transaksi',
   },
   {
-    name: 'Profile',
+    name: 'Profil',
     layout: '/admin',
     path: 'profile',
     icon: <MdPerson className="h-6 w-6" />,
   },
   {
-    name: 'Log Out',
+    name: 'Keluar',
     layout: '/admin',
     path: 'logout',
     icon: <MdLogout className="h-6 w-6" />,

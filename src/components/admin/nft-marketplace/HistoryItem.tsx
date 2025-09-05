@@ -54,9 +54,7 @@ const HistoryCard = () => {
         <div className="text-lg font-bold text-navy-700 dark:text-white">
           Riwayat Aktivitas Aset
         </div>
-        <button className="linear rounded-[20px] bg-[#294B29] px-4 py-2 text-base font-medium text-white transition duration-200 hover:bg-[#86A789] dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:active:bg-white/20">
-          Lihat Semua
-        </button>
+      
       </div>
 
       {/* Konten Riwayat */}

@@ -4,7 +4,7 @@ import WeeklyRevenue from 'components/admin/default/WeeklyRevenue';
 import TotalSpent from 'components/admin/default/TotalSpent';
 import PieChartCard from 'components/admin/default/PieChartCard';
 import { IoDocuments } from 'react-icons/io5';
-import { MdBarChart, MdDashboard } from 'react-icons/md';
+import { MdBarChart, MdDashboard, MdClose } from 'react-icons/md';
 import { FaUserFriends } from 'react-icons/fa';
 
 import Widget from 'components/widget/Widget';
@@ -26,6 +26,8 @@ const Dashboard = () => {
   const [Layanan, SetLayanan] = useState(0);
   const [loading, setLoading] = useState(true);
   const [photosToConfirm, setPhotosToConfirm] = useState([]);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchTotalUsers = async () => {
     try {
@@ -168,6 +170,7 @@ const Dashboard = () => {
 
       console.log('Photo confirmed successfully:', data);
       fetchFoto();
+      setIsModalOpen(false);
     } catch (error) {
       console.error('Error confirming photo:', error);
     }
@@ -194,9 +197,20 @@ const Dashboard = () => {
 
       console.log('Photo rejected successfully:', data);
       fetchFoto();
+      setIsModalOpen(false);
     } catch (error) {
       console.error('Error rejecting photo:', error);
     }
+  };
+
+  const openModal = (photo) => {
+    setSelectedPhoto(photo);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedPhoto(null);
   };
 
   useEffect(() => {
@@ -205,6 +219,27 @@ const Dashboard = () => {
     fetchTotalLayanan();
     fetchFoto();
   }, []);
+
+  // Handle escape key to close modal
+  useEffect(() => {
+    const handleEscKey = (event) => {
+      if (event.keyCode === 27) {
+        closeModal();
+      }
+    };
+
+    if (isModalOpen) {
+      document.addEventListener('keydown', handleEscKey);
+      document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isModalOpen]);
 
   return (
     <div>
@@ -271,14 +306,17 @@ const Dashboard = () => {
                   className="flex w-full items-center gap-4 rounded-xl border border-black/20 p-4 py-4 md:w-fit md:px-6 lg:w-full lg:p-4"
                 >
                   {/* Image from user */}
-                  <div className="flex h-20 w-28 items-center justify-center rounded-xl bg-blueSecondary">
+                  <div 
+                    className="flex h-20 w-28 items-center justify-center rounded-xl bg-blueSecondary cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => openModal(photo)}
+                  >
                     {photo.public_url ? (
                       <Image
-                      height={80}
-                      width={128}
+                        height={80}
+                        width={128}
                         src={photo.public_url}
                         alt="Gambar dari user"
-                        className="h-full w-full rounded-xl object-cover"
+                        className="h-full w-full rounded-xl object-cover hover:scale-110 transition-all duration-200 ease-in"
                       />
                     ) : (
                       <h1 className="text-center text-sm font-bold text-white">
@@ -316,6 +354,77 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {isModalOpen && selectedPhoto && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={closeModal}
+          ></div>
+          
+          {/* Modal Content */}
+          <div className="relative max-h-[90vh] max-w-[90vw] w-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <div>
+                <h2 className="text-lg font-bold text-gray-800">
+                  {selectedPhoto.profiles?.first_name} {selectedPhoto.profiles?.last_name}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {new Date(selectedPhoto.claimed_at).toLocaleDateString('id-ID', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </p>
+              </div>
+              <button
+                onClick={closeModal}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <MdClose className="h-6 w-6 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Image */}
+            <div className="p-4">
+              {selectedPhoto.public_url ? (
+                <div className="flex justify-center">
+                  <Image
+                    src={selectedPhoto.public_url}
+                    alt="Foto sampah dari user"
+                    width={600}
+                    height={400}
+                    className="max-h-[60vh] w-auto object-contain rounded-lg"
+                  />
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-64 bg-gray-100 rounded-lg">
+                  <p className="text-gray-500">Gambar tidak tersedia</p>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 p-4 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={() => handleRejection(selectedPhoto.id)}
+                className="flex-1 rounded-lg bg-red-500 px-6 py-3 font-semibold text-white transition-all duration-200 ease-out hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              >
+                Tolak Foto
+              </button>
+              <button
+                onClick={() => handleConfirmation(selectedPhoto.id)}
+                className="flex-1 rounded-lg bg-green-600 px-6 py-3 font-semibold text-white transition-all duration-200 ease-out hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              >
+                Konfirmasi Foto
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

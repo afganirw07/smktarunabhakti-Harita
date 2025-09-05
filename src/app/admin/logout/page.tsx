@@ -10,7 +10,7 @@ const LogoutPage = () => {
   useEffect(() => {
     const showLogoutModal = async () => {
       const result = await Swal.fire({
-        title: 'Konfirmasi Log Out',
+        title: 'Konfirmasi keluar akun?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',

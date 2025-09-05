@@ -35,12 +35,12 @@ export default function ResetPassword() {
     const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      toast.error("Gagal memperbarui password: " + error.message);
+      toast.error("Gagal memperbarui Kata Sandi: " + error.message);
       setLoading(false);
       return;
     }
 
-    toast.success("Password berhasil diperbarui!");
+    toast.success("Kata Sandi berhasil diperbarui!");
     setLoading(false);
 
     setTimeout(() => {
@@ -67,10 +67,10 @@ export default function ResetPassword() {
             <Lock className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2 font-inter">
-            Buat Password Baru
+            Buat Kata Sandi Baru
           </h1>
           <p className="text-gray-600 text-sm font-nunito">
-            Silakan masukkan password baru Anda
+            Silakan masukkan Kata Sandi baru Anda
           </p>
         </motion.div>
 
@@ -78,7 +78,7 @@ export default function ResetPassword() {
           {/* Password Baru */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 font-inter">
-              Password Baru
+              Kata Sandi Baru
             </label>
             <div className="relative">
               <input

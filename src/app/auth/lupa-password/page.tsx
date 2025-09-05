@@ -37,7 +37,7 @@ export default function LupaPassword() {
 
     setIsEmailSent(true);
     setLoading(false);
-    toast.success('Link reset password telah dikirim ke email Anda');
+    toast.success('Link mengubah kata sandi telah dikirim ke email Anda');
   };
 
   return (
