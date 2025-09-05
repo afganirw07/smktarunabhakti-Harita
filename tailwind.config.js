@@ -10,7 +10,7 @@ module.exports = {
   ],
   theme: {
     extend: {
-      animation: {
+     animation: {
         marquee: 'marquee var(--duration) linear infinite',
         'marquee-vertical': 'marquee-vertical var(--duration) linear infinite',
       },
@@ -24,6 +24,7 @@ module.exports = {
           to: { transform: 'translateY(calc(-100% - var(--gap)))' },
         },
       },
+    
 
       safelist: ['animate-marquee', 'animate-marquee-vertical'],
 
