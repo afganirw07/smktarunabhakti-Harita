@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import Card from "components/card";
 import { MdLock } from "react-icons/md";
 
 const CompleteProfile = () => {
   // State to manage the visibility of the modal
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Function to toggle the modal's visibility
-  const toggleModal = (e: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => {
+  const toggleModal = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsModalOpen(!isModalOpen);
@@ -16,7 +15,7 @@ const CompleteProfile = () => {
 
   // Handle escape key to close modal
   useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
+    const handleEscape = (event) => {
       if (event.key === 'Escape' && isModalOpen) {
         setIsModalOpen(false);
       }
@@ -37,7 +36,7 @@ const CompleteProfile = () => {
   }, [isModalOpen]);
 
   // Handle backdrop click
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleBackdropClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.target === e.currentTarget) {
@@ -62,11 +61,11 @@ const CompleteProfile = () => {
     >
       <div
         className="relative w-full max-w-md max-h-full"
-        onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+        onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
-        onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => {
+        onMouseDown={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
@@ -75,7 +74,7 @@ const CompleteProfile = () => {
           contain: 'layout style paint'
         }}
       >
-        <div className="rounded-lg bg-white shadow-sm dark:bg-gray-700 mx-auto">
+        <div className="rounded-lg bg-white shadow-lg dark:bg-gray-700 mx-auto">
           {/* Modal Header */}
           <div className="flex items-center justify-between rounded-t border-b border-gray-200 p-4 md:p-5 dark:border-gray-600">
             <h3
@@ -87,7 +86,7 @@ const CompleteProfile = () => {
             {/* Close button with onClick handler */}
             <button
               type="button"
-              className="end-2.5 rounded-lg bg-transparent p-1.5 text-sm text-gray-400 ms-auto inline-flex h-8 w-8 items-center hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
+              className="end-2.5 rounded-lg bg-transparent p-1.5 text-sm text-gray-400 ms-auto inline-flex h-8 w-8 items-center hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white transition-colors"
               onClick={toggleModal}
             >
               <svg className="h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -132,7 +131,7 @@ const CompleteProfile = () => {
             {/* Close button inside the modal body */}
             <button
               onClick={toggleModal}
-              className="inline-flex w-full justify-center rounded-lg bg-[#294B29] px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-[#86A789] focus:outline-none focus:ring-4 focus:ring-[#294B29] dark:bg-[#86A789] dark:hover:bg-[#294B29] dark:focus:ring-[#86A789]"
+              className="inline-flex w-full justify-center rounded-lg bg-[#294B29] px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-[#86A789] focus:outline-none focus:ring-4 focus:ring-[#294B29] dark:bg-[#86A789] dark:hover:bg-[#294B29] dark:focus:ring-[#86A789] transition-colors"
             >
               Tutup
             </button>
@@ -144,38 +143,35 @@ const CompleteProfile = () => {
 
   return (
     <>
-      <Card className="grid h-full w-full grid-cols-1 gap-3 rounded-[20px] bg-white bg-clip-border p-3 font-dm shadow-3xl shadow-shadow-500 dark:!bg-navy-800 dark:shadow-none 2xl:grid-cols-11">
-        {/* Left Column: Security Icon */}
-        <div className="col-span-5 h-full w-full rounded-xl 2xl:col-span-6">
-          <div className="flex h-full w-full flex-col items-center justify-center rounded-xl py-3 lg:pb-0">
-            <MdLock className="text-[80px] text-black opacity-15 dark:text-white" />
-            <h4 className="text-xl font-bold leading-9 text-navy-700 dark:text-white">
-              Keamanan Akun
-            </h4>
-            <p className="mt-2 text-sm font-medium text-gray-600">
-              Pantau aktivitas mencurigakan
-            </p>
-          </div>
+      <div className="flex flex-col w-full max-w-2xl h-auto rounded-[20px] bg-white bg-clip-border p-6 font-dm shadow-lg shadow-shadow-500 dark:bg-navy-800 dark:shadow-none">
+        {/* Top Section: Security Icon */}
+        <div className="flex flex-col items-center justify-center py-8 mb-6">
+          <MdLock className="text-[80px] text-black opacity-15 dark:text-white mb-4" />
+          <h4 className="text-2xl font-bold text-center text-navy-700 dark:text-white mb-2">
+            Keamanan Akun
+          </h4>
+          <p className="text-sm font-medium text-gray-600 text-center">
+            Pantau aktivitas mencurigakan
+          </p>
         </div>
 
-        {/* Right Column: Security Monitoring Guide */}
-        <div className="col-span-5 flex h-full w-full flex-col justify-center overflow-hidden rounded-xl bg-white pl-3 pb-4 dark:!bg-navy-800">
-          <h4 className="text-left text-xl font-bold leading-9 text-navy-700 dark:text-white">
+        {/* Bottom Section: Security Monitoring Guide */}
+        <div className="flex flex-col space-y-4">
+          <h4 className="text-xl font-bold text-navy-700 dark:text-white">
             Aktivitas Login
           </h4>
-          <p className="leading-1 mt-2 text-base font-normal text-gray-600">
+          <p className="text-base font-normal text-gray-600 leading-relaxed">
             Tinjau riwayat login terakhir untuk mendeteksi akses yang tidak sah. Pemberitahuan akan dikirimkan jika ada login dari perangkat atau lokasi baru.
           </p>
 
           <button
             onClick={toggleModal}
-            className="linear mt-4 flex items-center justify-center rounded-xl bg-[#294B29] px-2 py-2 text-base font-medium text-white transition duration-200 hover:bg-[#86A789] active:bg-[#294B29]"
+            className="inline-flex items-center justify-center rounded-xl bg-[#294B29] px-6 py-3 text-base font-medium text-white transition-colors duration-200 hover:bg-[#86A789] active:bg-[#294B29] focus:outline-none focus:ring-4 focus:ring-[#294B29] focus:ring-opacity-30"
           >
             Lihat Riwayat Login
           </button>
         </div>
-      </Card>
-
+      </div>
 
       {isModalOpen && createPortal(<Modal />, document.body)}
     </>
