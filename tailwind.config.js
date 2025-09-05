@@ -10,7 +10,7 @@ module.exports = {
   ],
   theme: {
   	extend: {
-		    animation: {
+		animation: {
         marquee: 'marquee var(--duration) linear infinite',
         'marquee-vertical': 'marquee-vertical var(--duration) linear infinite',
       },
