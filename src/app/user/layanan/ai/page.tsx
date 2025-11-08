@@ -1,7 +1,3 @@
-/**
- * HaritaAI Chatbot Template
- * Fix: Changed model name to the stable 'gemini-2.5-flash'.
- */
 'use client';
 
 import React, {
@@ -11,11 +7,16 @@ import React, {
   KeyboardEvent,
   ChangeEvent,
 } from 'react';
-import { Send, User, Bot, Copy, MessageCircle } from 'lucide-react';
-
-// Hardcoded System Prompt (Replaces './prompt' for self-contained code)
-const SYSTEM_PROMPT =
-  'Anda adalah HaritaAI, asisten AI yang ramah, profesional, dan informatif. Berikan jawaban yang akurat dan relevan dalam Bahasa Indonesia.';
+import {
+  Send,
+  User,
+  Bot,
+  Copy,
+  ThumbsUp,
+  ThumbsDown,
+  MessageCircle,
+} from 'lucide-react';
+import { Prompt } from './prompt';
 
 // Types
 interface Message {
@@ -38,8 +39,7 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
     {
       id: 1,
       type: 'ai',
-      content:
-        'Halo! Saya HaritaAI, siap menjawab pertanyaan Anda. Saya didukung oleh Google Gemini.',
+      content: 'Halo, saya adalah HaritaAI yang siap menjawab pertanyaan anda ',
       timestamp: new Date().toISOString(),
     },
   ],
@@ -52,10 +52,8 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // ⚠️ PENTING: Karena error 403, masukkan Kunci API Gemini Anda di antara kutip dua ini.
-  // Ganti '' menjadi 'YOUR_API_KEY_HERE'
-  const API_KEY = ''; 
-  const MODEL_NAME = 'gemini-2.5-flash'; 
+  // ✅ API Key dan URL
+  const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
   const scrollToBottom = (): void => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -65,41 +63,48 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
     scrollToBottom();
   }, [messages]);
 
+  // Validasi API Key saat komponen dimuat
   useEffect(() => {
-    console.log('Gemini API is ready with model:', MODEL_NAME);
-  }, []);
+    if (!API_KEY) {
+      console.error(' NEXT_PUBLIC_GEMINI_API_KEY tidak ditemukan!');
+    } else {
+      console.log(' API Key ditemukan');
+    }
+  }, [API_KEY]);
 
-  // Fungsi untuk parse markdown sederhana
+  // ✅ Fungsi untuk parse markdown sederhana
   const parseMarkdown = (text: string): string => {
     return text
       .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/\n/g, '<br/>'); // Preserve new lines
+      .replace(/\*(.*?)\*/g, '<em>$1</em>');
   };
 
-  // Fungsi yang diperbaiki untuk call API dengan format multi-turn yang benar
+  // ✅ Hapus quick response → langsung kirim ke Gemini
   const callGeminiAPI = async (userMessage: string): Promise<string> => {
     try {
-      console.log(' Mengirim request ke Gemini API dengan model:', MODEL_NAME);
+      if (!API_KEY) {
+        throw new Error('API Key tidak ditemukan');
+      }
 
-      // 1. Buat Riwayat Percakapan (Contents Array)
-      const chatHistory = messages
-        .slice(-10) // Ambil 10 pesan terakhir untuk konteks
-        .map((msg) => ({
-          role: msg.type === 'user' ? 'user' : 'model', 
-          parts: [{ text: msg.content }],
-        }));
+      console.log(' Mengirim request ke Gemini API...');
+      console.log('User message:', userMessage);
 
-      // 2. Tambahkan pesan user saat ini
-      chatHistory.push({ role: 'user', parts: [{ text: userMessage }] });
+      // Riwayat percakapan + Prompt
+      const fullPrompt = `${Prompt.SYSTEM_PROMPT}
+
+Riwayat Percakapan:
+${messages
+  .slice(-4)
+  .map((msg) => `${msg.type === 'user' ? 'User' : 'AI'}: ${msg.content}`)
+  .join('\n')}
+
+User: ${userMessage}
+AI:`;
 
       // Body request
       const requestBody = {
-        contents: chatHistory, 
-        systemInstruction: {
-            parts: [{ text: SYSTEM_PROMPT }]
-        },
+        contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
         generationConfig: {
           temperature: 0.7,
           topK: 40,
@@ -108,15 +113,15 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
         },
       };
 
-      // URL API menggunakan nama model yang baru (gemini-2.5-flash)
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
-
       // Fetch ke Gemini
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-      });
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody),
+        },
+      );
 
       console.log(' Response status:', response.status);
 
@@ -141,26 +146,37 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
           .trim() || '';
 
       if (!text) {
-        const blockReason = data?.candidates?.[0]?.finishReason;
-        if (blockReason) {
-            return `Maaf, respons AI diblokir karena alasan: ${blockReason}. Coba formulasi ulang pertanyaan Anda.`;
-        }
-        return 'Maaf, saya tidak bisa memberikan respons saat ini. (No text output)';
+        return ' Maaf, saya tidak bisa memberikan respons saat ini.';
       }
 
       console.log(' Respons berhasil:', text);
       return text;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Gemini API Error:', err);
-      const errorMessage = (err as Error).message || 'Terjadi kesalahan saat menghubungi AI. Silakan coba lagi.';
-      return errorMessage.includes('403') 
-        ? 'Error: Izin Ditolak (403). Pastikan Kunci API Gemini Anda sudah benar.' 
-        : errorMessage;
+      return (
+        err.message ||
+        ' Terjadi kesalahan saat menghubungi AI. Silakan coba lagi.'
+      );
     }
   };
 
   const handleSendMessage = async (): Promise<void> => {
     if (!inputMessage.trim()) return;
+
+    // Validasi API Key sebelum mengirim
+    if (!API_KEY) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          type: 'ai',
+          content:
+            ' API Key tidak ditemukan. Pastikan NEXT_PUBLIC_GEMINI_API_KEY sudah diset di file .env.local dan restart development server.',
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+      return;
+    }
 
     const newUserMessage: Message = {
       id: Date.now(),
@@ -197,7 +213,7 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
         id: Date.now() + 1,
         type: 'ai',
         content:
-          'Maaf, terjadi kesalahan saat memproses permintaan Anda. Silakan coba lagi dalam beberapa saat.',
+          ' Maaf, terjadi kesalahan saat memproses permintaan Anda. Silakan coba lagi dalam beberapa saat.',
         timestamp: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -219,14 +235,13 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
     e.target.style.height = Math.min(e.target.scrollHeight, 128) + 'px';
   };
 
-  const copyToClipboard = (text: string): void => {
-    const el = document.createElement('textarea');
-    el.value = text;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    console.log('Text copied to clipboard');
+  const copyToClipboard = async (text: string): Promise<void> => {
+    try {
+      await navigator.clipboard.writeText(text);
+      console.log('Text copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy text:', error);
+    }
   };
 
   const formatTime = (timestamp: string): string => {
@@ -236,10 +251,18 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
     });
   };
 
+  const handleFeedback = (messageId: number, isPositive: boolean): void => {
+    console.log(
+      `Feedback for message ${messageId}: ${
+        isPositive ? 'positive' : 'negative'
+      }`,
+    );
+  };
+
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-gradient-to-br from-green-50 to-green-100 font-sans">
+    <div className="flex h-screen flex-col overflow-hidden bg-gradient-to-br from-green-50 to-green-100">
       {/* Header */}
-      <header className="flex-shrink-0 border-b border-green-200 bg-white shadow-md">
+      <header className="flex-shrink-0 border-b border-green-200 bg-white shadow-sm">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r from-green-500 to-green-700 shadow-lg">
@@ -254,10 +277,12 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
           </div>
           <div className="flex items-center gap-2 rounded-full bg-green-100 px-3 py-1">
             <div
-              className={`h-2 w-2 rounded-full animate-pulse bg-green-500`}
+              className={`h-2 w-2 rounded-full ${
+                API_KEY ? 'animate-pulse bg-green-500' : 'bg-red-500'
+              }`}
             ></div>
             <span className="text-xs font-medium text-green-700">
-              Online
+              {API_KEY ? 'Online' : 'API Key Missing'}
             </span>
           </div>
         </div>
@@ -327,7 +352,7 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
                       <button
                         onClick={() => copyToClipboard(message.content)}
                         className="rounded-lg p-1.5 text-green-500 transition-all hover:bg-green-100 hover:text-green-700"
-                        title="Salin pesan"
+                        title="Copy message"
                       >
                         <Copy className="h-4 w-4" />
                       </button>
@@ -390,7 +415,7 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
                   ? 'bg-green-600 text-white shadow-lg hover:scale-105 hover:bg-green-700'
                   : 'cursor-not-allowed bg-green-300 text-green-500'
               }`}
-              title={'Kirim pesan'}
+              title={!API_KEY ? 'API Key tidak ditemukan' : 'Kirim pesan'}
             >
               <Send className="h-5 w-5" />
             </button>
@@ -400,6 +425,11 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
           <p className="text-xs font-medium text-green-600">
             Tekan Enter untuk mengirim, Shift + Enter untuk baris baru
           </p>
+          {!API_KEY && (
+            <p className="text-xs font-medium text-red-500">
+              API Key tidak ditemukan
+            </p>
+          )}
         </div>
       </div>
     </div>
