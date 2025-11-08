@@ -1,6 +1,6 @@
 /**
  * HaritaAI Chatbot Template
- * Fix: Changed model name to a supported endpoint and corrected chat history formatting.
+ * Fix: Changed model name to the stable 'gemini-2.5-flash'.
  */
 'use client';
 
@@ -52,10 +52,9 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // NOTE: API_KEY is set to empty string. In this environment, the key is provided
-  // by the runtime when the fetch call is made.
+  // ✅ FIXED: Menggunakan nama model yang paling stabil dan umum
   const API_KEY = ''; 
-  const MODEL_NAME = 'gemini-2.5-flash-preview-09-2025'; 
+  const MODEL_NAME = 'gemini-2.5-flash'; 
 
   const scrollToBottom = (): void => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -65,15 +64,12 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
     scrollToBottom();
   }, [messages]);
 
-  // Handle API Key logging (adjusted for sandbox)
   useEffect(() => {
-    // In this environment, API_KEY is intentionally blank and handled by the system.
-    console.log('Gemini API is ready.');
+    console.log('Gemini API is ready with model:', MODEL_NAME);
   }, []);
 
   // Fungsi untuk parse markdown sederhana
   const parseMarkdown = (text: string): string => {
-    // Basic Markdown parsing (you might need a library for more complex markdown)
     return text
       .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -81,17 +77,15 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
       .replace(/\n/g, '<br/>'); // Preserve new lines
   };
 
-  // ✅ FIXED: Menggunakan format contents yang benar untuk multi-turn chat
+  // Fungsi yang diperbaiki untuk call API dengan format multi-turn yang benar
   const callGeminiAPI = async (userMessage: string): Promise<string> => {
     try {
-      console.log(' Mengirim request ke Gemini API...');
-      console.log('User message:', userMessage);
+      console.log(' Mengirim request ke Gemini API dengan model:', MODEL_NAME);
 
       // 1. Buat Riwayat Percakapan (Contents Array)
       const chatHistory = messages
         .slice(-10) // Ambil 10 pesan terakhir untuk konteks
         .map((msg) => ({
-          // Gunakan role 'model' untuk respons AI
           role: msg.type === 'user' ? 'user' : 'model', 
           parts: [{ text: msg.content }],
         }));
@@ -101,9 +95,7 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
 
       // Body request
       const requestBody = {
-        // Gunakan array history yang sudah diformat dengan benar
         contents: chatHistory, 
-        // Tambahkan system instruction
         systemInstruction: {
             parts: [{ text: SYSTEM_PROMPT }]
         },
@@ -115,7 +107,7 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
         },
       };
 
-      // ✅ FIXED: Menggunakan model name yang benar
+      // URL API menggunakan nama model yang baru (gemini-2.5-flash)
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
 
       // Fetch ke Gemini
@@ -130,7 +122,6 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Gemini API Error:', errorText);
-        // Throw error with the status code and message for user feedback
         throw new Error(
           `Gemini API error ${response.status}: ${
             errorText || 'Unknown error'
@@ -149,7 +140,6 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
           .trim() || '';
 
       if (!text) {
-        // Cek jika ada block reason, misalnya Safety reasons
         const blockReason = data?.candidates?.[0]?.finishReason;
         if (blockReason) {
             return `Maaf, respons AI diblokir karena alasan: ${blockReason}. Coba formulasi ulang pertanyaan Anda.`;
@@ -161,10 +151,9 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
       return text;
     } catch (err) {
       console.error('Gemini API Error:', err);
-      // Ensure the error is cast to include a message property
       const errorMessage = (err as Error).message || 'Terjadi kesalahan saat menghubungi AI. Silakan coba lagi.';
       return errorMessage.includes('404') 
-        ? 'Error: Model tidak ditemukan. Pastikan nama model yang digunakan sudah benar.' 
+        ? 'Error Model: Model tidak ditemukan. Harap hubungi penyedia layanan.' 
         : errorMessage;
     }
   };
@@ -230,7 +219,6 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
   };
 
   const copyToClipboard = (text: string): void => {
-    // Using document.execCommand('copy') for better compatibility in iFrames
     const el = document.createElement('textarea');
     el.value = text;
     document.body.appendChild(el);
