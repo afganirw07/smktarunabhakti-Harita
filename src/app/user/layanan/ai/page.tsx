@@ -52,7 +52,8 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // ✅ FIXED: Menggunakan nama model yang paling stabil dan umum
+  // ⚠️ PENTING: Karena error 403, masukkan Kunci API Gemini Anda di antara kutip dua ini.
+  // Ganti '' menjadi 'YOUR_API_KEY_HERE'
   const API_KEY = ''; 
   const MODEL_NAME = 'gemini-2.5-flash'; 
 
@@ -152,8 +153,8 @@ const ChatBotTemplate: React.FC<ChatBotTemplateProps> = ({
     } catch (err) {
       console.error('Gemini API Error:', err);
       const errorMessage = (err as Error).message || 'Terjadi kesalahan saat menghubungi AI. Silakan coba lagi.';
-      return errorMessage.includes('404') 
-        ? 'Error Model: Model tidak ditemukan. Harap hubungi penyedia layanan.' 
+      return errorMessage.includes('403') 
+        ? 'Error: Izin Ditolak (403). Pastikan Kunci API Gemini Anda sudah benar.' 
         : errorMessage;
     }
   };
