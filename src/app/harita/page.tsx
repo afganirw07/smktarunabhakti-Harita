@@ -310,7 +310,7 @@ export default function landingPage() {
               'bg-green-400 top-10 right-14 w-[180px] h-[180px]',
               'bg-lime-300 bottom-12 left-14 w-[240px] h-[240px]',
             ]}
-            image={'/img/Landingpage/vector3.png'}
+            image={'/img/Landingpage/Vector3.png'}
           />
         </div>
         </FadeAnimation>
