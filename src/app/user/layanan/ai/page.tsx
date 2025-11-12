@@ -12,8 +12,6 @@ import {
   User,
   Bot,
   Copy,
-  ThumbsUp,
-  ThumbsDown,
   MessageCircle,
 } from 'lucide-react';
 import { Prompt } from './prompt';
